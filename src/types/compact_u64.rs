@@ -83,7 +83,7 @@ impl CompactU64 {
 
 #[cfg(test)]
 mod test {
-    use crate::data::compact_u64::CompactU64;
+    use crate::types::compact_u64::CompactU64;
 
     #[test]
     fn test_zero() {

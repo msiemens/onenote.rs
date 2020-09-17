@@ -8,6 +8,7 @@ fn main() {
     let data = std::fs::read(path).expect("Failed to read file");
 
     let mut parser = Parser::new(data);
+    let section = parser.parse_section().unwrap();
 
-    println!("{:#?}", parser.parse().expect("failed to parse file"))
+    println!("{:#?}", section)
 }

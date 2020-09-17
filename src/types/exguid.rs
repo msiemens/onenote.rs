@@ -1,45 +1,50 @@
-use crate::data::compact_u64::CompactU64;
-use crate::data::guid::Guid;
+use crate::types::compact_u64::CompactU64;
+use crate::types::guid::Guid;
 use crate::Reader;
+use std::fmt;
 
-#[derive(Debug)]
-pub(crate) struct ExGuid {
-    uuid: Guid,
-    value: u32,
+#[derive(Clone, Copy, PartialEq, Hash, Eq)]
+pub struct ExGuid {
+    pub guid: Guid,
+    pub value: u32,
 }
 
 impl ExGuid {
+    pub(crate) fn from_guid(guid: Guid, value: u32) -> ExGuid {
+        ExGuid { guid, value }
+    }
+
     pub(crate) fn parse(reader: Reader) -> ExGuid {
         let data = reader.get_u8();
 
         if data == 0 {
             return ExGuid {
-                uuid: Guid::nil(),
+                guid: Guid::nil(),
                 value: 0,
             };
         }
 
         if data & 0b111 == 4 {
             return ExGuid {
-                uuid: Guid::parse(reader),
+                guid: Guid::parse(reader),
                 value: (data >> 3) as u32,
             };
         }
 
         if data & 0b111111 == 32 {
-            let value = (data as u16 & 0b11000000) << 8 | reader.get_u8() as u16;
+            let value = (reader.get_u8() as u16) << 2 | (data >> 6) as u16;
 
             return ExGuid {
-                uuid: Guid::parse(reader),
+                guid: Guid::parse(reader),
                 value: value as u32,
             };
         }
 
         if data & 0b1111111 == 64 {
-            let value = (data as u32 & 0b10000000) << 16 | reader.get_u16_le() as u32;
+            let value = (reader.get_u16() as u32) << 1 | (data >> 7) as u32;
 
             return ExGuid {
-                uuid: Guid::parse(reader),
+                guid: Guid::parse(reader),
                 value,
             };
         }
@@ -48,7 +53,7 @@ impl ExGuid {
             let value = reader.get_u32_le();
 
             return ExGuid {
-                uuid: Guid::parse(reader),
+                guid: Guid::parse(reader),
                 value,
             };
         }
@@ -65,5 +70,11 @@ impl ExGuid {
         }
 
         values
+    }
+}
+
+impl fmt::Debug for ExGuid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "ExGuid {{{}, {}}}", self.guid, self.value)
     }
 }

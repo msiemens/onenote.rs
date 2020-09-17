@@ -1,19 +1,20 @@
-use crate::data::exguid::ExGuid;
-use crate::data::guid::Guid;
-use crate::data::stream_object::ObjectHeader;
 use crate::errors::Result;
+use crate::fsshttpb::data_element::DataElementPackage;
+use crate::types::exguid::ExGuid;
+use crate::types::guid::Guid;
+use crate::types::object_types::ObjectType;
+use crate::types::stream_object::ObjectHeader;
 use crate::Reader;
-use crate::types::data_element::DataElementPackage;
 
 #[derive(Debug)]
-pub struct Packaging {
-    file_type: Guid,
-    file: Guid,
-    legacy_file_version: Guid,
-    file_format: Guid,
-    storage_index: ExGuid,
-    cell_schema: Guid,
-    data_element_package: DataElementPackage,
+pub(crate) struct Packaging {
+    pub(crate) file_type: Guid,
+    pub(crate) file: Guid,
+    pub(crate) legacy_file_version: Guid,
+    pub(crate) file_format: Guid,
+    pub(crate) storage_index: ExGuid,
+    pub(crate) cell_schema: Guid,
+    pub(crate) data_element_package: DataElementPackage,
 }
 
 impl Packaging {
@@ -28,14 +29,17 @@ impl Packaging {
         assert_eq!(reader.get_u32_le(), 0);
 
         let header = ObjectHeader::parse_32(reader);
-        assert_eq!(header.object_type, 0x7a);
+        assert_eq!(header.object_type, ObjectType::OneNotePackaging);
 
         let storage_index = ExGuid::parse(reader);
         let cell_schema = Guid::parse(reader);
 
         let data_element_package = DataElementPackage::parse(reader);
 
-        assert_eq!(ObjectHeader::parse_end_16(reader), 0x7a);
+        assert_eq!(
+            ObjectHeader::parse_end_16(reader),
+            ObjectType::OneNotePackaging
+        );
 
         Ok(Packaging {
             file_type,

@@ -1,11 +1,17 @@
 use uuid::Uuid;
 
+use crate::errors::Result;
 use crate::Reader;
+use std::fmt;
 
-#[derive(Debug, PartialEq)]
-pub(crate) struct Guid(Uuid);
+#[derive(Clone, Copy, PartialEq, Hash, Eq)]
+pub struct Guid(pub Uuid);
 
 impl Guid {
+    pub(crate) fn from_str(value: &str) -> Result<Guid> {
+        Ok(Guid(Uuid::parse_str(value)?))
+    }
+
     pub(crate) fn parse(reader: Reader) -> Guid {
         let v = reader.get_u128();
 
@@ -35,5 +41,17 @@ impl Guid {
 
     pub(crate) fn nil() -> Guid {
         Guid(Uuid::nil())
+    }
+}
+
+impl fmt::Display for Guid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{{{:X}}}", self.0)
+    }
+}
+
+impl fmt::Debug for Guid {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "Guid {}", self)
     }
 }

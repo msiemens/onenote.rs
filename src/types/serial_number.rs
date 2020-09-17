@@ -1,10 +1,10 @@
-use crate::data::guid::Guid;
+use crate::types::guid::Guid;
 use crate::Reader;
 
 #[derive(Debug)]
-pub(crate) struct SerialNumber {
-    guid: Guid,
-    serial: u64,
+pub struct SerialNumber {
+    pub guid: Guid,
+    pub serial: u64,
 }
 
 impl SerialNumber {

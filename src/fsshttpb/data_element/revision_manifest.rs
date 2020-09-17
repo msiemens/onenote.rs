@@ -1,12 +1,21 @@
-use crate::data::exguid::ExGuid;
-use crate::data::stream_object::ObjectHeader;
-use crate::types::data_element::value::DataElementValue;
+use crate::fsshttpb::data_element::value::DataElementValue;
+use crate::types::exguid::ExGuid;
+use crate::types::object_types::ObjectType;
+use crate::types::stream_object::ObjectHeader;
 use crate::Reader;
 
 #[derive(Debug)]
+pub(crate) struct RevisionManifest {
+    pub(crate) rev_id: ExGuid,
+    pub(crate) base_rev_id: ExGuid,
+    pub(crate) root_declare: Vec<RevisionManifestRootDeclare>,
+    pub(crate) group_references: Vec<ExGuid>,
+}
+
+#[derive(Debug)]
 pub(crate) struct RevisionManifestRootDeclare {
-    root_id: ExGuid,
-    object_id: ExGuid,
+    pub(crate) root_id: ExGuid,
+    pub(crate) object_id: ExGuid,
 }
 
 impl RevisionManifestRootDeclare {
@@ -21,7 +30,7 @@ impl RevisionManifestRootDeclare {
 impl DataElementValue {
     pub(crate) fn parse_revision_manifest(reader: Reader) -> DataElementValue {
         let header = ObjectHeader::parse_16(reader);
-        assert_eq!(header.object_type, 0x1a);
+        assert_eq!(header.object_type, ObjectType::RevisionManifest);
 
         let rev_id = ExGuid::parse(reader);
         let base_rev_id = ExGuid::parse(reader);
@@ -30,24 +39,28 @@ impl DataElementValue {
         let mut group_references = vec![];
 
         loop {
-            if ObjectHeader::try_parse_end_8(reader, 0x01).is_some() {
+            if ObjectHeader::try_parse_end_8(reader, ObjectType::DataElement).is_some() {
                 break;
             }
 
             let header = ObjectHeader::parse_16(reader);
 
             match header.object_type {
-                0x0A => root_declare.push(RevisionManifestRootDeclare::parse(reader)),
-                0x19 => group_references.push(ExGuid::parse(reader)),
+                ObjectType::RevisionManifestRoot => {
+                    root_declare.push(RevisionManifestRootDeclare::parse(reader))
+                }
+                ObjectType::RevisionManifestGroupReference => {
+                    group_references.push(ExGuid::parse(reader))
+                }
                 _ => panic!("unexpected object type: 0x{:x}", header.object_type),
             }
         }
 
-        Self::RevisionManifest {
+        Self::RevisionManifest(RevisionManifest {
             rev_id,
             base_rev_id,
             root_declare,
             group_references,
-        }
+        })
     }
 }

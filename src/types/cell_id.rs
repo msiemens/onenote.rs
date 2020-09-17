@@ -1,9 +1,9 @@
-use crate::data::compact_u64::CompactU64;
-use crate::data::exguid::ExGuid;
+use crate::types::compact_u64::CompactU64;
+use crate::types::exguid::ExGuid;
 use crate::Reader;
 
-#[derive(Debug)]
-pub(crate) struct CellId(ExGuid, ExGuid);
+#[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
+pub struct CellId(pub ExGuid, pub ExGuid);
 
 impl CellId {
     pub(crate) fn parse(reader: Reader) -> CellId {
