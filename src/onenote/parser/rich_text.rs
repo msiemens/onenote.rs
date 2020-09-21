@@ -3,8 +3,8 @@ use crate::one::property::color_ref::ColorRef;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::paragraph_alignment::ParagraphAlignment;
 use crate::one::property_set::{paragraph_style_object, rich_text_node};
+use crate::onestore::object_space::ObjectSpace;
 use crate::onestore::revision::Revision;
-use crate::onestore::OneStore;
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
@@ -48,18 +48,18 @@ pub struct ParagraphStyling {
     pub(crate) hyperlink: bool,
 }
 
-pub(crate) fn parse_rich_text(content_id: ExGuid, rev: &Revision, store: &OneStore) -> RichText {
+pub(crate) fn parse_rich_text(content_id: ExGuid, rev: &Revision, space: &ObjectSpace) -> RichText {
     let object = rev
-        .resolve_object(content_id, store)
+        .resolve_object(content_id, space)
         .expect("rich text content is missing");
     let data = rich_text_node::parse(object);
 
-    let style = parse_style(data.paragraph_style(), rev, store);
+    let style = parse_style(data.paragraph_style(), rev, space);
 
     let styles = data
         .text_run_formatting()
         .iter()
-        .map(|id| parse_style(*id, rev, store))
+        .map(|id| parse_style(*id, rev, space))
         .collect();
 
     // TODO: Parse lang code into iso code
@@ -79,9 +79,9 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, rev: &Revision, store: &OneSto
     }
 }
 
-fn parse_style(style_id: ExGuid, rev: &Revision, store: &OneStore) -> ParagraphStyling {
+fn parse_style(style_id: ExGuid, rev: &Revision, space: &ObjectSpace) -> ParagraphStyling {
     let object = rev
-        .resolve_object(style_id, store)
+        .resolve_object(style_id, space)
         .expect("paragraph styling is missing");
     let data = paragraph_style_object::parse(object);
 

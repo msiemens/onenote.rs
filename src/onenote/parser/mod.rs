@@ -11,6 +11,7 @@ use crate::types::guid::Guid;
 use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::Path;
+use std::process::abort;
 
 mod content;
 mod embedded_file;
@@ -57,7 +58,7 @@ impl Parser {
         // FIXME: Try interpreting UTF-8 as Latin1 if file not found!
 
         let base_dir = path.parent().expect("no base dir found");
-        let sections = notebook::parse_toc(root_revision, &store)
+        let sections = notebook::parse_toc(root_revision, store.data_root())
             .iter()
             .map(|name| {
                 let mut file = base_dir.to_path_buf();
@@ -97,7 +98,11 @@ impl Parser {
 
         let root_revision = root_revisions.first().unwrap();
 
-        Ok(section::parse_section(root_revision, &store))
+        Ok(section::parse_section(
+            root_revision,
+            store.data_root(),
+            &store,
+        ))
     }
 
     fn read(file: File) -> Result<Vec<u8>> {

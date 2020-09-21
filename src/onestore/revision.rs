@@ -1,7 +1,7 @@
+use crate::fsshttpb::data_element::object_group::ObjectGroupData;
 use crate::fsshttpb::packaging::Packaging;
 use crate::onestore::object::Object;
-use crate::onestore::object_group::ObjectGroup;
-use crate::onestore::OneStore;
+use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 use crate::types::guid::Guid;
 use std::collections::HashMap;
@@ -11,8 +11,10 @@ pub(crate) struct Revision {
     id: ExGuid,
     base: ExGuid,
     roots: Vec<(RevisionRole, ExGuid)>,
-    object_groups: HashMap<ExGuid, ObjectGroup>,
+    objects: HashMap<ExGuid, Object>,
 }
+
+pub(crate) type GroupData<'a> = HashMap<(ExGuid, u64), &'a ObjectGroupData>;
 
 impl Revision {
     pub(crate) fn base_rev_id(&self) -> Option<ExGuid> {
@@ -50,24 +52,17 @@ impl Revision {
     pub(crate) fn resolve_object<'a>(
         &'a self,
         object_id: ExGuid,
-        store: &'a OneStore,
+        space: &'a ObjectSpace,
     ) -> Option<&'a Object> {
-        self.object_groups.values().find_map(|group| {
-            group
-                .objects()
-                .iter()
-                .find_map(|(id, object)| if *id == object_id { Some(object) } else { None })
-                .or_else(|| {
-                    if self.base.is_nil() {
-                        None
-                    } else {
-                        store
-                            .find_revision(self.base)
-                            .expect("base revison is missing")
-                            .resolve_object(object_id, store)
-                    }
-                })
-        })
+        let object = self.objects.get(&object_id);
+
+        if let Some(object) = object {
+            return Some(object);
+        }
+
+        // Try resolving in the base revision
+        self.base_rev(space)
+            .and_then(|rev| rev.resolve_object(object_id, space))
     }
 }
 
@@ -98,11 +93,11 @@ impl Revision {
             .map(|root| (RevisionRole::parse(root.root_id), root.object_id))
             .collect();
 
-        let object_groups = revision_manifest
-            .group_references
-            .iter()
-            .map(|id| (*id, ObjectGroup::parse(*id, object_space_id, packaging)))
-            .collect();
+        let mut objects = HashMap::new();
+
+        for id in revision_manifest.group_references.iter() {
+            Self::parse_group(&mut objects, *id, object_space_id, packaging)
+        }
 
         (
             id,
@@ -110,9 +105,38 @@ impl Revision {
                 id,
                 base,
                 roots,
-                object_groups,
+                objects,
             },
         )
+    }
+
+    fn parse_group(
+        objects: &mut HashMap<ExGuid, Object>,
+        group_id: ExGuid,
+        object_space_id: ExGuid,
+        packaging: &Packaging,
+    ) {
+        let group = packaging
+            .data_element_package
+            .find_object_group(group_id)
+            .expect("object group not found");
+
+        let object_ids: Vec<_> = group.declarations.iter().map(|o| o.object_id()).collect();
+
+        let group_objects: GroupData = group
+            .declarations
+            .iter()
+            .zip(group.objects.iter())
+            .map(|(decl, data)| ((decl.object_id(), decl.partition_id()), data))
+            .collect();
+
+        for object_id in object_ids {
+            assert_eq!(group.declarations.len(), group.objects.len());
+
+            let object = Object::parse(object_id, object_space_id, &group_objects, packaging);
+
+            objects.insert(object_id, object);
+        }
     }
 }
 

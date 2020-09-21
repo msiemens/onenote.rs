@@ -1,7 +1,7 @@
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::{image_node, picture_container};
+use crate::onestore::object_space::ObjectSpace;
 use crate::onestore::revision::Revision;
-use crate::onestore::OneStore;
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
@@ -35,15 +35,15 @@ pub struct Image {
     pub(crate) is_background: bool,
 }
 
-pub(crate) fn parse_image(image_id: ExGuid, rev: &Revision, store: &OneStore) -> Image {
+pub(crate) fn parse_image(image_id: ExGuid, rev: &Revision, space: &ObjectSpace) -> Image {
     let node_object = rev
-        .resolve_object(image_id, store)
+        .resolve_object(image_id, space)
         .expect("image is missing");
     let node = image_node::parse(node_object);
 
     let container_object_id = node.picture_container().expect("image container is empty");
     let container_object = rev
-        .resolve_object(container_object_id, store)
+        .resolve_object(container_object_id, space)
         .expect("image container is missing");
     let container = picture_container::parse(container_object);
 

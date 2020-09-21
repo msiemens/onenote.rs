@@ -5,7 +5,6 @@ use crate::fsshttpb::data_element::value::DataElementValue;
 use crate::fsshttpb::packaging::Packaging;
 use crate::onestore::header::StoreHeader;
 use crate::onestore::object_space::ObjectSpace;
-use crate::onestore::revision::Revision;
 use crate::types::cell_id::CellId;
 use crate::types::exguid::ExGuid;
 use crate::types::guid::Guid;
@@ -14,7 +13,6 @@ use std::collections::{HashMap, HashSet};
 pub(crate) mod header;
 mod mapping_table;
 pub(crate) mod object;
-pub(crate) mod object_group;
 pub(crate) mod object_space;
 pub(crate) mod revision;
 pub(crate) mod types;
@@ -38,14 +36,6 @@ impl OneStore {
 
     pub(crate) fn object_spaces(&self) -> &HashMap<ExGuid, ObjectSpace> {
         &self.object_spaces
-    }
-
-    pub(crate) fn find_revision(&self, rev_id: ExGuid) -> Option<&Revision> {
-        self.data_root.revisions().get(&rev_id).or_else(|| {
-            self.object_spaces
-                .values()
-                .find_map(|object_space| object_space.revisions().get(&rev_id))
-        })
     }
 }
 

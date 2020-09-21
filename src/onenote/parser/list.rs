@@ -1,7 +1,7 @@
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property_set::number_list_node;
+use crate::onestore::object_space::ObjectSpace;
 use crate::onestore::revision::Revision;
-use crate::onestore::OneStore;
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
@@ -17,9 +17,9 @@ pub struct List {
     pub(crate) font_color: Option<ColorRef>,
 }
 
-pub(crate) fn parse_list(list_id: ExGuid, rev: &Revision, store: &OneStore) -> List {
+pub(crate) fn parse_list(list_id: ExGuid, rev: &Revision, space: &ObjectSpace) -> List {
     let object = rev
-        .resolve_object(list_id, store)
+        .resolve_object(list_id, space)
         .expect("rich text content is missing");
     let data = number_list_node::parse(object);
 

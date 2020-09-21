@@ -1,6 +1,6 @@
 use crate::one::property_set::{embedded_file_container, embedded_file_node};
+use crate::onestore::object_space::ObjectSpace;
 use crate::onestore::revision::Revision;
-use crate::onestore::OneStore;
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
@@ -18,16 +18,16 @@ pub struct EmbeddedFile {
 pub(crate) fn parse_embedded_file(
     file_id: ExGuid,
     rev: &Revision,
-    store: &OneStore,
+    space: &ObjectSpace,
 ) -> EmbeddedFile {
     let node_object = rev
-        .resolve_object(file_id, store)
+        .resolve_object(file_id, space)
         .expect("embedded file is missing");
     let node = embedded_file_node::parse(node_object);
 
     let container_object_id = node.embedded_file_container();
     let container_object = rev
-        .resolve_object(container_object_id, store)
+        .resolve_object(container_object_id, space)
         .expect("embedded file container is missing");
     let container = embedded_file_container::parse(container_object);
 
