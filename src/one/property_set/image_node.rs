@@ -13,8 +13,8 @@ use crate::types::exguid::ExGuid;
 pub(crate) struct Data {
     last_modified: Time,
     picture_container: Option<ExGuid>,
-    layout_max_width: f32,
-    layout_max_height: f32,
+    layout_max_width: Option<f32>,
+    layout_max_height: Option<f32>,
     is_layout_size_set_by_user: bool,
     language_code: Option<u32>,
     alt_text: Option<String>,
@@ -38,11 +38,11 @@ impl Data {
         self.picture_container
     }
 
-    pub(crate) fn layout_max_width(&self) -> f32 {
+    pub(crate) fn layout_max_width(&self) -> Option<f32> {
         self.layout_max_width
     }
 
-    pub(crate) fn layout_max_height(&self) -> f32 {
+    pub(crate) fn layout_max_height(&self) -> Option<f32> {
         self.layout_max_height
     }
 
@@ -105,10 +105,8 @@ pub(crate) fn parse(object: &Object) -> Data {
     let last_modified = Time::parse(PropertyType::LastModifiedTime, object)
         .expect("image has no last modified time");
     let picture_container = ObjectReference::parse(PropertyType::PictureContainer, object);
-    let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object)
-        .expect("image has no layout max width");
-    let layout_max_height = simple::parse_f32(PropertyType::LayoutMaxHeight, object)
-        .expect("image has no layout max height");
+    let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object);
+    let layout_max_height = simple::parse_f32(PropertyType::LayoutMaxHeight, object);
     let is_layout_size_set_by_user =
         simple::parse_bool(PropertyType::IsLayoutSizeSetByUser, object).unwrap_or_default();
     let language_code = simple::parse_u32(PropertyType::LanguageID, object);

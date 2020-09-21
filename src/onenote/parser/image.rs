@@ -7,8 +7,8 @@ use crate::types::exguid::ExGuid;
 pub struct Image {
     pub(crate) data: Vec<u8>,
 
-    pub(crate) layout_max_width: f32,
-    pub(crate) layout_max_height: f32,
+    pub(crate) layout_max_width: Option<f32>,
+    pub(crate) layout_max_height: Option<f32>,
 
     // pub(crate) language_code: Option<u32>,
     pub(crate) alt_text: Option<String>,
