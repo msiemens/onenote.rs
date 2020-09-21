@@ -65,13 +65,13 @@ impl OutlineGroup {
 
 #[derive(Debug)]
 pub struct OutlineElement {
-    pub(crate) child_level: u8,
-    pub(crate) children: Vec<OutlineItem>,
-
     pub(crate) contents: Vec<Content>,
 
     pub(crate) list_contents: Vec<List>,
     pub(crate) list_spacing: Option<f32>,
+
+    pub(crate) child_level: u8,
+    pub(crate) children: Vec<OutlineItem>,
 }
 
 pub(crate) fn parse_outline(outline_id: ExGuid, space: &ObjectSpace) -> Outline {
