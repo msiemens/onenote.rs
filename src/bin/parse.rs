@@ -1,9 +1,8 @@
+use onenote::Parser;
+use onenote::Result;
 use std::env;
 use std::ffi::OsString;
 use std::path::PathBuf;
-
-use onenote::Parser;
-use onenote::Result;
 
 fn main() -> Result<()> {
     let path = env::args().nth(1).expect("usage: parse <file>");
