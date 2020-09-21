@@ -3,7 +3,6 @@ use crate::one::property_set::{page_manifest_node, page_metadata, page_node, tit
 use crate::onenote::parser::outline::{parse_outline, Outline};
 use crate::onenote::parser::page_content::{parse_page_content, PageContent};
 use crate::onestore::object_space::ObjectSpace;
-use crate::onestore::revision::Revision;
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
@@ -25,22 +24,18 @@ pub struct Title {
 }
 
 pub(crate) fn parse_page(page_space: &ObjectSpace) -> Page {
-    let rev = page_space
-        .find_root_revision()
-        .expect("no page space root revision");
+    let metadata = parse_metadata(page_space);
+    let manifest = parse_manifest(page_space);
 
-    let metadata = parse_metadata(rev, page_space);
-    let manifest = parse_manifest(rev, page_space);
+    let data = parse_data(manifest, page_space);
 
-    let data = parse_data(manifest, rev, page_space);
-
-    let title = parse_title(data.title(), rev, page_space);
+    let title = parse_title(data.title(), page_space);
     let level = metadata.page_level();
 
     let contents = data
         .content()
         .iter()
-        .map(|id| parse_page_content(*id, &rev, page_space))
+        .map(|id| parse_page_content(*id, page_space))
         .collect();
 
     Page {
@@ -52,10 +47,8 @@ pub(crate) fn parse_page(page_space: &ObjectSpace) -> Page {
     }
 }
 
-fn parse_title(title_id: ExGuid, rev: &Revision, space: &ObjectSpace) -> Title {
-    let title_object = rev
-        .resolve_object(title_id, space)
-        .expect("title object is missing");
+fn parse_title(title_id: ExGuid, space: &ObjectSpace) -> Title {
+    let title_object = space.get_object(title_id).expect("title object is missing");
     let title = title_node::parse(title_object);
     let outline_id = title
         .children()
@@ -63,7 +56,7 @@ fn parse_title(title_id: ExGuid, rev: &Revision, space: &ObjectSpace) -> Title {
         .copied()
         .expect("title has no outline");
 
-    let contents = parse_outline(outline_id, rev, space);
+    let contents = parse_outline(outline_id, space);
 
     Title {
         contents,
@@ -74,32 +67,26 @@ fn parse_title(title_id: ExGuid, rev: &Revision, space: &ObjectSpace) -> Title {
     }
 }
 
-fn parse_data(
-    manifest: page_manifest_node::Data,
-    rev: &Revision,
-    space: &ObjectSpace,
-) -> page_node::Data {
+fn parse_data(manifest: page_manifest_node::Data, space: &ObjectSpace) -> page_node::Data {
     let page_id = manifest.page();
-    let page_object = rev
-        .resolve_object(page_id, space)
-        .expect("page object is missing");
+    let page_object = space.get_object(page_id).expect("page object is missing");
 
     page_node::parse(page_object)
 }
 
-fn parse_manifest(rev: &Revision, space: &ObjectSpace) -> page_manifest_node::Data {
-    let page_manifest_id = rev.content_root().expect("page content id is missing");
-    let page_manifest_object = rev
-        .resolve_object(page_manifest_id, space)
+fn parse_manifest(space: &ObjectSpace) -> page_manifest_node::Data {
+    let page_manifest_id = space.content_root().expect("page content id is missing");
+    let page_manifest_object = space
+        .get_object(page_manifest_id)
         .expect("page object is missing");
 
     page_manifest_node::parse(page_manifest_object)
 }
 
-fn parse_metadata(rev: &Revision, space: &ObjectSpace) -> page_metadata::Data {
-    let metadata_id = rev.metadata_root().expect("page metadata id is missing");
-    let metadata_object = rev
-        .resolve_object(metadata_id, space)
+fn parse_metadata(space: &ObjectSpace) -> page_metadata::Data {
+    let metadata_id = space.metadata_root().expect("page metadata id is missing");
+    let metadata_object = space
+        .get_object(metadata_id)
         .expect("page metadata object is missing");
 
     page_metadata::parse(metadata_object)

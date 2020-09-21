@@ -1,7 +1,7 @@
 use crate::fsshttpb::data_element::object_group::ObjectGroupData;
 use crate::fsshttpb::packaging::Packaging;
 use crate::onestore::mapping_table::MappingTable;
-use crate::onestore::revision::GroupData;
+use crate::onestore::object_space::GroupData;
 use crate::onestore::types::jcid::JcId;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
 use crate::types::exguid::ExGuid;

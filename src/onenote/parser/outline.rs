@@ -3,7 +3,6 @@ use crate::one::property_set::{outline_element_node, outline_group, outline_node
 use crate::onenote::parser::content::{parse_content, Content};
 use crate::onenote::parser::list::{parse_list, List};
 use crate::onestore::object_space::ObjectSpace;
-use crate::onestore::revision::Revision;
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
@@ -75,16 +74,16 @@ pub struct OutlineElement {
     pub(crate) list_spacing: Option<f32>,
 }
 
-pub(crate) fn parse_outline(outline_id: ExGuid, rev: &Revision, space: &ObjectSpace) -> Outline {
-    let outline_object = rev
-        .resolve_object(outline_id, space)
+pub(crate) fn parse_outline(outline_id: ExGuid, space: &ObjectSpace) -> Outline {
+    let outline_object = space
+        .get_object(outline_id)
         .expect("outline node is missing");
     let data = outline_node::parse(outline_object);
 
     let items = data
         .children()
         .iter()
-        .map(|id| parse_outline_item(*id, rev, space))
+        .map(|id| parse_outline_item(*id, space))
         .collect();
 
     Outline {
@@ -97,32 +96,32 @@ pub(crate) fn parse_outline(outline_id: ExGuid, rev: &Revision, space: &ObjectSp
     }
 }
 
-fn parse_outline_item(item_id: ExGuid, rev: &Revision, space: &ObjectSpace) -> OutlineItem {
-    let content_type = rev
-        .resolve_object(item_id, space)
+fn parse_outline_item(item_id: ExGuid, space: &ObjectSpace) -> OutlineItem {
+    let content_type = space
+        .get_object(item_id)
         .expect("outline item is missing")
         .id();
     let id = PropertySetId::from_jcid(content_type).unwrap();
 
     match id {
-        PropertySetId::OutlineGroup => OutlineItem::Group(parse_outline_group(item_id, rev, space)),
+        PropertySetId::OutlineGroup => OutlineItem::Group(parse_outline_group(item_id, space)),
         PropertySetId::OutlineElementNode => {
-            OutlineItem::Element(parse_outline_element(item_id, rev, space))
+            OutlineItem::Element(parse_outline_element(item_id, space))
         }
         _ => panic!("invalid outline item type: {:?}", id),
     }
 }
 
-fn parse_outline_group(group_id: ExGuid, rev: &Revision, space: &ObjectSpace) -> OutlineGroup {
-    let group_object = rev
-        .resolve_object(group_id, space)
+fn parse_outline_group(group_id: ExGuid, space: &ObjectSpace) -> OutlineGroup {
+    let group_object = space
+        .get_object(group_id)
         .expect("outline group is missing");
     let data = outline_group::parse(group_object);
 
     let outlines = data
         .children()
         .iter()
-        .map(|id| parse_outline_item(*id, rev, space))
+        .map(|id| parse_outline_item(*id, space))
         .collect();
 
     OutlineGroup {
@@ -131,32 +130,28 @@ fn parse_outline_group(group_id: ExGuid, rev: &Revision, space: &ObjectSpace) ->
     }
 }
 
-pub(crate) fn parse_outline_element(
-    element_id: ExGuid,
-    rev: &Revision,
-    space: &ObjectSpace,
-) -> OutlineElement {
-    let element_object = rev
-        .resolve_object(element_id, space)
+pub(crate) fn parse_outline_element(element_id: ExGuid, space: &ObjectSpace) -> OutlineElement {
+    let element_object = space
+        .get_object(element_id)
         .expect("outline element is missing");
     let data = outline_element_node::parse(element_object);
 
     let children = data
         .children()
         .iter()
-        .map(|id| parse_outline_item(*id, rev, space))
+        .map(|id| parse_outline_item(*id, space))
         .collect();
 
     let contents = data
         .contents()
         .iter()
-        .map(|id| parse_content(*id, rev, space))
+        .map(|id| parse_content(*id, space))
         .collect();
 
     let list_contents = data
         .list_contents()
         .iter()
-        .map(|id| parse_list(*id, rev, space))
+        .map(|id| parse_list(*id, space))
         .collect();
 
     OutlineElement {

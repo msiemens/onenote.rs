@@ -3,7 +3,6 @@ use crate::one::property_set::outline_node::OutlineIndentDistance;
 use crate::one::property_set::{table_cell_node, table_node, table_row_node};
 use crate::onenote::parser::outline::{parse_outline_element, OutlineElement};
 use crate::onestore::object_space::ObjectSpace;
-use crate::onestore::revision::Revision;
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
@@ -34,17 +33,11 @@ pub struct TableCell {
     pub(crate) outline_indent_distance: OutlineIndentDistance,
 }
 
-pub(crate) fn parse_table(table_id: ExGuid, rev: &Revision, space: &ObjectSpace) -> Table {
-    let table_object = rev
-        .resolve_object(table_id, space)
-        .expect("table object is missing");
+pub(crate) fn parse_table(table_id: ExGuid, space: &ObjectSpace) -> Table {
+    let table_object = space.get_object(table_id).expect("table object is missing");
     let data = table_node::parse(table_object);
 
-    let contents = data
-        .rows()
-        .iter()
-        .map(|id| parse_row(*id, rev, space))
-        .collect();
+    let contents = data.rows().iter().map(|id| parse_row(*id, space)).collect();
 
     Table {
         rows: data.row_count(),
@@ -58,31 +51,27 @@ pub(crate) fn parse_table(table_id: ExGuid, rev: &Revision, space: &ObjectSpace)
     }
 }
 
-fn parse_row(row_id: ExGuid, rev: &Revision, space: &ObjectSpace) -> TableRow {
-    let row_object = rev
-        .resolve_object(row_id, space)
-        .expect("row object is missing");
+fn parse_row(row_id: ExGuid, space: &ObjectSpace) -> TableRow {
+    let row_object = space.get_object(row_id).expect("row object is missing");
     let data = table_row_node::parse(row_object);
 
     let contents = data
         .cells()
         .iter()
-        .map(|id| parse_cell(*id, rev, space))
+        .map(|id| parse_cell(*id, space))
         .collect();
 
     TableRow { contents }
 }
 
-fn parse_cell(cell_id: ExGuid, rev: &Revision, space: &ObjectSpace) -> TableCell {
-    let cell_object = rev
-        .resolve_object(cell_id, space)
-        .expect("cell object is missing");
+fn parse_cell(cell_id: ExGuid, space: &ObjectSpace) -> TableCell {
+    let cell_object = space.get_object(cell_id).expect("cell object is missing");
     let data = table_cell_node::parse(cell_object);
 
     let contents = data
         .contents()
         .iter()
-        .map(|id| parse_outline_element(*id, rev, space))
+        .map(|id| parse_outline_element(*id, space))
         .collect();
 
     TableCell {

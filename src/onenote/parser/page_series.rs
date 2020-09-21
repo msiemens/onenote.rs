@@ -1,7 +1,6 @@
 use crate::one::property_set::page_series_node;
 use crate::onenote::parser::page::{parse_page, Page};
 use crate::onestore::object_space::ObjectSpace;
-use crate::onestore::revision::Revision;
 use crate::onestore::OneStore;
 use crate::types::exguid::ExGuid;
 
@@ -10,15 +9,8 @@ pub struct PageSeries {
     pub(crate) pages: Vec<Page>,
 }
 
-pub(crate) fn parse_page_series(
-    id: ExGuid,
-    rev: &Revision,
-    space: &ObjectSpace,
-    store: &OneStore,
-) -> PageSeries {
-    let object = rev
-        .resolve_object(id, space)
-        .expect("page series object is missing");
+pub(crate) fn parse_page_series(id: ExGuid, space: &ObjectSpace, store: &OneStore) -> PageSeries {
+    let object = space.get_object(id).expect("page series object is missing");
     let data = page_series_node::parse(object);
     let pages = data.page_spaces();
 

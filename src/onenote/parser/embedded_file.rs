@@ -1,6 +1,5 @@
 use crate::one::property_set::{embedded_file_container, embedded_file_node};
 use crate::onestore::object_space::ObjectSpace;
-use crate::onestore::revision::Revision;
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
@@ -15,19 +14,13 @@ pub struct EmbeddedFile {
     pub(crate) offset_from_parent_vertical: Option<f32>,
 }
 
-pub(crate) fn parse_embedded_file(
-    file_id: ExGuid,
-    rev: &Revision,
-    space: &ObjectSpace,
-) -> EmbeddedFile {
-    let node_object = rev
-        .resolve_object(file_id, space)
-        .expect("embedded file is missing");
+pub(crate) fn parse_embedded_file(file_id: ExGuid, space: &ObjectSpace) -> EmbeddedFile {
+    let node_object = space.get_object(file_id).expect("embedded file is missing");
     let node = embedded_file_node::parse(node_object);
 
     let container_object_id = node.embedded_file_container();
-    let container_object = rev
-        .resolve_object(container_object_id, space)
+    let container_object = space
+        .get_object(container_object_id)
         .expect("embedded file container is missing");
     let container = embedded_file_container::parse(container_object);
 
