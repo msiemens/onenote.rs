@@ -7,6 +7,9 @@ edition = "2018"
 [profile.release]
 debug = true
 
+[features]
+backtrace = []
+
 [dependencies]
 bytes = "0.5"
 encoding_rs = "0.8.24"

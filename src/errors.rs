@@ -1,19 +1,45 @@
+#[cfg(feature = "backtrace")]
+use std::backtrace::Backtrace;
 use std::{io, string};
 use thiserror::Error;
 
 #[derive(Error, Debug)]
 pub enum Error {
-    #[error("invalid UUID: {0}")]
-    InvalidUuid(#[from] uuid::Error),
+    #[error("invalid UUID: {err}")]
+    InvalidUuid {
+        #[from]
+        err: uuid::Error,
 
-    #[error("io failure: {0}")]
-    IO(#[from] io::Error),
+        #[cfg(feature = "backtrace")]
+        backtrace: Backtrace,
+    },
 
-    #[error("malformed UTF-16 string: {0}")]
-    Utf16Error(#[from] string::FromUtf16Error),
+    #[error("io failure: {err}")]
+    IO {
+        #[from]
+        err: io::Error,
 
-    #[error("UTF-16 string is missing null terminator: {0}")]
-    Utf16MissingNull(#[from] widestring::MissingNulError<u16>),
+        #[cfg(feature = "backtrace")]
+        backtrace: Backtrace,
+    },
+
+    #[error("malformed UTF-16 string: {err}")]
+    Utf16Error {
+        #[from]
+        err: string::FromUtf16Error,
+
+        #[cfg(feature = "backtrace")]
+        backtrace: Backtrace,
+    },
+
+    #[error("UTF-16 string is missing null terminator: {err}")]
+    Utf16MissingNull {
+        #[from]
+        err: widestring::MissingNulError<u16>,
+
+        #[cfg(feature = "backtrace")]
+        backtrace: Backtrace,
+    },
 }
 
 pub type Result<T> = std::result::Result<T, Error>;
