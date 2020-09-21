@@ -34,8 +34,7 @@ pub(crate) fn parse(object: &Object) -> Data {
         simple::parse_u32(PropertyType::SchemaRevisionInOrderToRead, object);
     let schema_revision_in_order_to_write =
         simple::parse_u32(PropertyType::SchemaRevisionInOrderToWrite, object);
-    let page_level =
-        simple::parse_u32(PropertyType::SchemaRevisionInOrderToWrite, object).unwrap_or(1) as i32;
+    let page_level = simple::parse_u32(PropertyType::PageLevel, object).unwrap_or(0) as i32;
     let created_at = Timestamp::parse(PropertyType::TopologyCreationTimeStamp, object)
         .expect("page metadata has no creation timestamp");
     let is_deleted =
