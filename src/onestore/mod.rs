@@ -5,24 +5,48 @@ use crate::fsshttpb::data_element::value::DataElementValue;
 use crate::fsshttpb::packaging::Packaging;
 use crate::onestore::header::StoreHeader;
 use crate::onestore::object_space::ObjectSpace;
+use crate::onestore::revision::Revision;
 use crate::types::cell_id::CellId;
 use crate::types::exguid::ExGuid;
 use crate::types::guid::Guid;
 use std::collections::{HashMap, HashSet};
 
-mod header;
+pub(crate) mod header;
 mod mapping_table;
 pub(crate) mod object;
 pub(crate) mod object_group;
 pub(crate) mod object_space;
 pub(crate) mod revision;
-mod types;
+pub(crate) mod types;
 
 #[derive(Debug)]
 pub(crate) struct OneStore {
+    schema: Guid,
     header: StoreHeader,
     data_root: ObjectSpace,
     object_spaces: HashMap<ExGuid, ObjectSpace>,
+}
+
+impl OneStore {
+    pub fn schema_guid(&self) -> Guid {
+        self.schema
+    }
+
+    pub(crate) fn data_root(&self) -> &ObjectSpace {
+        &self.data_root
+    }
+
+    pub(crate) fn object_spaces(&self) -> &HashMap<ExGuid, ObjectSpace> {
+        &self.object_spaces
+    }
+
+    pub(crate) fn find_revision(&self, rev_id: ExGuid) -> Option<&Revision> {
+        self.data_root.revisions().get(&rev_id).or_else(|| {
+            self.object_spaces
+                .values()
+                .find_map(|object_space| object_space.revisions().get(&rev_id))
+        })
+    }
 }
 
 pub(crate) fn parse_store(package: Packaging) -> Result<OneStore> {
@@ -62,6 +86,10 @@ pub(crate) fn parse_store(package: Packaging) -> Result<OneStore> {
     let mut object_spaces = HashMap::new();
 
     for mapping in &storage_index.cell_mappings {
+        if mapping.id.is_nil() {
+            continue;
+        }
+
         if parsed_object_spaces.contains(&mapping.cell_id) {
             continue;
         }
@@ -71,6 +99,7 @@ pub(crate) fn parse_store(package: Packaging) -> Result<OneStore> {
     }
 
     Ok(OneStore {
+        schema: storage_manifest.id,
         header,
         data_root,
         object_spaces,

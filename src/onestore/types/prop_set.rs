@@ -1,9 +1,9 @@
 use crate::onestore::types::property::{PropertyId, PropertyValue};
 use crate::Reader;
-use std::collections::HashMap;
+use indexmap::map::IndexMap;
 
 #[derive(Debug)]
-pub(crate) struct PropertySet(HashMap<PropertyId, PropertyValue>);
+pub(crate) struct PropertySet(IndexMap<PropertyId, PropertyValue>);
 
 impl PropertySet {
     pub(crate) fn parse(reader: Reader) -> PropertySet {
@@ -21,5 +21,9 @@ impl PropertySet {
 
     pub(crate) fn get(&self, id: PropertyId) -> Option<&PropertyValue> {
         self.0.get(&id)
+    }
+
+    pub(crate) fn iter(&self) -> impl Iterator<Item = (&PropertyId, &PropertyValue)> {
+        self.0.iter()
     }
 }

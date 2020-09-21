@@ -1,14 +1,22 @@
 use std::env;
+use std::ffi::OsString;
+use std::path::PathBuf;
 
 use onenote::Parser;
+use onenote::Result;
 
-fn main() {
+fn main() -> Result<()> {
     let path = env::args().nth(1).expect("usage: parse <file>");
+    let path = PathBuf::from(path);
 
-    let data = std::fs::read(path).expect("Failed to read file");
+    let mut parser = Parser::new();
+    if path.extension() == Some(&OsString::from("onetoc2".to_string())) {
+        let notebook = parser.parse_notebook(&path).unwrap();
+        println!("{:#?}", notebook);
+    } else {
+        let section = parser.parse_section(&path).unwrap();
+        println!("{:#?}", section);
+    }
 
-    let mut parser = Parser::new(data);
-    let section = parser.parse_section().unwrap();
-
-    println!("{:#?}", section)
+    Ok(())
 }

@@ -15,12 +15,4 @@ impl CompactId {
 
         CompactId { n, guid_index }
     }
-
-    pub(crate) fn n(&self) -> u8 {
-        self.n
-    }
-
-    pub(crate) fn index(&self) -> u32 {
-        self.guid_index
-    }
 }

@@ -1,6 +1,7 @@
-use crate::fsshttpb::data_element::storage_index::StorageIndex;
 use crate::fsshttpb::packaging::Packaging;
+use crate::onestore::object::Object;
 use crate::onestore::object_group::ObjectGroup;
+use crate::onestore::OneStore;
 use crate::types::exguid::ExGuid;
 use crate::types::guid::Guid;
 use std::collections::HashMap;
@@ -13,7 +14,56 @@ pub(crate) struct Revision {
     object_groups: HashMap<ExGuid, ObjectGroup>,
 }
 
-#[derive(Debug)]
+impl Revision {
+    pub(crate) fn base(&self) -> ExGuid {
+        self.base
+    }
+
+    pub(crate) fn roots(&self) -> &[(RevisionRole, ExGuid)] {
+        &self.roots
+    }
+
+    pub(crate) fn content_root(&self) -> Option<ExGuid> {
+        self.roots
+            .iter()
+            .find(|(r, _)| *r == RevisionRole::DefaultContent)
+            .map(|(_, id)| id)
+            .copied()
+    }
+
+    pub(crate) fn metadata_root(&self) -> Option<ExGuid> {
+        self.roots
+            .iter()
+            .find(|(r, _)| *r == RevisionRole::Metadata)
+            .map(|(_, id)| id)
+            .copied()
+    }
+
+    pub(crate) fn resolve_object<'a>(
+        &'a self,
+        object_id: ExGuid,
+        store: &'a OneStore,
+    ) -> Option<&'a Object> {
+        self.object_groups.values().find_map(|group| {
+            group
+                .objects()
+                .iter()
+                .find_map(|(id, object)| if *id == object_id { Some(object) } else { None })
+                .or_else(|| {
+                    if self.base.is_nil() {
+                        None
+                    } else {
+                        store
+                            .find_revision(self.base)
+                            .expect("base revison is missing")
+                            .resolve_object(object_id, store)
+                    }
+                })
+        })
+    }
+}
+
+#[derive(Debug, PartialEq)]
 pub(crate) enum RevisionRole {
     DefaultContent,
     Metadata,
@@ -23,17 +73,13 @@ pub(crate) enum RevisionRole {
 
 impl Revision {
     pub(crate) fn parse(
-        revision_id: ExGuid,
+        revision_manifest_id: ExGuid,
         object_space_id: ExGuid,
-        storage_index: &StorageIndex,
         packaging: &Packaging,
-    ) -> Revision {
-        let revision_mapping_id = storage_index
-            .find_revision_mapping_id(revision_id)
-            .expect("revision mapping not found");
+    ) -> (ExGuid, Revision) {
         let revision_manifest = packaging
             .data_element_package
-            .find_revision(revision_mapping_id)
+            .find_revision_manifest(revision_manifest_id)
             .expect("revision manifest not found");
 
         let id = revision_manifest.rev_id;
@@ -50,12 +96,15 @@ impl Revision {
             .map(|id| (*id, ObjectGroup::parse(*id, object_space_id, packaging)))
             .collect();
 
-        Revision {
+        (
             id,
-            base,
-            roots,
-            object_groups,
-        }
+            Revision {
+                id,
+                base,
+                roots,
+                object_groups,
+            },
+        )
     }
 }
 

@@ -6,7 +6,7 @@ use crate::Reader;
 pub(crate) struct CompactU64(u64);
 
 impl CompactU64 {
-    pub fn value(&self) -> u64 {
+    pub(crate) fn value(&self) -> u64 {
         self.0
     }
 

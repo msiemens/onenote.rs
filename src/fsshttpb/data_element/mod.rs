@@ -58,7 +58,7 @@ impl DataElementPackage {
             .find_revision_mapping_id(revision_id)
             .expect("revision mapping id not found");
         let revision_manifest = self
-            .find_revision(revision_mapping_id)
+            .find_revision_manifest(revision_mapping_id)
             .expect("revision manifest not found");
 
         revision_manifest
@@ -71,6 +71,16 @@ impl DataElementPackage {
             .collect()
     }
 
+    pub(crate) fn find_blob(&self, id: ExGuid) -> Option<Vec<u8>> {
+        self.find_element(id).map(|element| {
+            if let DataElementValue::ObjectDataBlob(data) = &element.element {
+                data.to_vec()
+            } else {
+                panic!("data element is not a blob")
+            }
+        })
+    }
+
     pub(crate) fn find_cell_revision_id(&self, id: ExGuid) -> Option<ExGuid> {
         self.find_element(id).map(|element| {
             if let DataElementValue::CellManifest(revision_id) = &element.element {
@@ -81,7 +91,7 @@ impl DataElementPackage {
         })
     }
 
-    pub(crate) fn find_revision(&self, id: ExGuid) -> Option<&RevisionManifest> {
+    pub(crate) fn find_revision_manifest(&self, id: ExGuid) -> Option<&RevisionManifest> {
         self.find_element(id).map(|element| {
             if let DataElementValue::RevisionManifest(revision_manifest) = &element.element {
                 revision_manifest

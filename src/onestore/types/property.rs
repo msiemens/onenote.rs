@@ -23,6 +23,94 @@ pub(crate) enum PropertyValue {
 }
 
 impl PropertyValue {
+    pub(crate) fn to_bool(&self) -> Option<bool> {
+        if let Self::Bool(v) = self {
+            Some(*v)
+        } else {
+            None
+        }
+    }
+
+    pub(crate) fn to_u8(&self) -> Option<u8> {
+        if let Self::U8(v) = self {
+            Some(*v)
+        } else {
+            None
+        }
+    }
+
+    pub(crate) fn to_u16(&self) -> Option<u16> {
+        if let Self::U16(v) = self {
+            Some(*v)
+        } else {
+            None
+        }
+    }
+
+    pub(crate) fn to_u32(&self) -> Option<u32> {
+        if let Self::U32(v) = self {
+            Some(*v)
+        } else {
+            None
+        }
+    }
+
+    pub(crate) fn to_u64(&self) -> Option<u64> {
+        if let Self::U64(v) = self {
+            Some(*v)
+        } else {
+            None
+        }
+    }
+
+    pub(crate) fn to_vec(&self) -> Option<&[u8]> {
+        if let Self::Vec(v) = self {
+            Some(v)
+        } else {
+            None
+        }
+    }
+
+    pub(crate) fn to_object_id(&self) -> Option<()> {
+        if let Self::ObjectId = self {
+            Some(())
+        } else {
+            None
+        }
+    }
+
+    pub(crate) fn to_object_ids(&self) -> Option<u32> {
+        if let Self::ObjectIds(v) = self {
+            Some(*v)
+        } else {
+            None
+        }
+    }
+
+    pub(crate) fn to_object_space_ids(&self) -> Option<u32> {
+        if let Self::ObjectSpaceIds(v) = self {
+            Some(*v)
+        } else {
+            None
+        }
+    }
+
+    // pub(crate) fn property_values(&self) -> Option<(PropertyId, &[PropertySet])> {
+    //     if let Self::PropertyValues(id, values) = self {
+    //         Some((*id, values))
+    //     } else {
+    //         None
+    //     }
+    // }
+    //
+    // pub(crate) fn property_set(&self) -> Option<&PropertySet> {
+    //     if let Self::PropertySet(props) = self {
+    //         Some(props)
+    //     } else {
+    //         None
+    //     }
+    // }
+
     pub(crate) fn parse(property_id: PropertyId, reader: Reader) -> PropertyValue {
         let prop_type = property_id.prop_type();
 
@@ -81,8 +169,8 @@ impl PropertyId {
         PropertyId(value)
     }
 
-    pub(crate) fn id(&self) -> u32 {
-        self.0 & 0x3fffffff
+    pub(crate) fn value(&self) -> u32 {
+        self.0
     }
 
     pub(crate) fn prop_type(&self) -> u32 {

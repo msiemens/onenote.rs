@@ -27,7 +27,7 @@ impl DataElementValue {
             0x05 => Self::parse_object_group(reader),
             0x06 => Self::parse_data_element_fragment(reader),
             0x0A => Self::parse_object_data_blob(reader),
-            _ => unimplemented!(),
+            _ => panic!("invalid element type: 0x{:X}", element_type),
         }
     }
 }

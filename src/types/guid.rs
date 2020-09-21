@@ -42,6 +42,10 @@ impl Guid {
     pub(crate) fn nil() -> Guid {
         Guid(Uuid::nil())
     }
+
+    pub(crate) fn is_nil(&self) -> bool {
+        self.0.is_nil()
+    }
 }
 
 impl fmt::Display for Guid {

@@ -1,3 +1,4 @@
+use crate::errors::Result;
 use crate::types::compact_u64::CompactU64;
 use crate::types::guid::Guid;
 use crate::Reader;
@@ -10,6 +11,10 @@ pub struct ExGuid {
 }
 
 impl ExGuid {
+    pub(crate) fn is_nil(&self) -> bool {
+        self.guid.is_nil() && self.value == 0
+    }
+
     pub(crate) fn from_guid(guid: Guid, value: u32) -> ExGuid {
         ExGuid { guid, value }
     }
@@ -70,6 +75,13 @@ impl ExGuid {
         }
 
         values
+    }
+
+    pub(crate) fn parse_str(guid: &str, n: u32) -> Result<ExGuid> {
+        Ok(ExGuid {
+            guid: Guid::from_str(guid)?,
+            value: n,
+        })
     }
 }
 

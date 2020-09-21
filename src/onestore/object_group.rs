@@ -9,6 +9,12 @@ pub(crate) struct ObjectGroup {
 }
 
 impl ObjectGroup {
+    pub(crate) fn objects(&self) -> &HashMap<ExGuid, Object> {
+        &self.objects
+    }
+}
+
+impl ObjectGroup {
     pub(crate) fn parse(
         group_id: ExGuid,
         object_space_id: ExGuid,
@@ -33,6 +39,7 @@ impl ObjectGroup {
                     .iter()
                     .zip(group.objects.iter())
                     .collect::<Vec<_>>(),
+                packaging,
             );
 
             objects.insert(object_id, object);

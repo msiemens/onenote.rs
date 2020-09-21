@@ -1,6 +1,7 @@
 use crate::fsshttpb::data_element::object_group::{
     ObjectGroup, ObjectGroupData, ObjectGroupDeclaration,
 };
+use crate::one::property::PropertyType;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
 use crate::onestore::types::property::PropertyValue;
 use crate::types::guid::Guid;
@@ -9,23 +10,19 @@ use crate::types::guid::Guid;
 pub(crate) struct StoreHeader {
     file_identity: Guid,
     ancestor_identity: Guid,
-    last_code_version_that_wrote_to_it: u32,
+    last_code_version_that_wrote_to_it: Option<u32>,
     file_name_crc: u32,
 }
 
 impl StoreHeader {
     pub(crate) fn parse(data: &ObjectGroup) -> StoreHeader {
-        let declaration = data
+        let objects = &*data
             .declarations
-            .first()
-            .expect("no header object declaration");
-        if let ObjectGroupDeclaration::Object { partition_id, .. } = declaration {
-            assert_eq!(*partition_id, 1);
-        } else {
-            panic!("object group declaration it not an object")
-        };
+            .iter()
+            .zip(data.objects.iter())
+            .collect::<Vec<_>>();
 
-        let object_data = data.objects.first().expect("no header object data");
+        let object_data = Self::find_object(objects, 1);
         let object_data = if let ObjectGroupData::Object { data, .. } = object_data {
             data
         } else {
@@ -34,29 +31,24 @@ impl StoreHeader {
 
         let prop_set = ObjectPropSet::parse(&mut object_data.as_slice());
 
-        let file_identity = StoreHeader::parse_guid(
-            prop_set
-                .get(0x1C001D94)
-                .expect("FileIdentityGuid prop missing"),
-        );
+        let file_identity = prop_set
+            .get(PropertyType::FileIdentityGuid)
+            .map(|value| StoreHeader::parse_guid(value))
+            .expect("FileIdentityGuid prop missing");
 
-        let ancestor_identity = StoreHeader::parse_guid(
-            prop_set
-                .get(0x1C001D95)
-                .expect("FileAncestorIdentityGuid prop missing"),
-        );
+        let ancestor_identity = prop_set
+            .get(PropertyType::FileAncestorIdentityGuid)
+            .map(|value| StoreHeader::parse_guid(value))
+            .expect("FileAncestorIdentityGuid prop missing");
 
-        let last_code_version_that_wrote_to_it = StoreHeader::parse_u32(
-            prop_set
-                .get(0x14001D99)
-                .expect("FileLastCodeVersionThatWroteToIt prop missing"),
-        );
+        let last_code_version_that_wrote_to_it = prop_set
+            .get(PropertyType::FileLastCodeVersionThatWroteToIt)
+            .map(|value| StoreHeader::parse_u32(value));
 
-        let file_name_crc = StoreHeader::parse_u32(
-            prop_set
-                .get(0x14001D99)
-                .expect("FileLastCodeVersionThatWroteToIt prop missing"),
-        );
+        let file_name_crc = prop_set
+            .get(PropertyType::FileNameCRC)
+            .map(|value| StoreHeader::parse_u32(value))
+            .expect("FileNameCRC prop missing");
 
         StoreHeader {
             file_identity,
@@ -64,6 +56,17 @@ impl StoreHeader {
             last_code_version_that_wrote_to_it,
             file_name_crc,
         }
+    }
+
+    fn find_object<'a>(
+        objects: &'a [(&'a ObjectGroupDeclaration, &'a ObjectGroupData)],
+        partition_id: u64,
+    ) -> &'a ObjectGroupData {
+        objects
+            .iter()
+            .find(|(decl, _)| decl.partition_id() == partition_id)
+            .map(|(_, obj)| obj)
+            .unwrap_or_else(|| panic!("no object with partition id {} found", partition_id))
     }
 
     fn parse_guid(value: &PropertyValue) -> Guid {

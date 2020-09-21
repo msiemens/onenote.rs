@@ -1,4 +1,5 @@
 use crate::fsshttpb::data_element::object_group::{ObjectGroupData, ObjectGroupDeclaration};
+use crate::fsshttpb::packaging::Packaging;
 use crate::onestore::mapping_table::MappingTable;
 use crate::onestore::types::jcid::JcId;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
@@ -13,10 +14,29 @@ pub(crate) struct Object {
 }
 
 impl Object {
+    pub(crate) fn id(&self) -> JcId {
+        self.jc_id
+    }
+
+    pub(crate) fn props(&self) -> &ObjectPropSet {
+        &self.props
+    }
+
+    pub(crate) fn file_data(&self) -> Option<&[u8]> {
+        self.file_data.as_deref()
+    }
+
+    pub(crate) fn mapping(&self) -> &MappingTable {
+        &self.mapping
+    }
+}
+
+impl Object {
     pub(crate) fn parse(
         object_id: ExGuid,
         object_space_id: ExGuid,
         objects: &[(&ObjectGroupDeclaration, &ObjectGroupData)],
+        packaging: &Packaging,
     ) -> Object {
         let metadata_object = Object::find_object(object_id, objects, 4);
         let data_object = Object::find_object(object_id, objects, 1);
@@ -44,17 +64,12 @@ impl Object {
 
         // Parse file data
 
-        let file_data = None;
-        if jc_id.is_file_data() {
-            // FIXME: Read file data
-            unimplemented!()
-
-            // let file_data_group = objects
-            //     .iter()
-            //     .find(|(decl, _)| decl.object_id() == id && decl.partition_id() == 1)
-            //     .map(|(_, obj)| obj)
-            //     .expect("object not found");
-        }
+        let file_data = Object::find_blob_id(object_id, objects).map(|blob_id| {
+            packaging
+                .data_element_package
+                .find_blob(blob_id)
+                .expect("blob not found")
+        });
 
         let context_refs: Vec<_> = referenced_cells
             .iter()
@@ -68,22 +83,22 @@ impl Object {
             .map(|id| id.1)
             .collect();
 
-        assert_eq!(props.object_ids.len(), object_refs.len());
+        assert_eq!(props.object_ids().len(), object_refs.len());
         assert_eq!(
-            props.context_ids.len() + props.object_space_ids.len(),
+            props.context_ids().len() + props.object_space_ids().len(),
             referenced_cells.len()
         );
 
         let mapping_objects = props
-            .object_ids
+            .object_ids()
             .iter()
             .copied()
             .zip(object_refs.iter().copied());
 
-        let mapping_contexts = props.context_ids.iter().copied().zip(context_refs);
+        let mapping_contexts = props.context_ids().iter().copied().zip(context_refs);
 
         let mapping_object_spaces = props
-            .object_space_ids
+            .object_space_ids()
             .iter()
             .copied()
             .zip(object_space_refs);
@@ -112,5 +127,19 @@ impl Object {
             .find(|(decl, _)| decl.object_id() == id && decl.partition_id() == partition_id)
             .map(|(_, obj)| obj)
             .unwrap_or_else(|| panic!("no object with partition id {} found", partition_id))
+    }
+
+    fn find_blob_id(
+        id: ExGuid,
+        objects: &[(&ObjectGroupDeclaration, &ObjectGroupData)],
+    ) -> Option<ExGuid> {
+        objects
+            .iter()
+            .find(|(decl, _)| decl.object_id() == id && decl.partition_id() == 2)
+            .map(|(_, obj)| obj)
+            .map(|obj| match obj {
+                ObjectGroupData::BlobReference { blob, .. } => *blob,
+                _ => panic!("blob object is not a blob"),
+            })
     }
 }

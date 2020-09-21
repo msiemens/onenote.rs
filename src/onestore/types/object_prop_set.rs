@@ -1,3 +1,4 @@
+use crate::one::property::PropertyType;
 use crate::onestore::types::compact_id::CompactId;
 use crate::onestore::types::object_stream_header::ObjectStreamHeader;
 use crate::onestore::types::prop_set::PropertySet;
@@ -6,10 +7,28 @@ use crate::Reader;
 
 #[derive(Debug)]
 pub(crate) struct ObjectPropSet {
-    pub(crate) object_ids: Vec<CompactId>,
-    pub(crate) object_space_ids: Vec<CompactId>,
-    pub(crate) context_ids: Vec<CompactId>,
+    object_ids: Vec<CompactId>,
+    object_space_ids: Vec<CompactId>,
+    context_ids: Vec<CompactId>,
     properties: PropertySet,
+}
+
+impl ObjectPropSet {
+    pub(crate) fn object_ids(&self) -> &[CompactId] {
+        &self.object_ids
+    }
+
+    pub(crate) fn object_space_ids(&self) -> &[CompactId] {
+        &self.object_space_ids
+    }
+
+    pub(crate) fn context_ids(&self) -> &[CompactId] {
+        &self.context_ids
+    }
+
+    pub(crate) fn properties(&self) -> &PropertySet {
+        &self.properties
+    }
 }
 
 impl ObjectPropSet {
@@ -47,7 +66,7 @@ impl ObjectPropSet {
         }
     }
 
-    pub(crate) fn get(&self, id: u32) -> Option<&PropertyValue> {
-        self.properties.get(PropertyId::new(id))
+    pub(crate) fn get(&self, prop_type: PropertyType) -> Option<&PropertyValue> {
+        self.properties.get(PropertyId::new(prop_type as u32))
     }
 }
