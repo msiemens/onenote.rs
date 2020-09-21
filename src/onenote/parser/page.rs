@@ -7,7 +7,7 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub struct Page {
-    pub(crate) title: Title,
+    pub(crate) title: Option<Title>,
     pub(crate) level: i32,
     pub(crate) author: Option<String>,
     pub(crate) height: Option<f32>,
@@ -29,7 +29,7 @@ pub(crate) fn parse_page(page_space: &ObjectSpace) -> Page {
 
     let data = parse_data(manifest, page_space);
 
-    let title = parse_title(data.title(), page_space);
+    let title = data.title().map(|id| parse_title(id, page_space));
     let level = metadata.page_level();
 
     let contents = data

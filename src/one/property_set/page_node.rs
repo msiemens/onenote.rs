@@ -15,7 +15,7 @@ pub(crate) struct Data {
     cached_title: Option<String>,
     author: Option<Author>, // FIXME: Force this?
     content: Vec<ExGuid>,
-    title: ExGuid,
+    title: Option<ExGuid>,
     orientation_portrait: bool,
     page_width: Option<f32>,  // FIXME: Force this?
     page_height: Option<f32>, // FIXME: Force this?
@@ -38,7 +38,7 @@ impl Data {
         &self.content
     }
 
-    pub(crate) fn title(&self) -> ExGuid {
+    pub(crate) fn title(&self) -> Option<ExGuid> {
         self.title
     }
 
@@ -56,10 +56,9 @@ pub(crate) fn parse(object: &Object) -> Data {
     let content =
         ObjectReference::parse_vec(PropertyType::ElementChildNodes, object).unwrap_or_default();
     let title = ObjectReference::parse_vec(PropertyType::StructureElementChildNodes, object)
-        .expect("page has no title reference prop")
+        .unwrap_or_default()
         .first()
-        .copied()
-        .expect("page has no title");
+        .copied();
     let orientation_portrait =
         simple::parse_bool(PropertyType::PortraitPage, object).unwrap_or_default();
     let page_width = simple::parse_f32(PropertyType::PageWidth, object);
