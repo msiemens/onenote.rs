@@ -44,23 +44,20 @@ impl ObjectSpace {
             .expect("no revision manifest id found");
 
         let (rev_id, revision) = Revision::parse(revision_manifest_id, object_space_id, packaging);
-        let mut base_rev_mapping_id = revision.base();
+        let mut base_rev_mapping_id = revision.base_rev_id();
 
         let mut revisions = HashMap::new();
         revisions.insert(rev_id, revision);
 
         // Resolve all base revisions
-        loop {
-            if base_rev_mapping_id.is_nil() {
-                break;
-            }
-
+        while let Some(rev_id) = base_rev_mapping_id {
             let base_rev_manifest_id = storage_index
-                .find_revision_mapping_id(base_rev_mapping_id)
+                .find_revision_mapping_id(rev_id)
                 .expect("revision mapping not found");
             let (rev_id, revision) =
                 Revision::parse(base_rev_manifest_id, object_space_id, packaging);
-            base_rev_mapping_id = revision.base();
+
+            base_rev_mapping_id = revision.base_rev_id();
 
             revisions.insert(rev_id, revision);
         }

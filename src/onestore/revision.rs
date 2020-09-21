@@ -15,8 +15,16 @@ pub(crate) struct Revision {
 }
 
 impl Revision {
-    pub(crate) fn base(&self) -> ExGuid {
-        self.base
+    pub(crate) fn base_rev_id(&self) -> Option<ExGuid> {
+        if self.base.is_nil() {
+            None
+        } else {
+            Some(self.base)
+        }
+    }
+
+    pub(crate) fn base_rev<'a>(&'a self, space: &'a ObjectSpace) -> Option<&'a Revision> {
+        self.base_rev_id().and_then(|id| space.revisions().get(&id))
     }
 
     pub(crate) fn roots(&self) -> &[(RevisionRole, ExGuid)] {
