@@ -26,4 +26,8 @@ impl PropertySet {
     pub(crate) fn iter(&self) -> impl Iterator<Item = (&PropertyId, &PropertyValue)> {
         self.0.iter()
     }
+
+    pub(crate) fn values(&self) -> impl Iterator<Item = &PropertyValue> {
+        self.0.values()
+    }
 }

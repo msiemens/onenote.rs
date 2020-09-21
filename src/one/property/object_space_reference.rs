@@ -36,14 +36,18 @@ impl ObjectSpaceReference {
             .position(|(id, _)| id.value() == prop_type as u32)
             .unwrap();
 
-        object
-            .props()
-            .properties()
-            .iter()
-            .take(prop_index)
-            .map(|(_, v)| match v {
+        Self::count_references(object.props().properties().values().take(prop_index))
+    }
+
+    fn count_references<'a>(props: impl Iterator<Item = &'a PropertyValue>) -> usize {
+        props
+            .map(|v| match v {
                 PropertyValue::ObjectSpaceId => 1,
                 PropertyValue::ObjectSpaceIds(c) => *c as usize,
+                PropertyValue::PropertyValues(_, sets) => sets
+                    .iter()
+                    .map(|set| Self::count_references(set.values()))
+                    .sum(),
                 _ => 0,
             })
             .sum()
