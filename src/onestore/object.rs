@@ -1,6 +1,7 @@
-use crate::fsshttpb::data_element::object_group::{ObjectGroupData, ObjectGroupDeclaration};
+use crate::fsshttpb::data_element::object_group::ObjectGroupData;
 use crate::fsshttpb::packaging::Packaging;
 use crate::onestore::mapping_table::MappingTable;
+use crate::onestore::revision::GroupData;
 use crate::onestore::types::jcid::JcId;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
 use crate::types::exguid::ExGuid;
@@ -11,6 +12,13 @@ pub(crate) struct Object {
     props: ObjectPropSet,
     file_data: Option<Vec<u8>>,
     mapping: MappingTable,
+}
+
+#[derive(Debug, Copy, Clone)]
+enum Partition {
+    Metadata = 4,
+    ObjectData = 1,
+    FileData = 2,
 }
 
 impl Object {
@@ -35,18 +43,20 @@ impl Object {
     pub(crate) fn parse(
         object_id: ExGuid,
         object_space_id: ExGuid,
-        objects: &[(&ObjectGroupDeclaration, &ObjectGroupData)],
+        objects: &GroupData,
         packaging: &Packaging,
     ) -> Object {
-        let metadata_object = Object::find_object(object_id, objects, 4);
-        let data_object = Object::find_object(object_id, objects, 1);
+        let metadata_object = Object::find_object(object_id, Partition::Metadata, objects)
+            .expect("object metadata is missing");
+        let data_object = Object::find_object(object_id, Partition::ObjectData, objects)
+            .expect("object data is missing");
 
         // Parse metadata
 
         let metadata = if let ObjectGroupData::Object { data, .. } = metadata_object {
             data
         } else {
-            panic!("object group metadata it not an object")
+            panic!("object metadata it not an object")
         };
 
         let jc_id = JcId::parse(&mut metadata.as_slice());
@@ -57,7 +67,7 @@ impl Object {
             if let ObjectGroupData::Object { group, cells, data } = data_object {
                 (data, group, cells)
             } else {
-                panic!("object group metadata it not an object")
+                panic!("object data it not an object")
             };
 
         let props = ObjectPropSet::parse(&mut data.as_slice());
@@ -119,27 +129,16 @@ impl Object {
 
     fn find_object<'a>(
         id: ExGuid,
-        objects: &'a [(&'a ObjectGroupDeclaration, &'a ObjectGroupData)],
-        partition_id: u64,
-    ) -> &'a ObjectGroupData {
-        objects
-            .iter()
-            .find(|(decl, _)| decl.object_id() == id && decl.partition_id() == partition_id)
-            .map(|(_, obj)| obj)
-            .unwrap_or_else(|| panic!("no object with partition id {} found", partition_id))
+        partition_id: Partition,
+        objects: &'a GroupData,
+    ) -> Option<&'a ObjectGroupData> {
+        objects.get(&(id, partition_id as u64)).cloned()
     }
 
-    fn find_blob_id(
-        id: ExGuid,
-        objects: &[(&ObjectGroupDeclaration, &ObjectGroupData)],
-    ) -> Option<ExGuid> {
-        objects
-            .iter()
-            .find(|(decl, _)| decl.object_id() == id && decl.partition_id() == 2)
-            .map(|(_, obj)| obj)
-            .map(|obj| match obj {
-                ObjectGroupData::BlobReference { blob, .. } => *blob,
-                _ => panic!("blob object is not a blob"),
-            })
+    fn find_blob_id(id: ExGuid, objects: &GroupData) -> Option<ExGuid> {
+        Self::find_object(id, Partition::FileData, objects).map(|object| match object {
+            ObjectGroupData::BlobReference { blob, .. } => *blob,
+            _ => panic!("blob object is not a blob"),
+        })
     }
 }

@@ -28,19 +28,17 @@ impl ObjectGroup {
         let mut objects = HashMap::new();
         let object_ids: Vec<_> = group.declarations.iter().map(|o| o.object_id()).collect();
 
+        let group_objects: GroupData = group
+            .declarations
+            .iter()
+            .zip(group.objects.iter())
+            .map(|(decl, data)| ((decl.object_id(), decl.partition_id()), data))
+            .collect();
+
         for object_id in object_ids {
             assert_eq!(group.declarations.len(), group.objects.len());
 
-            let object = Object::parse(
-                object_id,
-                object_space_id,
-                &*group
-                    .declarations
-                    .iter()
-                    .zip(group.objects.iter())
-                    .collect::<Vec<_>>(),
-                packaging,
-            );
+            let object = Object::parse(object_id, object_space_id, &group_objects, packaging);
 
             objects.insert(object_id, object);
         }
