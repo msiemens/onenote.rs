@@ -36,6 +36,7 @@ pub(crate) enum PropertySetId {
     EmbeddedFileContainer = 0x00080036,
     EmbeddedFileNode = 0x00060035,
     ImageNode = 0x00060011,
+    InkNode = 0x00060014,
     NoteTagSharedDefinitionContainer = 0x00120043,
     NumberListNode = 0x00060012,
     OutlineElementNode = 0x0006000D,

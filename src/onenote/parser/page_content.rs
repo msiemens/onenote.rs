@@ -10,6 +10,7 @@ pub enum PageContent {
     Outline(Outline),
     Image(Image),
     EmbeddedFile(EmbeddedFile),
+    Unknown,
 }
 
 pub(crate) fn parse_page_content(content_id: ExGuid, space: &ObjectSpace) -> PageContent {
@@ -26,6 +27,7 @@ pub(crate) fn parse_page_content(content_id: ExGuid, space: &ObjectSpace) -> Pag
             PageContent::EmbeddedFile(parse_embedded_file(content_id, space))
         }
         PropertySetId::OutlineNode => PageContent::Outline(parse_outline(content_id, space)),
+        PropertySetId::InkNode => PageContent::Unknown,
         _ => panic!("invalid content type: {:?}", id),
     }
 }
