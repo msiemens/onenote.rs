@@ -35,7 +35,7 @@ pub(crate) fn parse_page(page_space: &ObjectSpace) -> Page {
     let contents = data
         .content()
         .iter()
-        .map(|id| parse_page_content(*id, page_space))
+        .map(|content_id| parse_page_content(*content_id, page_space))
         .collect();
 
     Page {

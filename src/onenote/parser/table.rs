@@ -37,7 +37,7 @@ pub(crate) fn parse_table(table_id: ExGuid, space: &ObjectSpace) -> Table {
     let table_object = space.get_object(table_id).expect("table object is missing");
     let data = table_node::parse(table_object);
 
-    let contents = data.rows().iter().map(|id| parse_row(*id, space)).collect();
+    let contents = data.rows().iter().map(|row_id| parse_row(*row_id, space)).collect();
 
     Table {
         rows: data.row_count(),
@@ -58,7 +58,7 @@ fn parse_row(row_id: ExGuid, space: &ObjectSpace) -> TableRow {
     let contents = data
         .cells()
         .iter()
-        .map(|id| parse_cell(*id, space))
+        .map(|cell_id| parse_cell(*cell_id, space))
         .collect();
 
     TableRow { contents }
@@ -71,7 +71,7 @@ fn parse_cell(cell_id: ExGuid, space: &ObjectSpace) -> TableCell {
     let contents = data
         .contents()
         .iter()
-        .map(|id| parse_outline_element(*id, space))
+        .map(|element_id| parse_outline_element(*element_id, space))
         .collect();
 
     TableCell {

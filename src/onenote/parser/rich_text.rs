@@ -58,7 +58,7 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> RichTe
     let styles = data
         .text_run_formatting()
         .iter()
-        .map(|id| parse_style(*id, space))
+        .map(|style_id| parse_style(*style_id, space))
         .collect();
 
     // TODO: Parse lang code into iso code

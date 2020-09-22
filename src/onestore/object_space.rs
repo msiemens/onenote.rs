@@ -95,8 +95,8 @@ impl ObjectSpace {
                 .map(|root| (RevisionRole::parse(root.root_id), root.object_id)),
         );
 
-        for id in revision_manifest.group_references.iter() {
-            Self::parse_group(objects, *id, object_space_id, packaging)
+        for group_id in revision_manifest.group_references.iter() {
+            Self::parse_group(objects, *group_id, object_space_id, packaging)
         }
 
         let base_mapping_id = revision_manifest.base_rev_id;

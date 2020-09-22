@@ -57,7 +57,7 @@ pub(crate) fn parse_outline(outline_id: ExGuid, space: &ObjectSpace) -> Outline 
     let items = data
         .children()
         .iter()
-        .map(|id| parse_outline_item(*id, space))
+        .map(|item_id| parse_outline_item(*item_id, space))
         .collect();
 
     Outline {
@@ -95,7 +95,7 @@ fn parse_outline_group(group_id: ExGuid, space: &ObjectSpace) -> OutlineGroup {
     let outlines = data
         .children()
         .iter()
-        .map(|id| parse_outline_item(*id, space))
+        .map(|item_id| parse_outline_item(*item_id, space))
         .collect();
 
     OutlineGroup {
@@ -113,19 +113,19 @@ pub(crate) fn parse_outline_element(element_id: ExGuid, space: &ObjectSpace) -> 
     let children = data
         .children()
         .iter()
-        .map(|id| parse_outline_item(*id, space))
+        .map(|item_id| parse_outline_item(*item_id, space))
         .collect();
 
     let contents = data
         .contents()
         .iter()
-        .map(|id| parse_content(*id, space))
+        .map(|content_id| parse_content(*content_id, space))
         .collect();
 
     let list_contents = data
         .list_contents()
         .iter()
-        .map(|id| parse_list(*id, space))
+        .map(|list_id| parse_list(*list_id, space))
         .collect();
 
     OutlineElement {
