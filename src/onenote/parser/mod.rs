@@ -43,8 +43,6 @@ impl Parser {
             Guid::from_str("E4DBFD38-E5C7-408B-A8A1-0E7B421E1F5F").unwrap()
         );
 
-        // FIXME: Try interpreting UTF-8 as Latin1 if file not found!
-
         let base_dir = path.parent().expect("no base dir found");
         let sections = notebook::parse_toc(store.data_root())
             .iter()
