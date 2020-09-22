@@ -1,4 +1,5 @@
 use crate::fsshttpb::data_element::data_element_fragment::DataElementFragment;
+use crate::fsshttpb::data_element::object_data_blob::ObjectDataBlob;
 use crate::fsshttpb::data_element::object_group::ObjectGroup;
 use crate::fsshttpb::data_element::revision_manifest::RevisionManifest;
 use crate::fsshttpb::data_element::storage_index::StorageIndex;
@@ -14,7 +15,7 @@ pub(crate) enum DataElementValue {
     RevisionManifest(RevisionManifest),
     ObjectGroup(ObjectGroup),
     DataElementFragment(DataElementFragment),
-    ObjectDataBlob(Vec<u8>),
+    ObjectDataBlob(ObjectDataBlob),
 }
 
 impl DataElementValue {

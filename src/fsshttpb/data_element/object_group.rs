@@ -6,6 +6,8 @@ use crate::types::exguid::ExGuid;
 use crate::types::object_types::ObjectType;
 use crate::types::stream_object::ObjectHeader;
 use crate::Reader;
+use std::fmt;
+use std::fmt::Formatter;
 
 #[derive(Debug)]
 pub(crate) struct ObjectGroup {
@@ -77,7 +79,6 @@ impl ObjectChangeFrequency {
     }
 }
 
-#[derive(Debug)]
 pub(crate) enum ObjectGroupData {
     Object {
         group: Vec<ExGuid>,
@@ -94,6 +95,43 @@ pub(crate) enum ObjectGroupData {
         cells: Vec<CellId>,
         blob: ExGuid,
     },
+}
+
+struct DebugSize(usize);
+
+impl fmt::Debug for ObjectGroupData {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        match self {
+            ObjectGroupData::Object { group, cells, data } => f
+                .debug_struct("Object")
+                .field("group", group)
+                .field("cells", cells)
+                .field("data", &DebugSize(data.len()))
+                .finish(),
+            ObjectGroupData::ObjectExcluded { group, cells, size } => f
+                .debug_struct("ObjectExcluded")
+                .field("group", group)
+                .field("cells", cells)
+                .field("size", size)
+                .finish(),
+            ObjectGroupData::BlobReference {
+                objects,
+                cells,
+                blob,
+            } => f
+                .debug_struct("ObjectExcluded")
+                .field("objects", objects)
+                .field("cells", cells)
+                .field("blob", blob)
+                .finish(),
+        }
+    }
+}
+
+impl fmt::Debug for DebugSize {
+    fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
+        write!(f, "{} bytes", self.0)
+    }
 }
 
 impl DataElementValue {

@@ -74,7 +74,7 @@ impl DataElementPackage {
     pub(crate) fn find_blob(&self, id: ExGuid) -> Option<Vec<u8>> {
         self.find_element(id).map(|element| {
             if let DataElementValue::ObjectDataBlob(data) = &element.element {
-                data.to_vec()
+                data.value().to_vec()
             } else {
                 panic!("data element is not a blob")
             }
