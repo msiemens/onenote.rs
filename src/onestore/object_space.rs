@@ -96,10 +96,6 @@ impl ObjectSpace {
         );
 
         for id in revision_manifest.group_references.iter() {
-            if objects.contains_key(id) {
-                continue;
-            }
-
             Self::parse_group(objects, *id, object_space_id, packaging)
         }
 
@@ -141,6 +137,10 @@ impl ObjectSpace {
             .collect();
 
         for object_id in object_ids {
+            if objects.contains_key(&object_id) {
+                continue;
+            }
+
             assert_eq!(group.declarations.len(), group.objects.len());
 
             let object = Object::parse(object_id, object_space_id, &group_objects, packaging);
