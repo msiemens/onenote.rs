@@ -1,6 +1,4 @@
-use crate::fsshttpb::data_element::object_group::{
-    ObjectGroup, ObjectGroupData, ObjectGroupDeclaration,
-};
+use crate::fsshttpb::data_element::object_group::{ObjectGroup, ObjectGroupData};
 use crate::one::property::PropertyType;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
 use crate::onestore::types::property::PropertyValue;
@@ -16,13 +14,13 @@ pub(crate) struct StoreHeader {
 
 impl StoreHeader {
     pub(crate) fn parse(data: &ObjectGroup) -> StoreHeader {
-        let objects = &*data
+        let (_, object_data) = data
             .declarations
             .iter()
             .zip(data.objects.iter())
-            .collect::<Vec<_>>();
+            .find(|(decl, _)| decl.partition_id() == 1)
+            .expect("object data is missing");
 
-        let object_data = Self::find_object(objects, 1);
         let object_data = if let ObjectGroupData::Object { data, .. } = object_data {
             data
         } else {
@@ -56,17 +54,6 @@ impl StoreHeader {
             last_code_version_that_wrote_to_it,
             file_name_crc,
         }
-    }
-
-    fn find_object<'a>(
-        objects: &'a [(&'a ObjectGroupDeclaration, &'a ObjectGroupData)],
-        partition_id: u64,
-    ) -> &'a ObjectGroupData {
-        objects
-            .iter()
-            .find(|(decl, _)| decl.partition_id() == partition_id)
-            .map(|(_, obj)| obj)
-            .unwrap_or_else(|| panic!("no object with partition id {} found", partition_id))
     }
 
     fn parse_guid(value: &PropertyValue) -> Guid {
