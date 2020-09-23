@@ -35,11 +35,18 @@ impl<'a> ObjectSpace<'a> {
     }
 }
 
+#[derive(Debug, Clone)]
+pub(crate) struct Revision<'a> {
+    objects: HashMap<ExGuid, Object<'a>>,
+    roots: HashMap<RevisionRole, ExGuid>,
+}
+
 impl<'a, 'b> ObjectSpace<'a> {
     pub(crate) fn parse(
         mapping: &'a StorageIndexCellMapping,
         storage_index: &'a StorageIndex,
         packaging: &'a Packaging,
+        revision_cache: &'b mut HashMap<ExGuid, Revision<'a>>,
     ) -> (ExGuid, ObjectSpace<'a>) {
         let cell_id = mapping.cell_id;
 
@@ -55,14 +62,22 @@ impl<'a, 'b> ObjectSpace<'a> {
         let mut objects = HashMap::new();
         let mut roots = HashMap::new();
 
-        Self::parse_revision(
-            &mut objects,
-            &mut roots,
-            revision_manifest_id,
-            object_space_id,
-            storage_index,
-            packaging,
-        );
+        let mut rev_id = Some(revision_manifest_id);
+
+        while let Some(revision_manifest_id) = rev_id {
+            let (rev, base_rev_id) = Self::parse_revision(
+                revision_manifest_id,
+                object_space_id,
+                storage_index,
+                packaging,
+                revision_cache,
+            );
+
+            objects.extend(rev.objects.into_iter());
+            roots.extend(rev.roots.into_iter());
+
+            rev_id = base_rev_id;
+        }
 
         (
             object_space_id,
@@ -76,44 +91,40 @@ impl<'a, 'b> ObjectSpace<'a> {
     }
 
     fn parse_revision(
-        objects: &mut HashMap<ExGuid, Object>,
-        roots: &mut HashMap<RevisionRole, ExGuid>,
         revision_manifest_id: ExGuid,
         object_space_id: ExGuid,
         storage_index: &'a StorageIndex,
         packaging: &'a Packaging,
-    ) {
+        revision_cache: &'b mut HashMap<ExGuid, Revision<'a>>,
+    ) -> (Revision<'a>, Option<ExGuid>) {
         let revision_manifest = packaging
             .data_element_package
             .find_revision_manifest(revision_manifest_id)
             .expect("revision manifest not found");
+        let base_rev = revision_manifest.base_rev_id.as_option().map(|mapping_id| {
+            storage_index
+                .find_revision_mapping_id(mapping_id)
+                .expect("revision mapping not found")
+        });
 
-        roots.extend(
-            revision_manifest
-                .root_declare
-                .iter()
-                .map(|root| (RevisionRole::parse(root.root_id), root.object_id)),
-        );
+        if let Some(objects) = revision_cache.get(&revision_manifest.rev_id) {
+            return (objects.clone(), base_rev);
+        }
+
+        let roots = revision_manifest
+            .root_declare
+            .iter()
+            .map(|root| (RevisionRole::parse(root.root_id), root.object_id))
+            .collect();
+        let mut objects = HashMap::new();
 
         for group_id in revision_manifest.group_references.iter() {
-            Self::parse_group(objects, *group_id, object_space_id, packaging)
+            Self::parse_group(&mut objects, *group_id, object_space_id, packaging)
         }
 
-        let base_mapping_id = revision_manifest.base_rev_id;
-        if !base_mapping_id.is_nil() {
-            let base_rev_manifest_id = storage_index
-                .find_revision_mapping_id(base_mapping_id)
-                .expect("revision mapping not found");
+        let revision = Revision { objects, roots };
 
-            Self::parse_revision(
-                objects,
-                roots,
-                base_rev_manifest_id,
-                object_space_id,
-                storage_index,
-                packaging,
-            );
-        }
+        (revision, base_rev)
     }
 
     fn parse_group(

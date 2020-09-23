@@ -1,7 +1,7 @@
 use crate::types::exguid::ExGuid;
 use crate::types::guid::Guid;
 
-#[derive(Debug, PartialEq, Hash, Eq)]
+#[derive(Debug, PartialEq, Hash, Eq, Copy, Clone)]
 pub(crate) enum RevisionRole {
     DefaultContent,
     Metadata,

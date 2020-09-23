@@ -6,7 +6,7 @@ use crate::onestore::types::jcid::JcId;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
 use crate::types::exguid::ExGuid;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct Object<'a> {
     jc_id: JcId,
     props: ObjectPropSet,

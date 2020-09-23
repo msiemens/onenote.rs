@@ -5,7 +5,7 @@ use crate::onestore::types::prop_set::PropertySet;
 use crate::onestore::types::property::{PropertyId, PropertyValue};
 use crate::Reader;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct ObjectPropSet {
     object_ids: Vec<CompactId>,
     object_space_ids: Vec<CompactId>,

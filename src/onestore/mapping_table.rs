@@ -3,7 +3,7 @@ use std::collections::HashMap;
 use crate::onestore::types::compact_id::CompactId;
 use crate::types::exguid::ExGuid;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct MappingTable(HashMap<CompactId, ExGuid>);
 
 impl MappingTable {

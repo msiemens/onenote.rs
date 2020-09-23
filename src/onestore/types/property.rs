@@ -3,7 +3,7 @@ use crate::Reader;
 use bytes::Buf;
 use std::fmt;
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) enum PropertyValue {
     Empty,
     Bool(bool),

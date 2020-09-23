@@ -1,10 +1,9 @@
 use crate::errors::Result;
 use crate::fsshttpb::data_element::storage_index::StorageIndex;
 use crate::fsshttpb::data_element::storage_manifest::StorageManifest;
-use crate::fsshttpb::data_element::value::DataElementValue;
 use crate::fsshttpb::packaging::Packaging;
 use crate::onestore::header::StoreHeader;
-use crate::onestore::object_space::ObjectSpace;
+use crate::onestore::object_space::{ObjectSpace, Revision};
 use crate::types::cell_id::CellId;
 use crate::types::exguid::ExGuid;
 use crate::types::guid::Guid;
@@ -64,10 +63,18 @@ pub(crate) fn parse_store(package: &Packaging) -> Result<OneStore> {
 
     parsed_object_spaces.insert(header_cell_id);
 
+    // FIXME: document revision cache
+    let mut revision_cache = HashMap::new();
+
     // Parse data root
 
     let data_root_cell_id = find_data_root_cell_id(storage_manifest);
-    let (_, data_root) = parse_object_space(data_root_cell_id, storage_index, &package);
+    let (_, data_root) = parse_object_space(
+        data_root_cell_id,
+        storage_index,
+        &package,
+        &mut revision_cache,
+    );
 
     parsed_object_spaces.insert(data_root_cell_id);
 
@@ -84,7 +91,12 @@ pub(crate) fn parse_store(package: &Packaging) -> Result<OneStore> {
             continue;
         }
 
-        let (id, group) = parse_object_space(mapping.cell_id, storage_index, &package);
+        let (id, group) = parse_object_space(
+            mapping.cell_id,
+            storage_index,
+            &package,
+            &mut revision_cache,
+        );
         object_spaces.insert(id, group);
     }
 
@@ -100,13 +112,14 @@ fn parse_object_space<'a, 'b>(
     cell_id: CellId,
     storage_index: &'a StorageIndex,
     package: &'a Packaging,
+    revision_cache: &'b mut HashMap<ExGuid, Revision<'a>>,
 ) -> (ExGuid, ObjectSpace<'a>) {
     let mapping = storage_index
         .cell_mappings
         .get(&cell_id)
         .expect("cell mapping not found");
 
-    ObjectSpace::parse(mapping, storage_index, package)
+    ObjectSpace::parse(mapping, storage_index, package, revision_cache)
 }
 
 fn find_header_cell_id(manifest: &StorageManifest) -> CellId {
