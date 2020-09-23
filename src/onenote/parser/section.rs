@@ -9,16 +9,16 @@ pub struct Section {
     pub(crate) page_series: Vec<PageSeries>,
 }
 
-pub(crate) fn parse_section(space: &ObjectSpace, store: &OneStore) -> Section {
-    let metadata = parse_metadata(space);
-    let content = parse_content(space);
+pub(crate) fn parse_section(store: OneStore) -> Section {
+    let metadata = parse_metadata(store.data_root());
+    let content = parse_content(store.data_root());
 
     let display_name = metadata.display_name().map(String::from);
 
     let page_series = content
         .page_series()
         .iter()
-        .map(|page_series_id| parse_page_series(*page_series_id, space, store))
+        .map(|page_series_id| parse_page_series(*page_series_id, &store))
         .collect();
 
     Section {

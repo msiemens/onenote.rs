@@ -6,11 +6,14 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub struct PageSeries {
-    pub(crate) pages: Vec<Page>,
+    pub pages: Vec<Page>,
 }
 
-pub(crate) fn parse_page_series(id: ExGuid, space: &ObjectSpace, store: &OneStore) -> PageSeries {
-    let object = space.get_object(id).expect("page series object is missing");
+pub(crate) fn parse_page_series(id: ExGuid, store: &OneStore) -> PageSeries {
+    let object = store
+        .data_root()
+        .get_object(id)
+        .expect("page series object is missing");
     let data = page_series_node::parse(object);
     let pages = data.page_spaces();
 
