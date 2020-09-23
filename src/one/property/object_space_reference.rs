@@ -1,7 +1,7 @@
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 use crate::onestore::types::compact_id::CompactId;
-use crate::onestore::types::property::PropertyValue;
+use crate::onestore::types::property::{PropertyId, PropertyValue};
 use crate::types::exguid::ExGuid;
 
 pub(crate) struct ObjectSpaceReference;
@@ -32,11 +32,17 @@ impl ObjectSpaceReference {
         let prop_index = object
             .props()
             .properties()
-            .iter()
-            .position(|(id, _)| id.value() == prop_type as u32)
+            .index(PropertyId::new(prop_type as u32))
             .unwrap();
 
-        Self::count_references(object.props().properties().values().take(prop_index))
+        Self::count_references(
+            object
+                .props()
+                .properties()
+                .values_with_index()
+                .filter(|(idx, _)| *idx < prop_index)
+                .map(|(_, value)| value),
+        )
     }
 
     fn count_references<'a>(props: impl Iterator<Item = &'a PropertyValue>) -> usize {

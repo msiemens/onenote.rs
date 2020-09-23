@@ -1,9 +1,11 @@
 use crate::onestore::types::property::{PropertyId, PropertyValue};
 use crate::Reader;
-use indexmap::map::IndexMap;
+use std::collections::HashMap;
 
-#[derive(Debug)]
-pub(crate) struct PropertySet(IndexMap<PropertyId, PropertyValue>);
+#[derive(Debug, Clone)]
+pub(crate) struct PropertySet {
+    values: HashMap<PropertyId, (usize, PropertyValue)>,
+}
 
 impl PropertySet {
     pub(crate) fn parse(reader: Reader) -> PropertySet {
@@ -11,23 +13,28 @@ impl PropertySet {
 
         let property_ids: Vec<_> = (0..count).map(|_| PropertyId::parse(reader)).collect();
 
-        let properties = property_ids
+        let values = property_ids
             .into_iter()
-            .map(|id| (id, PropertyValue::parse(id, reader)))
+            .enumerate()
+            .map(|(idx, id)| (id, (idx, PropertyValue::parse(id, reader))))
             .collect();
 
-        PropertySet(properties)
+        PropertySet { values }
     }
 
     pub(crate) fn get(&self, id: PropertyId) -> Option<&PropertyValue> {
-        self.0.get(&id)
+        self.values.get(&id).map(|(_, value)| value)
     }
 
-    pub(crate) fn iter(&self) -> impl Iterator<Item = (&PropertyId, &PropertyValue)> {
-        self.0.iter()
+    pub(crate) fn index(&self, id: PropertyId) -> Option<usize> {
+        self.values.get(&id).map(|(index, _)| index).copied()
     }
 
     pub(crate) fn values(&self) -> impl Iterator<Item = &PropertyValue> {
-        self.0.values()
+        self.values.values().map(|(_, value)| value)
+    }
+
+    pub(crate) fn values_with_index(&self) -> impl Iterator<Item = &(usize, PropertyValue)> {
+        self.values.values()
     }
 }
