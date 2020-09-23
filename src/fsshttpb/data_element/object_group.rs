@@ -7,7 +7,7 @@ use crate::types::object_types::ObjectType;
 use crate::types::stream_object::ObjectHeader;
 use crate::Reader;
 use std::fmt;
-use std::fmt::Formatter;
+
 
 #[derive(Debug)]
 pub(crate) struct ObjectGroup {
