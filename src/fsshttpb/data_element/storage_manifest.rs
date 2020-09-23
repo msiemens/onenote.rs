@@ -5,17 +5,12 @@ use crate::types::guid::Guid;
 use crate::types::object_types::ObjectType;
 use crate::types::stream_object::ObjectHeader;
 use crate::Reader;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub(crate) struct StorageManifest {
     pub(crate) id: Guid,
-    pub(crate) roots: Vec<StorageManifestRoot>,
-}
-
-#[derive(Debug, PartialEq)]
-pub(crate) struct StorageManifestRoot {
-    pub(crate) root_manifest: ExGuid,
-    pub(crate) cell: CellId,
+    pub(crate) roots: HashMap<ExGuid, CellId>,
 }
 
 impl DataElementValue {
@@ -25,7 +20,7 @@ impl DataElementValue {
 
         let id = Guid::parse(reader);
 
-        let mut roots = vec![];
+        let mut roots = HashMap::new();
 
         loop {
             if ObjectHeader::try_parse_end_8(reader, ObjectType::DataElement).is_some() {
@@ -38,10 +33,7 @@ impl DataElementValue {
             let root_manifest = ExGuid::parse(reader);
             let cell = CellId::parse(reader);
 
-            roots.push(StorageManifestRoot {
-                root_manifest,
-                cell,
-            })
+            roots.insert(root_manifest, cell);
         }
 
         DataElementValue::StorageManifest(StorageManifest { id, roots })

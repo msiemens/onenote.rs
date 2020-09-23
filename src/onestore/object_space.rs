@@ -153,16 +153,12 @@ impl ObjectSpace {
         packaging
             .data_element_package
             .elements
-            .iter()
-            .find_map(|element| {
-                if element.id == cell_manifest_id {
-                    if let DataElementValue::CellManifest(revision_id) = &element.element {
-                        Some(*revision_id)
-                    } else {
-                        panic!("data element is not a cell manifest")
-                    }
+            .get(&cell_manifest_id)
+            .map(|element| {
+                if let DataElementValue::CellManifest(revision_id) = &element.element {
+                    *revision_id
                 } else {
-                    None
+                    panic!("data element is not a cell manifest")
                 }
             })
     }

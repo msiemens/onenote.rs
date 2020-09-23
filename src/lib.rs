@@ -2,6 +2,8 @@ use bytes::Buf;
 
 mod errors;
 mod fsshttpb;
+#[macro_use]
+mod macros;
 mod one;
 mod onenote;
 mod onestore;

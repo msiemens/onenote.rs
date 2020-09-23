@@ -1,5 +1,3 @@
-use std::fmt::Debug;
-
 use crate::fsshttpb::data_element::object_group::ObjectGroup;
 use crate::fsshttpb::data_element::revision_manifest::RevisionManifest;
 use crate::fsshttpb::data_element::storage_index::StorageIndex;
@@ -10,6 +8,8 @@ use crate::types::object_types::ObjectType;
 use crate::types::serial_number::SerialNumber;
 use crate::types::stream_object::ObjectHeader;
 use crate::Reader;
+use std::collections::HashMap;
+use std::fmt::Debug;
 
 pub mod cell_manifest;
 pub mod data_element_fragment;
@@ -23,7 +23,7 @@ pub mod value;
 #[derive(Debug)]
 pub(crate) struct DataElementPackage {
     pub(crate) header: ObjectHeader,
-    pub(crate) elements: Vec<DataElement>,
+    pub(crate) elements: HashMap<ExGuid, DataElement>,
 }
 
 impl DataElementPackage {
@@ -33,14 +33,15 @@ impl DataElementPackage {
 
         assert_eq!(reader.get_u8(), 0);
 
-        let mut elements = vec![];
+        let mut elements = HashMap::new();
 
         loop {
             if ObjectHeader::try_parse_end_8(reader, ObjectType::DataElementPackage).is_some() {
                 break;
             }
 
-            elements.push(DataElement::parse(reader));
+            let (id, element) = DataElement::parse(reader);
+            elements.insert(id, element);
         }
 
         DataElementPackage { header, elements }
@@ -72,7 +73,7 @@ impl DataElementPackage {
     }
 
     pub(crate) fn find_blob(&self, id: ExGuid) -> Option<Vec<u8>> {
-        self.find_element(id).map(|element| {
+        self.elements.get(&id).map(|element| {
             if let DataElementValue::ObjectDataBlob(data) = &element.element {
                 data.value().to_vec()
             } else {
@@ -82,7 +83,7 @@ impl DataElementPackage {
     }
 
     pub(crate) fn find_cell_revision_id(&self, id: ExGuid) -> Option<ExGuid> {
-        self.find_element(id).map(|element| {
+        self.elements.get(&id).map(|element| {
             if let DataElementValue::CellManifest(revision_id) = &element.element {
                 *revision_id
             } else {
@@ -92,7 +93,7 @@ impl DataElementPackage {
     }
 
     pub(crate) fn find_revision_manifest(&self, id: ExGuid) -> Option<&RevisionManifest> {
-        self.find_element(id).map(|element| {
+        self.elements.get(&id).map(|element| {
             if let DataElementValue::RevisionManifest(revision_manifest) = &element.element {
                 revision_manifest
             } else {
@@ -102,7 +103,7 @@ impl DataElementPackage {
     }
 
     pub(crate) fn find_object_group(&self, id: ExGuid) -> Option<&ObjectGroup> {
-        self.find_element(id).map(|element| {
+        self.elements.get(&id).map(|element| {
             if let DataElementValue::ObjectGroup(object_group) = &element.element {
                 object_group
             } else {
@@ -110,21 +111,16 @@ impl DataElementPackage {
             }
         })
     }
-
-    fn find_element(&self, id: ExGuid) -> Option<&DataElement> {
-        self.elements.iter().find(|element| element.id == id)
-    }
 }
 
 #[derive(Debug)]
 pub(crate) struct DataElement {
-    pub(crate) id: ExGuid,
     pub(crate) serial: SerialNumber,
     pub(crate) element: DataElementValue,
 }
 
 impl DataElement {
-    pub(crate) fn parse(reader: Reader) -> DataElement {
+    pub(crate) fn parse(reader: Reader) -> (ExGuid, DataElement) {
         let header = ObjectHeader::parse_16(reader);
         assert_eq!(header.object_type, ObjectType::DataElement);
 
@@ -134,10 +130,6 @@ impl DataElement {
 
         let element = DataElementValue::parse(element_type.value(), reader);
 
-        DataElement {
-            id,
-            serial,
-            element,
-        }
+        (id, DataElement { serial, element })
     }
 }

@@ -5,26 +5,23 @@ use crate::types::object_types::ObjectType;
 use crate::types::serial_number::SerialNumber;
 use crate::types::stream_object::ObjectHeader;
 use crate::Reader;
+use std::collections::HashMap;
 
 #[derive(Debug)]
 pub(crate) struct StorageIndex {
     pub(crate) manifest_mappings: Vec<StorageIndexManifestMapping>,
-    pub(crate) cell_mappings: Vec<StorageIndexCellMapping>,
-    pub(crate) revision_mappings: Vec<StorageIndexRevisionMapping>,
+    pub(crate) cell_mappings: HashMap<CellId, StorageIndexCellMapping>,
+    pub(crate) revision_mappings: HashMap<ExGuid, StorageIndexRevisionMapping>,
 }
 
 impl StorageIndex {
     pub(crate) fn find_cell_mapping_id(&self, cell_id: CellId) -> Option<ExGuid> {
-        self.cell_mappings
-            .iter()
-            .find(|mapping| mapping.cell_id == cell_id)
-            .map(|mapping| mapping.id)
+        self.cell_mappings.get(&cell_id).map(|mapping| mapping.id)
     }
 
     pub(crate) fn find_revision_mapping_id(&self, id: ExGuid) -> Option<ExGuid> {
         self.revision_mappings
-            .iter()
-            .find(|mapping| mapping.id == id)
+            .get(&id)
             .map(|mapping| mapping.revision_mapping)
     }
 }
@@ -44,7 +41,6 @@ pub(crate) struct StorageIndexCellMapping {
 
 #[derive(Debug)]
 pub(crate) struct StorageIndexRevisionMapping {
-    pub(crate) id: ExGuid,
     pub(crate) revision_mapping: ExGuid,
     pub(crate) serial: SerialNumber,
 }
@@ -52,8 +48,8 @@ pub(crate) struct StorageIndexRevisionMapping {
 impl DataElementValue {
     pub(crate) fn parse_storage_index(reader: Reader) -> DataElementValue {
         let mut manifest_mappings = vec![];
-        let mut cell_mappings = vec![];
-        let mut revision_mappings = vec![];
+        let mut cell_mappings = HashMap::new();
+        let mut revision_mappings = HashMap::new();
 
         loop {
             if ObjectHeader::try_parse_end_8(reader, ObjectType::DataElement).is_some() {
@@ -66,10 +62,14 @@ impl DataElementValue {
                     manifest_mappings.push(Self::parse_storage_index_manifest_mapping(reader))
                 }
                 ObjectType::StorageIndexCellMapping => {
-                    cell_mappings.push(Self::parse_storage_index_cell_mapping(reader))
+                    let (id, mapping) = Self::parse_storage_index_cell_mapping(reader);
+
+                    cell_mappings.insert(id, mapping);
                 }
                 ObjectType::StorageIndexRevisionMapping => {
-                    revision_mappings.push(Self::parse_storage_index_revision_mapping(reader))
+                    let (id, mapping) = Self::parse_storage_index_revision_mapping(reader);
+
+                    revision_mappings.insert(id, mapping);
                 }
                 _ => panic!("unexpected object type: 0x{:x}", object_header.object_type),
             }
@@ -89,27 +89,34 @@ impl DataElementValue {
         StorageIndexManifestMapping { mapping_id, serial }
     }
 
-    fn parse_storage_index_cell_mapping(reader: Reader) -> StorageIndexCellMapping {
+    fn parse_storage_index_cell_mapping(reader: Reader) -> (CellId, StorageIndexCellMapping) {
         let cell_id = CellId::parse(reader);
         let id = ExGuid::parse(reader);
         let serial = SerialNumber::parse(reader);
 
-        StorageIndexCellMapping {
+        (
             cell_id,
-            id,
-            serial,
-        }
+            StorageIndexCellMapping {
+                cell_id,
+                id,
+                serial,
+            },
+        )
     }
 
-    fn parse_storage_index_revision_mapping(reader: Reader) -> StorageIndexRevisionMapping {
+    fn parse_storage_index_revision_mapping(
+        reader: Reader,
+    ) -> (ExGuid, StorageIndexRevisionMapping) {
         let id = ExGuid::parse(reader);
         let revision_mapping = ExGuid::parse(reader);
         let serial = SerialNumber::parse(reader);
 
-        StorageIndexRevisionMapping {
+        (
             id,
-            revision_mapping,
-            serial,
-        }
+            StorageIndexRevisionMapping {
+                revision_mapping,
+                serial,
+            },
+        )
     }
 }

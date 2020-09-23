@@ -75,7 +75,7 @@ pub(crate) fn parse_store(package: Packaging) -> Result<OneStore> {
 
     let mut object_spaces = HashMap::new();
 
-    for mapping in &storage_index.cell_mappings {
+    for mapping in storage_index.cell_mappings.values() {
         if mapping.id.is_nil() {
             continue;
         }
@@ -103,8 +103,7 @@ fn parse_object_space(
 ) -> (ExGuid, ObjectSpace) {
     let mapping = storage_index
         .cell_mappings
-        .iter()
-        .find(|mapping| mapping.cell_id == cell_id)
+        .get(&cell_id)
         .expect("cell mapping not found");
 
     ObjectSpace::parse(mapping, storage_index, package)
@@ -114,7 +113,7 @@ fn find_storage_index(package: &Packaging) -> &StorageIndex {
     package
         .data_element_package
         .elements
-        .iter()
+        .values()
         .find_map(|element| {
             if let DataElementValue::StorageIndex(index) = &element.element {
                 Some(index)
@@ -129,7 +128,7 @@ fn find_storage_manifest(package: &Packaging) -> &StorageManifest {
     package
         .data_element_package
         .elements
-        .iter()
+        .values()
         .find_map(|element| {
             if let DataElementValue::StorageManifest(manifest) = &element.element {
                 Some(manifest)
@@ -143,29 +142,15 @@ fn find_storage_manifest(package: &Packaging) -> &StorageManifest {
 fn find_header_cell_id(manifest: &StorageManifest) -> CellId {
     manifest
         .roots
-        .iter()
-        .find(|root| {
-            root.root_manifest
-                == ExGuid::from_guid(
-                    Guid::from_str("1A5A319C-C26b-41AA-B9C5-9BD8C44E07D4").unwrap(),
-                    1,
-                )
-        })
+        .get(&exguid!({{1A5A319C-C26B-41AA-B9C5-9BD8C44E07D4}, 1}))
+        .copied()
         .expect("no header cell root")
-        .cell
 }
 
 fn find_data_root_cell_id(manifest: &StorageManifest) -> CellId {
     manifest
         .roots
-        .iter()
-        .find(|root| {
-            root.root_manifest
-                == ExGuid::from_guid(
-                    Guid::from_str("84DEFAB9-AAA3-4A0D-A3A8-520C77AC7073").unwrap(),
-                    2,
-                )
-        })
+        .get(&exguid!({{84DEFAB9-AAA3-4A0D-A3A8-520C77AC7073}, 2}))
+        .copied()
         .expect("no header cell root")
-        .cell
 }
