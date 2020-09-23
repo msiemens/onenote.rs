@@ -10,14 +10,14 @@ use std::collections::HashMap;
 pub(crate) type GroupData<'a> = HashMap<(ExGuid, u64), &'a ObjectGroupData>;
 
 #[derive(Debug)]
-pub(crate) struct ObjectSpace {
+pub(crate) struct ObjectSpace<'a> {
     id: ExGuid,
     context: ExGuid,
     roots: HashMap<RevisionRole, ExGuid>,
-    objects: HashMap<ExGuid, Object>,
+    objects: HashMap<ExGuid, Object<'a>>,
 }
 
-impl ObjectSpace {
+impl<'a> ObjectSpace<'a> {
     pub(crate) fn get_object(&self, id: ExGuid) -> Option<&Object> {
         self.objects.get(&id)
     }
@@ -35,12 +35,12 @@ impl ObjectSpace {
     }
 }
 
-impl ObjectSpace {
+impl<'a, 'b> ObjectSpace<'a> {
     pub(crate) fn parse(
-        mapping: &StorageIndexCellMapping,
-        storage_index: &StorageIndex,
-        packaging: &Packaging,
-    ) -> (ExGuid, ObjectSpace) {
+        mapping: &'a StorageIndexCellMapping,
+        storage_index: &'a StorageIndex,
+        packaging: &'a Packaging,
+    ) -> (ExGuid, ObjectSpace<'a>) {
         let cell_id = mapping.cell_id;
 
         let context = cell_id.0;
@@ -80,8 +80,8 @@ impl ObjectSpace {
         roots: &mut HashMap<RevisionRole, ExGuid>,
         revision_manifest_id: ExGuid,
         object_space_id: ExGuid,
-        storage_index: &StorageIndex,
-        packaging: &Packaging,
+        storage_index: &'a StorageIndex,
+        packaging: &'a Packaging,
     ) {
         let revision_manifest = packaging
             .data_element_package
@@ -117,10 +117,10 @@ impl ObjectSpace {
     }
 
     fn parse_group(
-        objects: &mut HashMap<ExGuid, Object>,
+        objects: &'b mut HashMap<ExGuid, Object<'a>>,
         group_id: ExGuid,
         object_space_id: ExGuid,
-        packaging: &Packaging,
+        packaging: &'a Packaging,
     ) {
         let group = packaging
             .data_element_package
@@ -149,7 +149,7 @@ impl ObjectSpace {
         }
     }
 
-    fn find_cell_manifest_id(cell_manifest_id: ExGuid, packaging: &Packaging) -> Option<ExGuid> {
+    fn find_cell_manifest_id(cell_manifest_id: ExGuid, packaging: &'a Packaging) -> Option<ExGuid> {
         packaging
             .data_element_package
             .elements

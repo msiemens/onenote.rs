@@ -7,10 +7,10 @@ use crate::onestore::types::object_prop_set::ObjectPropSet;
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
-pub(crate) struct Object {
+pub(crate) struct Object<'a> {
     jc_id: JcId,
     props: ObjectPropSet,
-    file_data: Option<Vec<u8>>,
+    file_data: Option<&'a [u8]>,
     mapping: MappingTable,
 }
 
@@ -21,7 +21,7 @@ enum Partition {
     FileData = 2,
 }
 
-impl Object {
+impl<'a> Object<'a> {
     pub(crate) fn id(&self) -> JcId {
         self.jc_id
     }
@@ -39,13 +39,13 @@ impl Object {
     }
 }
 
-impl Object {
+impl<'a, 'b> Object<'a> {
     pub(crate) fn parse(
         object_id: ExGuid,
         object_space_id: ExGuid,
-        objects: &GroupData,
-        packaging: &Packaging,
-    ) -> Object {
+        objects: &'b GroupData,
+        packaging: &'a Packaging,
+    ) -> Object<'a> {
         let metadata_object = Object::find_object(object_id, Partition::Metadata, objects)
             .expect("object metadata is missing");
         let data_object = Object::find_object(object_id, Partition::ObjectData, objects)
@@ -127,7 +127,7 @@ impl Object {
         }
     }
 
-    fn find_object<'a>(
+    fn find_object(
         id: ExGuid,
         partition_id: Partition,
         objects: &'a GroupData,
@@ -135,7 +135,7 @@ impl Object {
         objects.get(&(id, partition_id as u64)).cloned()
     }
 
-    fn find_blob_id(id: ExGuid, objects: &GroupData) -> Option<ExGuid> {
+    fn find_blob_id(id: ExGuid, objects: &'a GroupData) -> Option<ExGuid> {
         Self::find_object(id, Partition::FileData, objects).map(|object| match object {
             ObjectGroupData::BlobReference { blob, .. } => *blob,
             _ => panic!("blob object is not a blob"),

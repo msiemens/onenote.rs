@@ -36,7 +36,7 @@ impl Parser {
         let file = File::open(path)?;
         let data = Parser::read(file)?;
         let packaging = Packaging::parse(&mut Bytes::from(data))?;
-        let store = parse_store(packaging)?;
+        let store = parse_store(&packaging)?;
 
         assert_eq!(
             store.schema_guid(),

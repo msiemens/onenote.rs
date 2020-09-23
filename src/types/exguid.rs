@@ -15,6 +15,14 @@ impl ExGuid {
         self.guid.is_nil() && self.value == 0
     }
 
+    pub(crate) fn as_option(&self) -> Option<ExGuid> {
+        if self.is_nil() {
+            None
+        } else {
+            Some(*self)
+        }
+    }
+
     pub(crate) fn from_guid(guid: Guid, value: u32) -> ExGuid {
         ExGuid { guid, value }
     }

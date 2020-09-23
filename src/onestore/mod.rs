@@ -18,33 +18,33 @@ mod revision_role;
 pub(crate) mod types;
 
 #[derive(Debug)]
-pub(crate) struct OneStore {
+pub(crate) struct OneStore<'a> {
     schema: Guid,
     header: StoreHeader,
-    data_root: ObjectSpace,
-    object_spaces: HashMap<ExGuid, ObjectSpace>,
+    data_root: ObjectSpace<'a>,
+    object_spaces: HashMap<ExGuid, ObjectSpace<'a>>,
 }
 
-impl OneStore {
+impl<'a> OneStore<'a> {
     pub fn schema_guid(&self) -> Guid {
         self.schema
     }
 
-    pub(crate) fn data_root(&self) -> &ObjectSpace {
+    pub(crate) fn data_root(&'a self) -> &'a ObjectSpace {
         &self.data_root
     }
 
-    pub(crate) fn object_spaces(&self) -> &HashMap<ExGuid, ObjectSpace> {
+    pub(crate) fn object_spaces(&'a self) -> &'a HashMap<ExGuid, ObjectSpace> {
         &self.object_spaces
     }
 }
 
-pub(crate) fn parse_store(package: Packaging) -> Result<OneStore> {
+pub(crate) fn parse_store(package: &Packaging) -> Result<OneStore> {
     let mut parsed_object_spaces = HashSet::new();
 
     // [ONESTORE] 2.7.1: Parse storage manifest
-    let storage_index = find_storage_index(&package);
-    let storage_manifest = find_storage_manifest(&package);
+    let storage_index = package.find_storage_index();
+    let storage_manifest = package.find_storage_manifest();
 
     let header_cell_id = find_header_cell_id(storage_manifest);
 
@@ -96,47 +96,17 @@ pub(crate) fn parse_store(package: Packaging) -> Result<OneStore> {
     })
 }
 
-fn parse_object_space(
+fn parse_object_space<'a, 'b>(
     cell_id: CellId,
-    storage_index: &StorageIndex,
-    package: &Packaging,
-) -> (ExGuid, ObjectSpace) {
+    storage_index: &'a StorageIndex,
+    package: &'a Packaging,
+) -> (ExGuid, ObjectSpace<'a>) {
     let mapping = storage_index
         .cell_mappings
         .get(&cell_id)
         .expect("cell mapping not found");
 
     ObjectSpace::parse(mapping, storage_index, package)
-}
-
-fn find_storage_index(package: &Packaging) -> &StorageIndex {
-    package
-        .data_element_package
-        .elements
-        .values()
-        .find_map(|element| {
-            if let DataElementValue::StorageIndex(index) = &element.element {
-                Some(index)
-            } else {
-                None
-            }
-        })
-        .expect("no storage index found")
-}
-
-fn find_storage_manifest(package: &Packaging) -> &StorageManifest {
-    package
-        .data_element_package
-        .elements
-        .values()
-        .find_map(|element| {
-            if let DataElementValue::StorageManifest(manifest) = &element.element {
-                Some(manifest)
-            } else {
-                None
-            }
-        })
-        .expect("no storage manifest found")
 }
 
 fn find_header_cell_id(manifest: &StorageManifest) -> CellId {
