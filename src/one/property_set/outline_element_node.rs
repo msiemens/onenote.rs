@@ -1,49 +1,25 @@
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
-
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    created_at: Time,
-    last_modified: Time,
-    children: Vec<ExGuid>,
-    child_level: u8,
-    contents: Vec<ExGuid>,
-    list_contents: Vec<ExGuid>,
-    list_spacing: Option<f32>,
-    author_original: ExGuid,
-    author_most_recent: ExGuid,
-    rtl: bool,
-    is_deletable: bool,
-    is_selectable: bool,
-    is_title_text: bool,
-}
-
-impl Data {
-    pub(crate) fn children(&self) -> &[ExGuid] {
-        &self.children
-    }
-
-    pub(crate) fn child_level(&self) -> u8 {
-        self.child_level
-    }
-
-    pub(crate) fn contents(&self) -> &[ExGuid] {
-        &self.contents
-    }
-
-    pub(crate) fn list_contents(&self) -> &[ExGuid] {
-        &self.list_contents
-    }
-
-    pub(crate) fn list_spacing(&self) -> Option<f32> {
-        self.list_spacing
-    }
+    pub(crate) created_at: Time,
+    pub(crate) last_modified: Time,
+    pub(crate) children: Vec<ExGuid>,
+    pub(crate) child_level: u8,
+    pub(crate) contents: Vec<ExGuid>,
+    pub(crate) list_contents: Vec<ExGuid>,
+    pub(crate) list_spacing: Option<f32>,
+    pub(crate) author_original: ExGuid,
+    pub(crate) author_most_recent: ExGuid,
+    pub(crate) rtl: bool,
+    pub(crate) is_deletable: bool,
+    pub(crate) is_selectable: bool,
+    pub(crate) is_title_text: bool,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

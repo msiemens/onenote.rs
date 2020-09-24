@@ -25,13 +25,13 @@ pub(crate) fn parse_list(list_id: ExGuid, space: &ObjectSpace) -> List {
     // TODO: Parse language code
 
     List {
-        list_font: data.list_font().map(String::from),
-        list_restart: data.list_restart(),
-        list_format: data.list_format().to_vec(),
-        bold: data.bold(),
-        italic: data.italic(),
-        font: data.font().map(String::from),
-        font_size: data.font_size(),
-        font_color: data.font_color(),
+        list_font: data.list_font,
+        list_restart: data.list_restart,
+        list_format: data.list_format,
+        bold: data.bold,
+        italic: data.italic,
+        font: data.font,
+        font_size: data.font_size,
+        font_color: data.font_color,
     }
 }

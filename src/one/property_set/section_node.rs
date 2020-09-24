@@ -3,21 +3,14 @@ use crate::one::property::time::Timestamp;
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-
 use crate::types::exguid::ExGuid;
 use crate::types::guid::Guid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    entity_guid: Guid,
-    page_series: Vec<ExGuid>,
-    created_at: Timestamp,
-}
-
-impl Data {
-    pub(crate) fn page_series(&self) -> &[ExGuid] {
-        &self.page_series
-    }
+    pub(crate) entity_guid: Guid,
+    pub(crate) page_series: Vec<ExGuid>,
+    pub(crate) created_at: Timestamp,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

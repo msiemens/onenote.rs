@@ -12,28 +12,10 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    definition: Option<ExGuid>,
-    created_at: Time,
-    completed_at: Option<Time>,
-    item_status: ActionItemStatus,
-}
-
-impl Data {
-    pub fn definition(&self) -> Option<ExGuid> {
-        self.definition
-    }
-
-    pub fn created_at(&self) -> Time {
-        self.created_at
-    }
-
-    pub fn completed_at(&self) -> Option<Time> {
-        self.completed_at
-    }
-
-    pub fn item_status(&self) -> ActionItemStatus {
-        self.item_status
-    }
+    pub(crate) definition: Option<ExGuid>,
+    pub(crate) created_at: Time,
+    pub(crate) completed_at: Option<Time>,
+    pub(crate) item_status: ActionItemStatus,
 }
 
 impl Data {

@@ -10,71 +10,25 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    last_modified_time: Time,
-    tight_layout: bool,
-    text_run_formatting: Vec<ExGuid>,
-    text_run_indices: Vec<u32>,
-    paragraph_style: ExGuid,
-    paragraph_space_before: f32,
-    paragraph_space_after: f32,
-    paragraph_line_spacing_exact: Option<f32>,
-    paragraph_alignment: ParagraphAlignment,
-    text: Option<String>,
-    is_title_time: bool,
-    is_boiler_text: bool,
-    is_title_date: bool,
-    is_title_text: bool,
-    layout_alignment_in_parent: Option<LayoutAlignment>,
-    layout_alignment_self: Option<LayoutAlignment>,
-    language_code: Option<u32>,
-    rtl: bool,
-    note_tags: Vec<NoteTagData>,
-}
-
-impl Data {
-    pub(crate) fn text_run_formatting(&self) -> &[ExGuid] {
-        &self.text_run_formatting
-    }
-
-    pub(crate) fn text_run_indices(&self) -> &[u32] {
-        &self.text_run_indices
-    }
-
-    pub(crate) fn paragraph_style(&self) -> ExGuid {
-        self.paragraph_style
-    }
-
-    pub(crate) fn paragraph_space_before(&self) -> f32 {
-        self.paragraph_space_before
-    }
-
-    pub(crate) fn paragraph_space_after(&self) -> f32 {
-        self.paragraph_space_after
-    }
-
-    pub(crate) fn paragraph_line_spacing_exact(&self) -> Option<f32> {
-        self.paragraph_line_spacing_exact
-    }
-
-    pub(crate) fn paragraph_alignment(&self) -> ParagraphAlignment {
-        self.paragraph_alignment
-    }
-
-    pub(crate) fn text(&self) -> Option<&str> {
-        self.text.as_deref()
-    }
-
-    pub(crate) fn layout_alignment_in_parent(&self) -> Option<LayoutAlignment> {
-        self.layout_alignment_in_parent
-    }
-
-    pub(crate) fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
-        self.layout_alignment_self
-    }
-
-    pub fn note_tags(&self) -> &[NoteTagData] {
-        &self.note_tags
-    }
+    pub(crate) last_modified_time: Time,
+    pub(crate) tight_layout: bool,
+    pub(crate) text_run_formatting: Vec<ExGuid>,
+    pub(crate) text_run_indices: Vec<u32>,
+    pub(crate) paragraph_style: ExGuid,
+    pub(crate) paragraph_space_before: f32,
+    pub(crate) paragraph_space_after: f32,
+    pub(crate) paragraph_line_spacing_exact: Option<f32>,
+    pub(crate) paragraph_alignment: ParagraphAlignment,
+    pub(crate) text: Option<String>,
+    pub(crate) is_title_time: bool,
+    pub(crate) is_boiler_text: bool,
+    pub(crate) is_title_date: bool,
+    pub(crate) is_title_text: bool,
+    pub(crate) layout_alignment_in_parent: Option<LayoutAlignment>,
+    pub(crate) layout_alignment_self: Option<LayoutAlignment>,
+    pub(crate) language_code: Option<u32>,
+    pub(crate) rtl: bool,
+    pub(crate) note_tags: Vec<NoteTagData>,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

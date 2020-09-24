@@ -7,10 +7,10 @@ use crate::Reader;
 
 #[derive(Debug, Clone)]
 pub(crate) struct ObjectPropSet {
-    object_ids: Vec<CompactId>,
-    object_space_ids: Vec<CompactId>,
-    context_ids: Vec<CompactId>,
-    properties: PropertySet,
+    pub(crate) object_ids: Vec<CompactId>,
+    pub(crate) object_space_ids: Vec<CompactId>,
+    pub(crate) context_ids: Vec<CompactId>,
+    pub(crate) properties: PropertySet,
 }
 
 impl ObjectPropSet {

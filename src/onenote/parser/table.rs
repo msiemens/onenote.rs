@@ -1,7 +1,7 @@
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::outline_node::OutlineIndentDistance;
 use crate::one::property_set::{table_cell_node, table_node, table_row_node};
-use crate::onenote::parser::note_tag::{NoteTag, parse_note_tags};
+use crate::onenote::parser::note_tag::{parse_note_tags, NoteTag};
 use crate::onenote::parser::outline::{parse_outline_element, OutlineElement};
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
@@ -41,21 +41,21 @@ pub(crate) fn parse_table(table_id: ExGuid, space: &ObjectSpace) -> Table {
     let data = table_node::parse(table_object);
 
     let contents = data
-        .rows()
-        .iter()
-        .map(|row_id| parse_row(*row_id, space))
+        .rows
+        .into_iter()
+        .map(|row_id| parse_row(row_id, space))
         .collect();
 
     Table {
-        rows: data.row_count(),
-        cols: data.col_count(),
+        rows: data.row_count,
+        cols: data.col_count,
         contents,
-        cols_locked: data.cols_locked().to_vec(),
-        col_widths: data.col_widths().to_vec(),
-        borders_visible: data.borders_visible(),
-        layout_alignment_in_parent: data.layout_alignment_in_parent(),
-        layout_alignment_self: data.layout_alignment_self(),
-        note_tags: parse_note_tags(data.note_tags(), space),
+        cols_locked: data.cols_locked,
+        col_widths: data.col_widths,
+        borders_visible: data.borders_visible,
+        layout_alignment_in_parent: data.layout_alignment_in_parent,
+        layout_alignment_self: data.layout_alignment_self,
+        note_tags: parse_note_tags(data.note_tags, space),
     }
 }
 
@@ -64,9 +64,9 @@ fn parse_row(row_id: ExGuid, space: &ObjectSpace) -> TableRow {
     let data = table_row_node::parse(row_object);
 
     let contents = data
-        .cells()
-        .iter()
-        .map(|cell_id| parse_cell(*cell_id, space))
+        .cells
+        .into_iter()
+        .map(|cell_id| parse_cell(cell_id, space))
         .collect();
 
     TableRow { contents }
@@ -77,14 +77,14 @@ fn parse_cell(cell_id: ExGuid, space: &ObjectSpace) -> TableCell {
     let data = table_cell_node::parse(cell_object);
 
     let contents = data
-        .contents()
-        .iter()
-        .map(|element_id| parse_outline_element(*element_id, space))
+        .contents
+        .into_iter()
+        .map(|element_id| parse_outline_element(element_id, space))
         .collect();
 
     TableCell {
         contents,
-        layout_max_width: data.layout_max_width(),
-        outline_indent_distance: data.outline_indent_distance().clone(),
+        layout_max_width: data.layout_max_width,
+        outline_indent_distance: data.outline_indent_distance,
     }
 }

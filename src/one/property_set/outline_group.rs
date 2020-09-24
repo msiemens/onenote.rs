@@ -3,24 +3,13 @@ use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    last_modified: Time,
-    children: Vec<ExGuid>,
-    child_level: u8,
-}
-
-impl Data {
-    pub(crate) fn children(&self) -> &[ExGuid] {
-        &self.children
-    }
-
-    pub(crate) fn child_level(&self) -> u8 {
-        self.child_level
-    }
+    pub(crate) last_modified: Time,
+    pub(crate) children: Vec<ExGuid>,
+    pub(crate) child_level: u8,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

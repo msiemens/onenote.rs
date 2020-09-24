@@ -21,12 +21,12 @@ fn parse_toc_entry(content_id: ExGuid, space: &ObjectSpace) -> Vec<String> {
 
     let toc = toc_container::parse(content);
 
-    if let Some(name) = toc.filename() {
+    if let Some(name) = toc.filename {
         vec![name.to_string()]
     } else {
-        toc.children()
-            .iter()
-            .flat_map(|id| parse_toc_entry(*id, space))
+        toc.children
+            .into_iter()
+            .flat_map(|content_id| parse_toc_entry(content_id, space))
             .collect()
     }
 }

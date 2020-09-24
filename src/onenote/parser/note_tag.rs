@@ -26,14 +26,14 @@ pub(crate) struct NoteTagDefinition {
     action_item_type: ActionItemType,
 }
 
-pub(crate) fn parse_note_tags(note_tags: &[Data], space: &ObjectSpace) -> Vec<NoteTag> {
+pub(crate) fn parse_note_tags(note_tags: Vec<Data>, space: &ObjectSpace) -> Vec<NoteTag> {
     note_tags
-        .iter()
+        .into_iter()
         .map(|data| NoteTag {
-            completed_at: data.completed_at(),
-            item_status: data.item_status(),
+            completed_at: data.completed_at,
+            item_status: data.item_status,
             definition: data
-                .definition()
+                .definition
                 .map(|definition_id| parse_note_tag_definition(definition_id, space)),
         })
         .collect()
@@ -50,11 +50,11 @@ pub(crate) fn parse_note_tag_definition(
     let data = note_tag_shared_definition_container::parse(object);
 
     NoteTagDefinition {
-        label: data.label().to_string(),
-        status: data.status().clone(),
-        shape: data.shape(),
-        highlight_color: data.highlight_color(),
-        text_color: data.text_color(),
-        action_item_type: data.action_item_type(),
+        label: data.label,
+        status: data.status,
+        shape: data.shape,
+        highlight_color: data.highlight_color,
+        text_color: data.text_color,
+        action_item_type: data.action_item_type,
     }
 }

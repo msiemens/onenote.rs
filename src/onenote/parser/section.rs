@@ -5,20 +5,20 @@ use crate::onestore::OneStore;
 
 #[derive(Debug)]
 pub struct Section {
-    pub(crate) display_name: Option<String>,
-    pub(crate) page_series: Vec<PageSeries>,
+    pub display_name: Option<String>,
+    pub page_series: Vec<PageSeries>,
 }
 
 pub(crate) fn parse_section(store: OneStore) -> Section {
     let metadata = parse_metadata(store.data_root());
     let content = parse_content(store.data_root());
 
-    let display_name = metadata.display_name().map(String::from);
+    let display_name = metadata.display_name;
 
     let page_series = content
-        .page_series()
-        .iter()
-        .map(|page_series_id| parse_page_series(*page_series_id, &store))
+        .page_series
+        .into_iter()
+        .map(|page_series_id| parse_page_series(page_series_id, &store))
         .collect();
 
     Section {

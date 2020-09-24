@@ -5,6 +5,10 @@ use crate::onestore::object::Object;
 pub(crate) struct Author(String);
 
 impl Author {
+    pub(crate) fn into_value(self) -> String {
+        self.0
+    }
+
     pub(crate) fn name(&self) -> &str {
         &self.0
     }

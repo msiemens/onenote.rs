@@ -1,16 +1,14 @@
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Timestamp;
 use crate::one::property::PropertyType;
-
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    last_modified: Timestamp,
-    author_most_recent: ExGuid,
+    pub(crate) last_modified: Timestamp,
+    pub(crate) author_most_recent: ExGuid,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

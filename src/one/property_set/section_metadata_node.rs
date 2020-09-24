@@ -5,16 +5,10 @@ use crate::onestore::object::Object;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    schema_revision_in_order_to_read: u32,
-    schema_revision_in_order_to_write: u32,
-    display_name: Option<String>,
-    color: Option<Color>,
-}
-
-impl Data {
-    pub(crate) fn display_name(&self) -> Option<&str> {
-        self.display_name.as_deref()
-    }
+    pub(crate) schema_revision_in_order_to_read: u32,
+    pub(crate) schema_revision_in_order_to_write: u32,
+    pub(crate) display_name: Option<String>,
+    pub(crate) color: Option<Color>,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

@@ -11,16 +11,10 @@ use crate::types::guid::Guid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    entity_guid: Guid,
-    page_spaces: Vec<ExGuid>,
-    page_metadata: Vec<ExGuid>,
-    created_at: Option<Timestamp>, // FIXME: Force this?
-}
-
-impl Data {
-    pub(crate) fn page_spaces(&self) -> &[ExGuid] {
-        &self.page_spaces
-    }
+    pub(crate) entity_guid: Guid,
+    pub(crate) page_spaces: Vec<ExGuid>,
+    pub(crate) page_metadata: Vec<ExGuid>,
+    pub(crate) created_at: Option<Timestamp>, // FIXME: Force this?
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

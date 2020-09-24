@@ -6,38 +6,12 @@ use crate::onestore::object::Object;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    label: String,
-    status: NoteTagPropertyStatus,
-    shape: NoteTagShape,
-    highlight_color: Option<ColorRef>,
-    text_color: Option<ColorRef>,
-    action_item_type: ActionItemType,
-}
-
-impl Data {
-    pub fn label(&self) -> &str {
-        &self.label
-    }
-
-    pub fn status(&self) -> &NoteTagPropertyStatus {
-        &self.status
-    }
-
-    pub fn shape(&self) -> NoteTagShape {
-        self.shape
-    }
-
-    pub fn highlight_color(&self) -> Option<ColorRef> {
-        self.highlight_color
-    }
-
-    pub fn text_color(&self) -> Option<ColorRef> {
-        self.text_color
-    }
-
-    pub fn action_item_type(&self) -> ActionItemType {
-        self.action_item_type
-    }
+    pub(crate) label: String,
+    pub(crate) status: NoteTagPropertyStatus,
+    pub(crate) shape: NoteTagShape,
+    pub(crate) highlight_color: Option<ColorRef>,
+    pub(crate) text_color: Option<ColorRef>,
+    pub(crate) action_item_type: ActionItemType,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

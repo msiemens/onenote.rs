@@ -41,7 +41,7 @@ pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Image {
     let node_object = space.get_object(image_id).expect("image is missing");
     let node = image_node::parse(node_object);
 
-    let container_object_id = node.picture_container().expect("image container is empty");
+    let container_object_id = node.picture_container.expect("image container is empty");
     let container_object = space
         .get_object(container_object_id)
         .expect("image container is missing");
@@ -50,22 +50,22 @@ pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Image {
     // TODO: Parse language code
 
     Image {
-        data: container.data().to_vec(),
-        layout_max_width: node.layout_max_width(),
-        layout_max_height: node.layout_max_height(),
-        alt_text: node.alt_text().map(String::from),
-        layout_alignment_in_parent: node.layout_alignment_in_parent(),
-        layout_alignment_self: node.layout_alignment_self(),
-        image_filename: node.image_filename().map(String::from),
-        displayed_page_number: node.displayed_page_number(),
-        text: node.text().map(String::from),
-        text_language_code: node.text_language_code(),
-        picture_width: node.picture_width(),
-        picture_height: node.picture_height(),
-        hyperlink_url: node.hyperlink_url().map(String::from),
-        offset_from_parent_horizontal: node.offset_from_parent_horiz(),
-        offset_from_parent_vertical: node.offset_from_parent_vert(),
-        is_background: node.is_background(),
-        note_tags: parse_note_tags(node.note_tags(), space),
+        data: container.into_value(),
+        layout_max_width: node.layout_max_width,
+        layout_max_height: node.layout_max_height,
+        alt_text: node.alt_text.map(String::from),
+        layout_alignment_in_parent: node.layout_alignment_in_parent,
+        layout_alignment_self: node.layout_alignment_self,
+        image_filename: node.image_filename,
+        displayed_page_number: node.displayed_page_number,
+        text: node.text.map(String::from),
+        text_language_code: node.text_language_code,
+        picture_width: node.picture_width,
+        picture_height: node.picture_height,
+        hyperlink_url: node.hyperlink_url.map(String::from),
+        offset_from_parent_horizontal: node.offset_from_parent_horiz,
+        offset_from_parent_vertical: node.offset_from_parent_vert,
+        is_background: node.is_background,
+        note_tags: parse_note_tags(node.note_tags, space),
     }
 }

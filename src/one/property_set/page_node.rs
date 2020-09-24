@@ -11,40 +11,22 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    last_modified: Option<Time>,
-    cached_title: Option<String>,
-    author: Option<Author>, // FIXME: Force this?
-    content: Vec<ExGuid>,
-    title: Option<ExGuid>,
-    orientation_portrait: bool,
-    page_width: Option<f32>,  // FIXME: Force this?
-    page_height: Option<f32>, // FIXME: Force this?
-    page_margin_origin_x: Option<f32>,
-    page_margin_origin_y: Option<f32>,
-    page_margin_left: Option<f32>,   // FIXME: Force this?
-    page_margin_right: Option<f32>,  // FIXME: Force this?
-    page_margin_top: Option<f32>,    // FIXME: Force this?
-    page_margin_bottom: Option<f32>, // FIXME: Force this?
-    page_size: PageSize,
-    rtl: bool,
-}
-
-impl Data {
-    pub(crate) fn author(&self) -> Option<&Author> {
-        self.author.as_ref()
-    }
-
-    pub(crate) fn content(&self) -> &[ExGuid] {
-        &self.content
-    }
-
-    pub(crate) fn title(&self) -> Option<ExGuid> {
-        self.title
-    }
-
-    pub(crate) fn page_height(&self) -> Option<f32> {
-        self.page_height
-    }
+    pub(crate) last_modified: Option<Time>,
+    pub(crate) cached_title: Option<String>,
+    pub(crate) author: Option<Author>, // FIXME: Force this?
+    pub(crate) content: Vec<ExGuid>,
+    pub(crate) title: Option<ExGuid>,
+    pub(crate) orientation_portrait: bool,
+    pub(crate) page_width: Option<f32>,  // FIXME: Force this?
+    pub(crate) page_height: Option<f32>, // FIXME: Force this?
+    pub(crate) page_margin_origin_x: Option<f32>,
+    pub(crate) page_margin_origin_y: Option<f32>,
+    pub(crate) page_margin_left: Option<f32>, // FIXME: Force this?
+    pub(crate) page_margin_right: Option<f32>, // FIXME: Force this?
+    pub(crate) page_margin_top: Option<f32>,  // FIXME: Force this?
+    pub(crate) page_margin_bottom: Option<f32>, // FIXME: Force this?
+    pub(crate) page_size: PageSize,
+    pub(crate) rtl: bool,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

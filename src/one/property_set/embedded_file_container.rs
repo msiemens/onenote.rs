@@ -1,12 +1,13 @@
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+
 #[derive(Debug)]
-pub(crate) struct Data(Vec<u8>);
+pub(crate) struct Data(pub(crate) Vec<u8>);
 
 impl Data {
-    pub(crate) fn data(&self) -> &[u8] {
-        &self.0
+    pub(crate) fn into_value(self) -> Vec<u8> {
+        self.0
     }
 }
 

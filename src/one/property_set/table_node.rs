@@ -9,54 +9,16 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    last_modified: Time,
-    rows: Vec<ExGuid>,
-    row_count: u32,
-    col_count: u32,
-    cols_locked: Vec<u8>,
-    col_widths: Vec<f32>,
-    borders_visible: bool,
-    layout_alignment_in_parent: Option<LayoutAlignment>,
-    layout_alignment_self: Option<LayoutAlignment>,
-    note_tags: Vec<NoteTagData>,
-}
-
-impl Data {
-    pub(crate) fn rows(&self) -> &[ExGuid] {
-        &self.rows
-    }
-
-    pub(crate) fn row_count(&self) -> u32 {
-        self.row_count
-    }
-
-    pub(crate) fn col_count(&self) -> u32 {
-        self.col_count
-    }
-
-    pub(crate) fn cols_locked(&self) -> &[u8] {
-        &self.cols_locked
-    }
-
-    pub(crate) fn col_widths(&self) -> &[f32] {
-        &self.col_widths
-    }
-
-    pub(crate) fn borders_visible(&self) -> bool {
-        self.borders_visible
-    }
-
-    pub(crate) fn layout_alignment_in_parent(&self) -> Option<LayoutAlignment> {
-        self.layout_alignment_in_parent
-    }
-
-    pub(crate) fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
-        self.layout_alignment_self
-    }
-
-    pub fn note_tags(&self) -> &[NoteTagData] {
-        &self.note_tags
-    }
+    pub(crate) last_modified: Time,
+    pub(crate) rows: Vec<ExGuid>,
+    pub(crate) row_count: u32,
+    pub(crate) col_count: u32,
+    pub(crate) cols_locked: Vec<u8>,
+    pub(crate) col_widths: Vec<f32>,
+    pub(crate) borders_visible: bool,
+    pub(crate) layout_alignment_in_parent: Option<LayoutAlignment>,
+    pub(crate) layout_alignment_self: Option<LayoutAlignment>,
+    pub(crate) note_tags: Vec<NoteTagData>,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

@@ -15,7 +15,7 @@ pub(crate) fn parse_page_series(id: ExGuid, store: &OneStore) -> PageSeries {
         .get_object(id)
         .expect("page series object is missing");
     let data = page_series_node::parse(object);
-    let pages = data.page_spaces();
+    let pages = data.page_spaces;
 
     let pages = pages
         .iter()

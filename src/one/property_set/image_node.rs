@@ -9,96 +9,26 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    last_modified: Time,
-    picture_container: Option<ExGuid>,
-    layout_max_width: Option<f32>,
-    layout_max_height: Option<f32>,
-    is_layout_size_set_by_user: bool,
-    language_code: Option<u32>,
-    alt_text: Option<String>,
-    layout_alignment_in_parent: Option<LayoutAlignment>,
-    layout_alignment_self: Option<LayoutAlignment>,
-    image_filename: Option<String>,
-    displayed_page_number: Option<u32>,
-    text: Option<String>,
-    text_language_code: Option<u32>,
-    picture_width: Option<f32>,
-    picture_height: Option<f32>,
-    hyperlink_url: Option<String>,
-    note_tags: Vec<NoteTagData>,
-    offset_from_parent_horiz: Option<f32>,
-    offset_from_parent_vert: Option<f32>,
-    is_background: bool,
-}
-
-impl Data {
-    pub(crate) fn picture_container(&self) -> Option<ExGuid> {
-        self.picture_container
-    }
-
-    pub(crate) fn layout_max_width(&self) -> Option<f32> {
-        self.layout_max_width
-    }
-
-    pub(crate) fn layout_max_height(&self) -> Option<f32> {
-        self.layout_max_height
-    }
-
-    pub(crate) fn alt_text(&self) -> Option<&str> {
-        self.alt_text.as_deref()
-    }
-
-    pub(crate) fn layout_alignment_in_parent(&self) -> Option<LayoutAlignment> {
-        self.layout_alignment_in_parent
-    }
-
-    pub(crate) fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
-        self.layout_alignment_self
-    }
-
-    pub(crate) fn image_filename(&self) -> Option<&str> {
-        self.image_filename.as_deref()
-    }
-
-    pub(crate) fn displayed_page_number(&self) -> Option<u32> {
-        self.displayed_page_number
-    }
-
-    pub(crate) fn text(&self) -> Option<&str> {
-        self.text.as_deref()
-    }
-
-    pub(crate) fn text_language_code(&self) -> Option<u32> {
-        self.text_language_code
-    }
-
-    pub(crate) fn picture_width(&self) -> Option<f32> {
-        self.picture_width
-    }
-
-    pub(crate) fn picture_height(&self) -> Option<f32> {
-        self.picture_height
-    }
-
-    pub(crate) fn hyperlink_url(&self) -> Option<&str> {
-        self.hyperlink_url.as_deref()
-    }
-
-    pub(crate) fn offset_from_parent_horiz(&self) -> Option<f32> {
-        self.offset_from_parent_horiz
-    }
-
-    pub(crate) fn offset_from_parent_vert(&self) -> Option<f32> {
-        self.offset_from_parent_vert
-    }
-
-    pub(crate) fn is_background(&self) -> bool {
-        self.is_background
-    }
-
-    pub fn note_tags(&self) -> &[NoteTagData] {
-        &self.note_tags
-    }
+    pub(crate) last_modified: Time,
+    pub(crate) picture_container: Option<ExGuid>,
+    pub(crate) layout_max_width: Option<f32>,
+    pub(crate) layout_max_height: Option<f32>,
+    pub(crate) is_layout_size_set_by_user: bool,
+    pub(crate) language_code: Option<u32>,
+    pub(crate) alt_text: Option<String>,
+    pub(crate) layout_alignment_in_parent: Option<LayoutAlignment>,
+    pub(crate) layout_alignment_self: Option<LayoutAlignment>,
+    pub(crate) image_filename: Option<String>,
+    pub(crate) displayed_page_number: Option<u32>,
+    pub(crate) text: Option<String>,
+    pub(crate) text_language_code: Option<u32>,
+    pub(crate) picture_width: Option<f32>,
+    pub(crate) picture_height: Option<f32>,
+    pub(crate) hyperlink_url: Option<String>,
+    pub(crate) note_tags: Vec<NoteTagData>,
+    pub(crate) offset_from_parent_horiz: Option<f32>,
+    pub(crate) offset_from_parent_vert: Option<f32>,
+    pub(crate) is_background: bool,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

@@ -8,19 +8,13 @@ use crate::types::guid::Guid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    entity_guid: Guid,
-    cached_title: String,
-    schema_revision_in_order_to_read: Option<u32>, // FIXME: Force this?
-    schema_revision_in_order_to_write: Option<u32>, // FIXME: Force this?
-    page_level: i32,
-    created_at: Timestamp,
-    is_deleted: bool,
-}
-
-impl Data {
-    pub(crate) fn page_level(&self) -> i32 {
-        self.page_level
-    }
+    pub(crate) entity_guid: Guid,
+    pub(crate) cached_title: String,
+    pub(crate) schema_revision_in_order_to_read: Option<u32>, // FIXME: Force this?
+    pub(crate) schema_revision_in_order_to_write: Option<u32>, // FIXME: Force this?
+    pub(crate) page_level: i32,
+    pub(crate) created_at: Timestamp,
+    pub(crate) is_deleted: bool,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

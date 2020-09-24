@@ -56,29 +56,29 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> RichTe
         .expect("rich text content is missing");
     let data = rich_text_node::parse(object);
 
-    let style = parse_style(data.paragraph_style(), space);
+    let style = parse_style(data.paragraph_style, space);
 
     let styles = data
-        .text_run_formatting()
-        .iter()
-        .map(|style_id| parse_style(*style_id, space))
+        .text_run_formatting
+        .into_iter()
+        .map(|style_id| parse_style(style_id, space))
         .collect();
 
     // TODO: Parse lang code into iso code
     // dia-i18n = "0.8.0"
 
     RichText {
-        text: data.text().unwrap_or_default().to_string(),
+        text: data.text.unwrap_or_default(),
         text_run_formatting: styles,
-        text_run_indices: data.text_run_indices().to_vec(),
+        text_run_indices: data.text_run_indices,
         paragraph_style: style,
-        paragraph_space_before: data.paragraph_space_before(),
-        paragraph_space_after: data.paragraph_space_after(),
-        paragraph_line_spacing_exact: data.paragraph_line_spacing_exact(),
-        paragraph_alignment: data.paragraph_alignment(),
-        layout_alignment_in_parent: data.layout_alignment_in_parent(),
-        layout_alignment_self: data.layout_alignment_self(),
-        note_tags: parse_note_tags(data.note_tags(), space),
+        paragraph_space_before: data.paragraph_space_before,
+        paragraph_space_after: data.paragraph_space_after,
+        paragraph_line_spacing_exact: data.paragraph_line_spacing_exact,
+        paragraph_alignment: data.paragraph_alignment,
+        layout_alignment_in_parent: data.layout_alignment_in_parent,
+        layout_alignment_self: data.layout_alignment_self,
+        note_tags: parse_note_tags(data.note_tags, space),
     }
 }
 
@@ -89,25 +89,25 @@ fn parse_style(style_id: ExGuid, space: &ObjectSpace) -> ParagraphStyling {
     let data = paragraph_style_object::parse(object);
 
     ParagraphStyling {
-        charset: data.charset(),
-        bold: data.bold(),
-        italic: data.italic(),
-        underline: data.underline(),
-        strikethrough: data.strikethrough(),
-        superscript: data.superscript(),
-        subscript: data.subscript(),
-        font: data.font().map(String::from),
-        font_size: data.font_size(),
-        font_color: data.font_color(),
-        highlight: data.highlight(),
-        next_style: data.next_style().map(String::from),
-        style_id: data.style_id().map(String::from),
-        paragraph_alignment: data.paragraph_alignment(),
-        paragraph_space_before: data.paragraph_space_before(),
-        paragraph_space_after: data.paragraph_space_after(),
-        paragraph_line_spacing_exact: data.paragraph_line_spacing_exact(),
-        language_code: data.language_code(),
-        math_formatting: data.math_formatting(),
-        hyperlink: data.hyperlink(),
+        charset: data.charset,
+        bold: data.bold,
+        italic: data.italic,
+        underline: data.underline,
+        strikethrough: data.strikethrough,
+        superscript: data.superscript,
+        subscript: data.subscript,
+        font: data.font,
+        font_size: data.font_size,
+        font_color: data.font_color,
+        highlight: data.highlight,
+        next_style: data.next_style,
+        style_id: data.style_id,
+        paragraph_alignment: data.paragraph_alignment,
+        paragraph_space_before: data.paragraph_space_before,
+        paragraph_space_after: data.paragraph_space_after,
+        paragraph_line_spacing_exact: data.paragraph_line_spacing_exact,
+        language_code: data.language_code,
+        math_formatting: data.math_formatting,
+        hyperlink: data.hyperlink,
     }
 }

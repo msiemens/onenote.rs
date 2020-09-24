@@ -3,55 +3,20 @@ use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-
 use std::char::{decode_utf16, REPLACEMENT_CHARACTER};
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    last_modified: Time,
-    list_font: Option<String>,
-    list_restart: Option<i32>,
-    list_format: Vec<char>,
-    bold: bool,
-    italic: bool,
-    language_code: Option<u32>,
-    font: Option<String>,
-    font_size: Option<u16>,
-    font_color: Option<ColorRef>,
-}
-
-impl Data {
-    pub(crate) fn list_font(&self) -> Option<&str> {
-        self.list_font.as_deref()
-    }
-
-    pub(crate) fn list_restart(&self) -> Option<i32> {
-        self.list_restart
-    }
-
-    pub(crate) fn list_format(&self) -> &[char] {
-        &self.list_format
-    }
-
-    pub(crate) fn bold(&self) -> bool {
-        self.bold
-    }
-
-    pub(crate) fn italic(&self) -> bool {
-        self.italic
-    }
-
-    pub(crate) fn font(&self) -> Option<&str> {
-        self.font.as_deref()
-    }
-
-    pub(crate) fn font_size(&self) -> Option<u16> {
-        self.font_size
-    }
-
-    pub(crate) fn font_color(&self) -> Option<ColorRef> {
-        self.font_color
-    }
+    pub(crate) last_modified: Time,
+    pub(crate) list_font: Option<String>,
+    pub(crate) list_restart: Option<i32>,
+    pub(crate) list_format: Vec<char>,
+    pub(crate) bold: bool,
+    pub(crate) italic: bool,
+    pub(crate) language_code: Option<u32>,
+    pub(crate) font: Option<String>,
+    pub(crate) font_size: Option<u16>,
+    pub(crate) font_color: Option<ColorRef>,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

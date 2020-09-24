@@ -8,14 +8,8 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    last_modified: Time,
-    cells: Vec<ExGuid>,
-}
-
-impl Data {
-    pub(crate) fn cells(&self) -> &[ExGuid] {
-        &self.cells
-    }
+    pub(crate) last_modified: Time,
+    pub(crate) cells: Vec<ExGuid>,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

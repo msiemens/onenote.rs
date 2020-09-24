@@ -7,11 +7,11 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub struct Page {
-    pub(crate) title: Option<Title>,
-    pub(crate) level: i32,
-    pub(crate) author: Option<String>,
-    pub(crate) height: Option<f32>,
-    pub(crate) contents: Vec<PageContent>,
+    pub title: Option<Title>,
+    pub level: i32,
+    pub author: Option<String>,
+    pub height: Option<f32>,
+    pub contents: Vec<PageContent>,
 }
 
 #[derive(Debug)]
@@ -29,20 +29,20 @@ pub(crate) fn parse_page(page_space: &ObjectSpace) -> Page {
 
     let data = parse_data(manifest, page_space);
 
-    let title = data.title().map(|id| parse_title(id, page_space));
-    let level = metadata.page_level();
+    let title = data.title.map(|id| parse_title(id, page_space));
+    let level = metadata.page_level;
 
     let contents = data
-        .content()
-        .iter()
-        .map(|content_id| parse_page_content(*content_id, page_space))
+        .content
+        .into_iter()
+        .map(|content_id| parse_page_content(content_id, page_space))
         .collect();
 
     Page {
         title,
         level,
-        author: data.author().map(|author| author.name().to_string()),
-        height: data.page_height(),
+        author: data.author.map(|author| author.into_value()),
+        height: data.page_height,
         contents,
     }
 }
@@ -51,7 +51,7 @@ fn parse_title(title_id: ExGuid, space: &ObjectSpace) -> Title {
     let title_object = space.get_object(title_id).expect("title object is missing");
     let title = title_node::parse(title_object);
     let outline_id = title
-        .children()
+        .children
         .first()
         .copied()
         .expect("title has no outline");
@@ -60,15 +60,15 @@ fn parse_title(title_id: ExGuid, space: &ObjectSpace) -> Title {
 
     Title {
         contents,
-        offset_horizontal: title.offset_horizontal(),
-        offset_vertical: title.offset_vertical(),
-        layout_alignment_in_parent: title.layout_alignment_in_parent(),
-        layout_alignment_self: title.layout_alignment_self(),
+        offset_horizontal: title.offset_horizontal,
+        offset_vertical: title.offset_vertical,
+        layout_alignment_in_parent: title.layout_alignment_in_parent,
+        layout_alignment_self: title.layout_alignment_self,
     }
 }
 
 fn parse_data(manifest: page_manifest_node::Data, space: &ObjectSpace) -> page_node::Data {
-    let page_id = manifest.page();
+    let page_id = manifest.page;
     let page_object = space.get_object(page_id).expect("page object is missing");
 
     page_node::parse(page_object)

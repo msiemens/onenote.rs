@@ -21,7 +21,7 @@ pub(crate) fn parse_embedded_file(file_id: ExGuid, space: &ObjectSpace) -> Embed
     let node_object = space.get_object(file_id).expect("embedded file is missing");
     let node = embedded_file_node::parse(node_object);
 
-    let container_object_id = node.embedded_file_container();
+    let container_object_id = node.embedded_file_container;
     let container_object = space
         .get_object(container_object_id)
         .expect("embedded file container is missing");
@@ -30,12 +30,12 @@ pub(crate) fn parse_embedded_file(file_id: ExGuid, space: &ObjectSpace) -> Embed
     // TODO: Resolve picture container
 
     EmbeddedFile {
-        filename: node.embedded_file_name().to_string(),
-        data: container.data().to_vec(),
-        layout_max_width: node.layout_max_width(),
-        layout_max_height: node.layout_max_height(),
-        offset_from_parent_horizontal: node.offset_from_parent_horiz(),
-        offset_from_parent_vertical: node.offset_from_parent_vert(),
-        note_tags: parse_note_tags(node.note_tags(), space),
+        filename: node.embedded_file_name,
+        data: container.into_value(),
+        layout_max_width: node.layout_max_width,
+        layout_max_height: node.layout_max_height,
+        offset_from_parent_horizontal: node.offset_from_parent_horiz,
+        offset_from_parent_vertical: node.offset_from_parent_vert,
+        note_tags: parse_note_tags(node.note_tags, space),
     }
 }

@@ -8,24 +8,10 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    last_modified: Time,
-    contents: Vec<ExGuid>,
-    layout_max_width: Option<f32>,
-    outline_indent_distance: OutlineIndentDistance,
-}
-
-impl Data {
-    pub(crate) fn contents(&self) -> &[ExGuid] {
-        &self.contents
-    }
-
-    pub(crate) fn layout_max_width(&self) -> Option<f32> {
-        self.layout_max_width
-    }
-
-    pub(crate) fn outline_indent_distance(&self) -> &OutlineIndentDistance {
-        &self.outline_indent_distance
-    }
+    pub(crate) last_modified: Time,
+    pub(crate) contents: Vec<ExGuid>,
+    pub(crate) layout_max_width: Option<f32>,
+    pub(crate) outline_indent_distance: OutlineIndentDistance,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

@@ -55,18 +55,18 @@ pub(crate) fn parse_outline(outline_id: ExGuid, space: &ObjectSpace) -> Outline 
     let data = outline_node::parse(outline_object);
 
     let items = data
-        .children()
-        .iter()
-        .map(|item_id| parse_outline_item(*item_id, space))
+        .children
+        .into_iter()
+        .map(|item_id| parse_outline_item(item_id, space))
         .collect();
 
     Outline {
         items,
-        items_level: data.child_level(),
-        list_spacing: data.list_spacing(),
-        indents: data.outline_indent_distance().value().to_vec(),
-        alignment_in_parent: data.layout_alignment_in_parent().copied(),
-        alignment_self: data.layout_alignment_self().copied(),
+        items_level: data.child_level,
+        list_spacing: data.list_spacing,
+        indents: data.outline_indent_distance.into_value(),
+        alignment_in_parent: data.layout_alignment_in_parent,
+        alignment_self: data.layout_alignment_self,
     }
 }
 
@@ -93,13 +93,13 @@ fn parse_outline_group(group_id: ExGuid, space: &ObjectSpace) -> OutlineGroup {
     let data = outline_group::parse(group_object);
 
     let outlines = data
-        .children()
-        .iter()
-        .map(|item_id| parse_outline_item(*item_id, space))
+        .children
+        .into_iter()
+        .map(|item_id| parse_outline_item(item_id, space))
         .collect();
 
     OutlineGroup {
-        child_level: data.child_level(),
+        child_level: data.child_level,
         outlines,
     }
 }
@@ -111,26 +111,26 @@ pub(crate) fn parse_outline_element(element_id: ExGuid, space: &ObjectSpace) -> 
     let data = outline_element_node::parse(element_object);
 
     let children = data
-        .children()
-        .iter()
-        .map(|item_id| parse_outline_item(*item_id, space))
+        .children
+        .into_iter()
+        .map(|item_id| parse_outline_item(item_id, space))
         .collect();
 
     let contents = data
-        .contents()
-        .iter()
-        .map(|content_id| parse_content(*content_id, space))
+        .contents
+        .into_iter()
+        .map(|content_id| parse_content(content_id, space))
         .collect();
 
     let list_contents = data
-        .list_contents()
-        .iter()
-        .map(|list_id| parse_list(*list_id, space))
+        .list_contents
+        .into_iter()
+        .map(|list_id| parse_list(list_id, space))
         .collect();
 
     OutlineElement {
-        child_level: data.child_level(),
-        list_spacing: data.list_spacing(),
+        child_level: data.child_level,
+        list_spacing: data.list_spacing,
         children,
         contents,
         list_contents,

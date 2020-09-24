@@ -8,111 +8,29 @@ use crate::onestore::object::Object;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    charset: Option<Charset>,
-    bold: bool,
-    italic: bool,
-    underline: bool,
-    strikethrough: bool,
-    superscript: bool,
-    subscript: bool,
-    font: Option<String>,
-    font_size: Option<u16>,
-    font_color: Option<ColorRef>,
-    highlight: Option<ColorRef>,
-    next_style: Option<String>,
-    style_id: Option<String>,
-    paragraph_alignment: Option<ParagraphAlignment>,
-    paragraph_space_before: Option<f32>,
-    paragraph_space_after: Option<f32>,
-    paragraph_line_spacing_exact: Option<f32>,
-    language_code: Option<u32>,
-    math_formatting: bool,
-    hyperlink: bool,
-    hyperlink_protected: bool,
-    hidden: bool,
-    text_run_is_embedded_object: bool,
-}
-
-impl Data {
-    pub(crate) fn charset(&self) -> Option<Charset> {
-        self.charset
-    }
-
-    pub(crate) fn bold(&self) -> bool {
-        self.bold
-    }
-
-    pub(crate) fn italic(&self) -> bool {
-        self.italic
-    }
-
-    pub(crate) fn underline(&self) -> bool {
-        self.underline
-    }
-
-    pub(crate) fn strikethrough(&self) -> bool {
-        self.strikethrough
-    }
-
-    pub(crate) fn superscript(&self) -> bool {
-        self.superscript
-    }
-
-    pub(crate) fn subscript(&self) -> bool {
-        self.subscript
-    }
-
-    pub(crate) fn font(&self) -> Option<&str> {
-        self.font.as_deref()
-    }
-
-    pub(crate) fn font_size(&self) -> Option<u16> {
-        self.font_size
-    }
-
-    pub(crate) fn font_color(&self) -> Option<ColorRef> {
-        self.font_color
-    }
-
-    pub(crate) fn highlight(&self) -> Option<ColorRef> {
-        self.highlight
-    }
-
-    pub(crate) fn next_style(&self) -> Option<&str> {
-        self.next_style.as_deref()
-    }
-
-    pub(crate) fn style_id(&self) -> Option<&str> {
-        self.style_id.as_deref()
-    }
-
-    pub(crate) fn paragraph_alignment(&self) -> Option<ParagraphAlignment> {
-        self.paragraph_alignment
-    }
-
-    pub(crate) fn paragraph_space_before(&self) -> Option<f32> {
-        self.paragraph_space_before
-    }
-
-    pub(crate) fn paragraph_space_after(&self) -> Option<f32> {
-        self.paragraph_space_after
-    }
-
-    pub(crate) fn paragraph_line_spacing_exact(&self) -> Option<f32> {
-        self.paragraph_line_spacing_exact
-    }
-
-    pub(crate) fn language_code(&self) -> Option<u32> {
-        self.language_code
-    }
-
-    pub(crate) fn math_formatting(&self) -> bool {
-        self.math_formatting
-    }
-
-    pub(crate) fn hyperlink(&self) -> bool {
-        self.hyperlink
-    }
+    pub(crate) charset: Option<Charset>,
+    pub(crate) bold: bool,
+    pub(crate) italic: bool,
+    pub(crate) underline: bool,
+    pub(crate) strikethrough: bool,
+    pub(crate) superscript: bool,
+    pub(crate) subscript: bool,
+    pub(crate) font: Option<String>,
+    pub(crate) font_size: Option<u16>,
+    pub(crate) font_color: Option<ColorRef>,
+    pub(crate) highlight: Option<ColorRef>,
+    pub(crate) next_style: Option<String>,
+    pub(crate) style_id: Option<String>,
+    pub(crate) paragraph_alignment: Option<ParagraphAlignment>,
+    pub(crate) paragraph_space_before: Option<f32>,
+    pub(crate) paragraph_space_after: Option<f32>,
+    pub(crate) paragraph_line_spacing_exact: Option<f32>,
+    pub(crate) language_code: Option<u32>,
+    pub(crate) math_formatting: bool,
+    pub(crate) hyperlink: bool,
+    pub(crate) hyperlink_protected: bool,
+    pub(crate) hidden: bool,
+    pub(crate) text_run_is_embedded_object: bool,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {

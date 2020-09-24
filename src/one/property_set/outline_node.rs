@@ -2,69 +2,42 @@ use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
-
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-
 use crate::types::exguid::ExGuid;
 use bytes::Buf;
 
+
 #[derive(Debug)]
 pub(crate) struct Data {
-    last_modified: Time,
-    children: Vec<ExGuid>,
-    child_level: u8,
-    layout_max_height: Option<f32>,
-    layout_max_width: Option<f32>,
-    layout_reserved_width: Option<f32>,
-    layout_minimum_outline_width: Option<f32>,
-    layout_tight_alignment: bool,
-    is_layout_size_set_by_user: bool,
-    list_spacing: Option<f32>,
-    outline_indent_distance: OutlineIndentDistance,
-    layout_alignment_in_parent: Option<LayoutAlignment>,
-    layout_alignment_self: Option<LayoutAlignment>,
-    is_deletable: bool,
-    is_title_date: bool,
-    is_selectable: bool,
-    is_title_text: bool,
-    is_read_only: bool,
-    descendants_cannot_be_moved: bool,
-    tight_layout: bool,
-}
-
-impl Data {
-    pub(crate) fn children(&self) -> &[ExGuid] {
-        &self.children
-    }
-
-    pub(crate) fn child_level(&self) -> u8 {
-        self.child_level
-    }
-
-    pub(crate) fn list_spacing(&self) -> Option<f32> {
-        self.list_spacing
-    }
-
-    pub(crate) fn outline_indent_distance(&self) -> &OutlineIndentDistance {
-        &self.outline_indent_distance
-    }
-
-    pub(crate) fn layout_alignment_in_parent(&self) -> Option<&LayoutAlignment> {
-        self.layout_alignment_in_parent.as_ref()
-    }
-
-    pub(crate) fn layout_alignment_self(&self) -> Option<&LayoutAlignment> {
-        self.layout_alignment_self.as_ref()
-    }
+    pub(crate) last_modified: Time,
+    pub(crate) children: Vec<ExGuid>,
+    pub(crate) child_level: u8,
+    pub(crate) layout_max_height: Option<f32>,
+    pub(crate) layout_max_width: Option<f32>,
+    pub(crate) layout_reserved_width: Option<f32>,
+    pub(crate) layout_minimum_outline_width: Option<f32>,
+    pub(crate) layout_tight_alignment: bool,
+    pub(crate) is_layout_size_set_by_user: bool,
+    pub(crate) list_spacing: Option<f32>,
+    pub(crate) outline_indent_distance: OutlineIndentDistance,
+    pub(crate) layout_alignment_in_parent: Option<LayoutAlignment>,
+    pub(crate) layout_alignment_self: Option<LayoutAlignment>,
+    pub(crate) is_deletable: bool,
+    pub(crate) is_title_date: bool,
+    pub(crate) is_selectable: bool,
+    pub(crate) is_title_text: bool,
+    pub(crate) is_read_only: bool,
+    pub(crate) descendants_cannot_be_moved: bool,
+    pub(crate) tight_layout: bool,
 }
 
 #[derive(Debug, Clone)]
 pub(crate) struct OutlineIndentDistance(Vec<f32>);
 
 impl OutlineIndentDistance {
-    pub(crate) fn value(&self) -> &[f32] {
-        &self.0
+    pub(crate) fn into_value(self) -> Vec<f32> {
+        self.0
     }
 
     pub(crate) fn parse(object: &Object) -> Option<OutlineIndentDistance> {

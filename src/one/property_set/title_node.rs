@@ -10,34 +10,12 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    last_modified_time: Time,
-    children: Vec<ExGuid>,
-    offset_horizontal: f32,
-    offset_vertical: f32,
-    layout_alignment_in_parent: Option<LayoutAlignment>,
-    layout_alignment_self: Option<LayoutAlignment>,
-}
-
-impl Data {
-    pub(crate) fn children(&self) -> &[ExGuid] {
-        &self.children
-    }
-
-    pub(crate) fn offset_horizontal(&self) -> f32 {
-        self.offset_horizontal
-    }
-
-    pub(crate) fn offset_vertical(&self) -> f32 {
-        self.offset_vertical
-    }
-
-    pub(crate) fn layout_alignment_in_parent(&self) -> Option<LayoutAlignment> {
-        self.layout_alignment_in_parent
-    }
-
-    pub(crate) fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
-        self.layout_alignment_self
-    }
+    pub(crate) last_modified_time: Time,
+    pub(crate) children: Vec<ExGuid>,
+    pub(crate) offset_horizontal: f32,
+    pub(crate) offset_vertical: f32,
+    pub(crate) layout_alignment_in_parent: Option<LayoutAlignment>,
+    pub(crate) layout_alignment_self: Option<LayoutAlignment>,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {
