@@ -95,15 +95,15 @@ impl PropertyValue {
         }
     }
 
-    // pub(crate) fn property_values(&self) -> Option<(PropertyId, &[PropertySet])> {
-    //     if let Self::PropertyValues(id, values) = self {
-    //         Some((*id, values))
-    //     } else {
-    //         None
-    //     }
-    // }
+    pub(crate) fn to_property_values(&self) -> Option<(PropertyId, &[PropertySet])> {
+        if let Self::PropertyValues(id, values) = self {
+            Some((*id, values))
+        } else {
+            None
+        }
+    }
     //
-    // pub(crate) fn property_set(&self) -> Option<&PropertySet> {
+    // pub(crate) fn to_property_set(&self) -> Option<&PropertySet> {
     //     if let Self::PropertySet(props) = self {
     //         Some(props)
     //     } else {

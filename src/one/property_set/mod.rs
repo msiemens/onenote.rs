@@ -6,6 +6,7 @@ pub(crate) mod author_container;
 pub(crate) mod embedded_file_container;
 pub(crate) mod embedded_file_node;
 pub(crate) mod image_node;
+pub(crate) mod note_tag_container;
 pub(crate) mod note_tag_shared_definition_container;
 pub(crate) mod number_list_node;
 pub(crate) mod outline_element_node;

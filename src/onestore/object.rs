@@ -8,10 +8,10 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug, Clone)]
 pub(crate) struct Object<'a> {
-    jc_id: JcId,
-    props: ObjectPropSet,
-    file_data: Option<&'a [u8]>,
-    mapping: MappingTable,
+    pub(crate) jc_id: JcId,
+    pub(crate) props: ObjectPropSet,
+    pub(crate) file_data: Option<&'a [u8]>,
+    pub(crate) mapping: MappingTable,
 }
 
 #[derive(Debug, Copy, Clone)]

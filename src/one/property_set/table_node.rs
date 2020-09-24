@@ -1,11 +1,10 @@
 use crate::one::property::layout_alignment::LayoutAlignment;
-use crate::one::property::note_tag_state::NoteTagState;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
+use crate::one::property_set::note_tag_container::Data as NoteTagData;
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
@@ -19,7 +18,7 @@ pub(crate) struct Data {
     borders_visible: bool,
     layout_alignment_in_parent: Option<LayoutAlignment>,
     layout_alignment_self: Option<LayoutAlignment>,
-    note_tag_states: Vec<NoteTagState>,
+    note_tags: Vec<NoteTagData>,
 }
 
 impl Data {
@@ -54,6 +53,10 @@ impl Data {
     pub(crate) fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
         self.layout_alignment_self
     }
+
+    pub fn note_tags(&self) -> &[NoteTagData] {
+        &self.note_tags
+    }
 }
 
 pub(crate) fn parse(object: &Object) -> Data {
@@ -87,6 +90,8 @@ pub(crate) fn parse(object: &Object) -> Data {
         LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object);
     let layout_alignment_self = LayoutAlignment::parse(PropertyType::LayoutAlignmentSelf, object);
 
+    let note_tags = NoteTagData::parse(object).unwrap_or_default();
+
     Data {
         last_modified,
         rows,
@@ -97,6 +102,6 @@ pub(crate) fn parse(object: &Object) -> Data {
         borders_visible,
         layout_alignment_in_parent,
         layout_alignment_self,
-        note_tag_states: vec![], // FIXME: Parse this
+        note_tags,
     }
 }

@@ -3,6 +3,7 @@ use crate::one::property::color_ref::ColorRef;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::paragraph_alignment::ParagraphAlignment;
 use crate::one::property_set::{paragraph_style_object, rich_text_node};
+use crate::onenote::parser::note_tag::{parse_note_tags, NoteTag};
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 
@@ -21,6 +22,8 @@ pub struct RichText {
 
     pub(crate) layout_alignment_in_parent: Option<LayoutAlignment>,
     pub(crate) layout_alignment_self: Option<LayoutAlignment>,
+
+    pub(crate) note_tags: Vec<NoteTag>,
 }
 
 #[derive(Debug)]
@@ -75,6 +78,7 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> RichTe
         paragraph_alignment: data.paragraph_alignment(),
         layout_alignment_in_parent: data.layout_alignment_in_parent(),
         layout_alignment_self: data.layout_alignment_self(),
+        note_tags: parse_note_tags(data.note_tags(), space),
     }
 }
 

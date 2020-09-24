@@ -1,11 +1,10 @@
 use crate::one::property::layout_alignment::LayoutAlignment;
-use crate::one::property::note_tag_state::NoteTagState;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
+use crate::one::property_set::note_tag_container::Data as NoteTagData;
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
@@ -25,7 +24,7 @@ pub(crate) struct Data {
     file_type: FileType,
     picture_width: Option<f32>,
     picture_height: Option<f32>,
-    note_tag_states: Vec<NoteTagState>,
+    note_tags: Vec<NoteTagData>,
     offset_from_parent_horiz: Option<f32>,
     offset_from_parent_vert: Option<f32>,
     recording_duration: Option<u32>,
@@ -54,6 +53,10 @@ impl Data {
 
     pub(crate) fn offset_from_parent_vert(&self) -> Option<f32> {
         self.offset_from_parent_vert
+    }
+
+    pub fn note_tags(&self) -> &[NoteTagData] {
+        &self.note_tags
     }
 }
 
@@ -108,6 +111,8 @@ pub(crate) fn parse(object: &Object) -> Data {
     let offset_from_parent_vert = simple::parse_f32(PropertyType::OffsetFromParentVert, object);
     // let recording_duration = simple::parse_u32(PropertyType::Duration) // FIXME: Record duration property id not known
 
+    let note_tags = NoteTagData::parse(object).unwrap_or_default();
+
     Data {
         last_modified,
         picture_container,
@@ -124,7 +129,7 @@ pub(crate) fn parse(object: &Object) -> Data {
         file_type,
         picture_width,
         picture_height,
-        note_tag_states: vec![], // FIXME: Parse this
+        note_tags,
         offset_from_parent_horiz,
         offset_from_parent_vert,
         recording_duration: None, // FIXME: Parse this

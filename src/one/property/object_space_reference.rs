@@ -28,7 +28,7 @@ impl ObjectSpaceReference {
             })
     }
 
-    fn get_offset(prop_type: PropertyType, object: &Object) -> usize {
+    pub(crate) fn get_offset(prop_type: PropertyType, object: &Object) -> usize {
         let prop_index = object
             .props()
             .properties()
@@ -45,7 +45,7 @@ impl ObjectSpaceReference {
         )
     }
 
-    fn count_references<'a>(props: impl Iterator<Item = &'a PropertyValue>) -> usize {
+    pub(crate) fn count_references<'a>(props: impl Iterator<Item = &'a PropertyValue>) -> usize {
         props
             .map(|v| match v {
                 PropertyValue::ObjectSpaceId => 1,

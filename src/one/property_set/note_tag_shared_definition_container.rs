@@ -1,5 +1,5 @@
 use crate::one::property::color_ref::ColorRef;
-use crate::one::property::note_tag_state::ActionItemType;
+use crate::one::property::note_tag::ActionItemType;
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
@@ -12,6 +12,32 @@ pub(crate) struct Data {
     highlight_color: Option<ColorRef>,
     text_color: Option<ColorRef>,
     action_item_type: ActionItemType,
+}
+
+impl Data {
+    pub fn label(&self) -> &str {
+        &self.label
+    }
+
+    pub fn status(&self) -> &NoteTagPropertyStatus {
+        &self.status
+    }
+
+    pub fn shape(&self) -> NoteTagShape {
+        self.shape
+    }
+
+    pub fn highlight_color(&self) -> Option<ColorRef> {
+        self.highlight_color
+    }
+
+    pub fn text_color(&self) -> Option<ColorRef> {
+        self.text_color
+    }
+
+    pub fn action_item_type(&self) -> ActionItemType {
+        self.action_item_type
+    }
 }
 
 pub(crate) fn parse(object: &Object) -> Data {
@@ -41,7 +67,7 @@ pub(crate) fn parse(object: &Object) -> Data {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 pub(crate) struct NoteTagPropertyStatus {
     has_label: bool,
     has_font_color: bool,
@@ -80,7 +106,7 @@ impl NoteTagPropertyStatus {
     }
 }
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 #[allow(dead_code)]
 pub(crate) enum NoteTagShape {
     NoIcon,

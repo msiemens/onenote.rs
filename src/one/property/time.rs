@@ -1,7 +1,7 @@
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub(crate) struct Time(u32);
 
 impl Time {

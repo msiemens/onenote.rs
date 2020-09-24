@@ -1,6 +1,7 @@
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::outline_node::OutlineIndentDistance;
 use crate::one::property_set::{table_cell_node, table_node, table_row_node};
+use crate::onenote::parser::note_tag::{NoteTag, parse_note_tags};
 use crate::onenote::parser::outline::{parse_outline_element, OutlineElement};
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
@@ -18,6 +19,8 @@ pub struct Table {
 
     pub(crate) layout_alignment_in_parent: Option<LayoutAlignment>,
     pub(crate) layout_alignment_self: Option<LayoutAlignment>,
+
+    pub(crate) note_tags: Vec<NoteTag>,
 }
 
 #[derive(Debug)]
@@ -37,7 +40,11 @@ pub(crate) fn parse_table(table_id: ExGuid, space: &ObjectSpace) -> Table {
     let table_object = space.get_object(table_id).expect("table object is missing");
     let data = table_node::parse(table_object);
 
-    let contents = data.rows().iter().map(|row_id| parse_row(*row_id, space)).collect();
+    let contents = data
+        .rows()
+        .iter()
+        .map(|row_id| parse_row(*row_id, space))
+        .collect();
 
     Table {
         rows: data.row_count(),
@@ -48,6 +55,7 @@ pub(crate) fn parse_table(table_id: ExGuid, space: &ObjectSpace) -> Table {
         borders_visible: data.borders_visible(),
         layout_alignment_in_parent: data.layout_alignment_in_parent(),
         layout_alignment_self: data.layout_alignment_self(),
+        note_tags: parse_note_tags(data.note_tags(), space),
     }
 }
 

@@ -1,5 +1,6 @@
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::{image_node, picture_container};
+use crate::onenote::parser::note_tag::{parse_note_tags, NoteTag};
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 
@@ -32,6 +33,8 @@ pub struct Image {
     pub(crate) offset_from_parent_vertical: Option<f32>,
 
     pub(crate) is_background: bool,
+
+    pub(crate) note_tags: Vec<NoteTag>,
 }
 
 pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Image {
@@ -63,5 +66,6 @@ pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Image {
         offset_from_parent_horizontal: node.offset_from_parent_horiz(),
         offset_from_parent_vertical: node.offset_from_parent_vert(),
         is_background: node.is_background(),
+        note_tags: parse_note_tags(node.note_tags(), space),
     }
 }

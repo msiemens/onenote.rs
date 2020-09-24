@@ -1,4 +1,5 @@
 use crate::one::property_set::{embedded_file_container, embedded_file_node};
+use crate::onenote::parser::note_tag::{parse_note_tags, NoteTag};
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 
@@ -12,6 +13,8 @@ pub struct EmbeddedFile {
 
     pub(crate) offset_from_parent_horizontal: Option<f32>,
     pub(crate) offset_from_parent_vertical: Option<f32>,
+
+    pub(crate) note_tags: Vec<NoteTag>,
 }
 
 pub(crate) fn parse_embedded_file(file_id: ExGuid, space: &ObjectSpace) -> EmbeddedFile {
@@ -33,5 +36,6 @@ pub(crate) fn parse_embedded_file(file_id: ExGuid, space: &ObjectSpace) -> Embed
         layout_max_height: node.layout_max_height(),
         offset_from_parent_horizontal: node.offset_from_parent_horiz(),
         offset_from_parent_vertical: node.offset_from_parent_vert(),
+        note_tags: parse_note_tags(node.note_tags(), space),
     }
 }

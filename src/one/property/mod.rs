@@ -5,7 +5,7 @@ pub(crate) mod charset;
 pub(crate) mod color;
 pub(crate) mod color_ref;
 pub(crate) mod layout_alignment;
-pub(crate) mod note_tag_state;
+pub(crate) mod note_tag;
 pub(crate) mod object_reference;
 pub(crate) mod object_space_reference;
 pub(crate) mod page_size;
@@ -159,4 +159,6 @@ pub(crate) enum PropertyType {
     // Undocumented:
     TocChildren = 0x24001CF6,
     SectionFileName = 0x1C001D6B,
+    NoteTags = 0x40003489,
+    NoteTag = 0x44000811,
 }

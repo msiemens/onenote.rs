@@ -1,23 +1,28 @@
-use crate::one::property::time::Time;
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
-#[derive(Debug)]
-pub(crate) struct NoteTagState {
-    created_at: Time,
-    completed_at: Time,
-    item_status: ActionItemStatus,
-    item_type: ActionItemType,
-}
-
-#[derive(Debug)]
+#[derive(Debug, Copy, Clone)]
 pub(crate) struct ActionItemStatus {
     completed: bool,
     disabled: bool,
     task_tag: bool,
 }
 
-#[derive(Debug)]
+impl ActionItemStatus {
+    pub(crate) fn parse(object: &Object) -> Option<ActionItemStatus> {
+        object
+            .props()
+            .get(PropertyType::ActionItemStatus)
+            .map(|value| value.to_u16().expect("action item status is not a u16"))
+            .map(|value| ActionItemStatus {
+                completed: value & 0x1 != 0,
+                disabled: (value >> 1) & 0x1 != 0,
+                task_tag: (value >> 2) & 0x1 != 0,
+            })
+    }
+}
+
+#[derive(Debug, Copy, Clone)]
 #[allow(dead_code)]
 pub(crate) enum ActionItemType {
     Numeric(u16),

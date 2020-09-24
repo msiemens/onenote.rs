@@ -1,13 +1,11 @@
 use crate::one::property::layout_alignment::LayoutAlignment;
-use crate::one::property::note_tag_state::NoteTagState;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::paragraph_alignment::ParagraphAlignment;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
-
+use crate::one::property_set::note_tag_container::Data as NoteTagData;
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
@@ -30,7 +28,7 @@ pub(crate) struct Data {
     layout_alignment_self: Option<LayoutAlignment>,
     language_code: Option<u32>,
     rtl: bool,
-    note_tag_states: Vec<NoteTagState>,
+    note_tags: Vec<NoteTagData>,
 }
 
 impl Data {
@@ -73,6 +71,10 @@ impl Data {
     pub(crate) fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
         self.layout_alignment_self
     }
+
+    pub fn note_tags(&self) -> &[NoteTagData] {
+        &self.note_tags
+    }
 }
 
 pub(crate) fn parse(object: &Object) -> Data {
@@ -111,6 +113,8 @@ pub(crate) fn parse(object: &Object) -> Data {
         simple::parse_u16(PropertyType::RichEditTextLangID, object).map(|value| value as u32);
     let rtl = simple::parse_bool(PropertyType::ReadingOrderRTL, object).unwrap_or_default();
 
+    let note_tags = NoteTagData::parse(object).unwrap_or_default();
+
     Data {
         last_modified_time,
         tight_layout,
@@ -130,6 +134,6 @@ pub(crate) fn parse(object: &Object) -> Data {
         layout_alignment_self,
         language_code,
         rtl,
-        note_tag_states: vec![], // FIXME: parse this
+        note_tags,
     }
 }

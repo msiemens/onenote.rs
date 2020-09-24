@@ -10,7 +10,7 @@ use crate::types::guid::Guid;
 use std::collections::{HashMap, HashSet};
 
 pub(crate) mod header;
-mod mapping_table;
+pub(crate) mod mapping_table;
 pub(crate) mod object;
 pub(crate) mod object_space;
 mod revision_role;

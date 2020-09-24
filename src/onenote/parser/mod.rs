@@ -16,6 +16,7 @@ mod content;
 mod embedded_file;
 mod image;
 mod list;
+mod note_tag;
 mod notebook;
 mod outline;
 mod page;
