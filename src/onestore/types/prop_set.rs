@@ -4,7 +4,7 @@ use std::collections::HashMap;
 
 #[derive(Debug, Clone)]
 pub(crate) struct PropertySet {
-    values: HashMap<PropertyId, (usize, PropertyValue)>,
+    values: HashMap<u32, (usize, PropertyValue)>,
 }
 
 impl PropertySet {
@@ -16,18 +16,18 @@ impl PropertySet {
         let values = property_ids
             .into_iter()
             .enumerate()
-            .map(|(idx, id)| (id, (idx, PropertyValue::parse(id, reader))))
+            .map(|(idx, id)| (id.id(), (idx, PropertyValue::parse(id, reader))))
             .collect();
 
         PropertySet { values }
     }
 
     pub(crate) fn get(&self, id: PropertyId) -> Option<&PropertyValue> {
-        self.values.get(&id).map(|(_, value)| value)
+        self.values.get(&id.id()).map(|(_, value)| value)
     }
 
     pub(crate) fn index(&self, id: PropertyId) -> Option<usize> {
-        self.values.get(&id).map(|(index, _)| index).copied()
+        self.values.get(&id.id()).map(|(index, _)| index).copied()
     }
 
     pub(crate) fn values(&self) -> impl Iterator<Item = &PropertyValue> {

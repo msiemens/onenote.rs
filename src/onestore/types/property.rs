@@ -173,12 +173,16 @@ impl PropertyId {
         self.0
     }
 
+    pub(crate) fn id(&self) -> u32 {
+        self.0 & 0x3ffffff
+    }
+
     pub(crate) fn prop_type(&self) -> u32 {
         self.0 >> 26 & 0b011111
     }
 
     pub(crate) fn bool(&self) -> bool {
-        self.0 << 31 == 1
+        self.0 >> 31 == 1
     }
 
     pub(crate) fn parse(reader: Reader) -> PropertyId {
@@ -189,5 +193,18 @@ impl PropertyId {
 impl fmt::Debug for PropertyId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "PropertyId(0x{:08X})", self.0)
+    }
+}
+
+#[cfg(test)]
+mod test {
+    use crate::onestore::types::property::PropertyId;
+
+    #[test]
+    fn test_property_bool() {
+        assert_eq!(PropertyId::new(0x08001C04).bool(), false);
+        assert_eq!(PropertyId::new(0x88001C04).bool(), true);
+        assert_eq!(PropertyId::new(0x88001C04).id(), 0x1C04);
+        assert_eq!(PropertyId::new(0x88001C04).prop_type(), 0x2);
     }
 }
