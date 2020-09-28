@@ -158,7 +158,7 @@ pub(crate) enum PropertyType {
 
     // Undocumented:
     TocChildren = 0x24001CF6,
-    SectionFileName = 0x1C001D6B,
+    FolderChildFilename = 0x1C001D6B,
     NotebookElementOrderingID = 0x14001CB9,
     NoteTags = 0x40003489,
     NoteTag = 0x44000811,
