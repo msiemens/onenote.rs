@@ -3,7 +3,7 @@ use crate::onestore::object::Object;
 use crate::onestore::types::compact_id::CompactId;
 use crate::onestore::types::property::{PropertyId, PropertyValue};
 use crate::types::cell_id::CellId;
-use crate::types::exguid::ExGuid;
+
 
 pub(crate) struct ObjectSpaceReference;
 
