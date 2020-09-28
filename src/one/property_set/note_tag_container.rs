@@ -31,6 +31,7 @@ impl Data {
             .map(|(id, sets)| {
                 sets.iter()
                     .map(|props| Object {
+                        context_id: object.context_id,
                         jc_id: JcId(id.value()),
                         props: ObjectPropSet {
                             object_ids: Self::get_object_ids(props, object),

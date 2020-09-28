@@ -5,7 +5,6 @@ use crate::fsshttpb::packaging::Packaging;
 use crate::onestore::header::StoreHeader;
 use crate::onestore::object_space::{ObjectSpace, Revision};
 use crate::types::cell_id::CellId;
-use crate::types::exguid::ExGuid;
 use crate::types::guid::Guid;
 use std::collections::{HashMap, HashSet};
 
@@ -21,7 +20,7 @@ pub(crate) struct OneStore<'a> {
     schema: Guid,
     header: StoreHeader,
     data_root: ObjectSpace<'a>,
-    object_spaces: HashMap<ExGuid, ObjectSpace<'a>>,
+    object_spaces: HashMap<CellId, ObjectSpace<'a>>,
 }
 
 impl<'a> OneStore<'a> {
@@ -33,8 +32,8 @@ impl<'a> OneStore<'a> {
         &self.data_root
     }
 
-    pub(crate) fn object_spaces(&'a self) -> &'a HashMap<ExGuid, ObjectSpace> {
-        &self.object_spaces
+    pub(crate) fn object_space(&'a self, space_id: CellId) -> Option<&'a ObjectSpace<'a>> {
+        self.object_spaces.get(&space_id)
     }
 }
 
@@ -112,8 +111,8 @@ fn parse_object_space<'a, 'b>(
     cell_id: CellId,
     storage_index: &'a StorageIndex,
     package: &'a Packaging,
-    revision_cache: &'b mut HashMap<ExGuid, Revision<'a>>,
-) -> (ExGuid, ObjectSpace<'a>) {
+    revision_cache: &'b mut HashMap<CellId, Revision<'a>>,
+) -> (CellId, ObjectSpace<'a>) {
     let mapping = storage_index
         .cell_mappings
         .get(&cell_id)

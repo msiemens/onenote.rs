@@ -2,12 +2,13 @@ use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 use crate::onestore::types::compact_id::CompactId;
 use crate::onestore::types::property::{PropertyId, PropertyValue};
+use crate::types::cell_id::CellId;
 use crate::types::exguid::ExGuid;
 
 pub(crate) struct ObjectSpaceReference;
 
 impl ObjectSpaceReference {
-    pub(crate) fn parse_vec(prop_type: PropertyType, object: &Object) -> Option<Vec<ExGuid>> {
+    pub(crate) fn parse_vec(prop_type: PropertyType, object: &Object) -> Option<Vec<CellId>> {
         object
             .props()
             .get(prop_type)
@@ -59,10 +60,10 @@ impl ObjectSpaceReference {
             .sum()
     }
 
-    fn resolve_id(id: &CompactId, object: &Object) -> ExGuid {
+    fn resolve_id(id: &CompactId, object: &Object) -> CellId {
         object
             .mapping()
-            .get_object(*id)
+            .get_object_space(*id)
             .expect("id not defined in mapping")
     }
 }

@@ -1,19 +1,34 @@
 use std::collections::HashMap;
 
 use crate::onestore::types::compact_id::CompactId;
+use crate::types::cell_id::CellId;
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug, Clone)]
-pub(crate) struct MappingTable(HashMap<CompactId, ExGuid>);
+pub(crate) struct MappingTable {
+    objects: HashMap<CompactId, ExGuid>,
+    object_spaces: HashMap<CompactId, CellId>,
+}
 
 impl MappingTable {
-    pub(crate) fn from_entries<I: Iterator<Item = (CompactId, ExGuid)>>(
-        entries: I,
+    pub(crate) fn from_entries<
+        I: Iterator<Item = (CompactId, ExGuid)>,
+        J: Iterator<Item = (CompactId, CellId)>,
+    >(
+        objects: I,
+        object_spaces: J,
     ) -> MappingTable {
-        MappingTable(entries.collect())
+        MappingTable {
+            objects: objects.collect(),
+            object_spaces: object_spaces.collect(),
+        }
     }
 
     pub(crate) fn get_object(&self, id: CompactId) -> Option<ExGuid> {
-        self.0.get(&id).copied()
+        self.objects.get(&id).copied()
+    }
+
+    pub(crate) fn get_object_space(&self, id: CompactId) -> Option<CellId> {
+        self.object_spaces.get(&id).copied()
     }
 }

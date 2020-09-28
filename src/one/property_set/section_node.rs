@@ -8,6 +8,7 @@ use crate::types::guid::Guid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
+    pub(crate) context_id: ExGuid,
     pub(crate) entity_guid: Guid,
     pub(crate) page_series: Vec<ExGuid>,
     pub(crate) created_at: Timestamp,
@@ -15,6 +16,8 @@ pub(crate) struct Data {
 
 pub(crate) fn parse(object: &Object) -> Data {
     assert_eq!(object.id(), PropertySetId::SectionNode.as_jcid());
+
+    let context_id = object.context_id();
 
     let entity_guid = simple::parse_guid(PropertyType::NotebookManagementEntityGuid, object)
         .expect("section has no guid");
@@ -24,6 +27,7 @@ pub(crate) fn parse(object: &Object) -> Data {
         .expect("section has no creation timestamp");
 
     Data {
+        context_id,
         entity_guid,
         page_series,
         created_at,

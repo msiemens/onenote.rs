@@ -8,6 +8,8 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug, Clone)]
 pub(crate) struct Object<'a> {
+    pub(crate) context_id: ExGuid,
+
     pub(crate) jc_id: JcId,
     pub(crate) props: ObjectPropSet,
     pub(crate) file_data: Option<&'a [u8]>,
@@ -26,6 +28,10 @@ impl<'a> Object<'a> {
         self.jc_id
     }
 
+    pub(crate) fn context_id(&self) -> ExGuid {
+        self.context_id
+    }
+
     pub(crate) fn props(&self) -> &ObjectPropSet {
         &self.props
     }
@@ -42,6 +48,7 @@ impl<'a> Object<'a> {
 impl<'a, 'b> Object<'a> {
     pub(crate) fn parse(
         object_id: ExGuid,
+        context_id: ExGuid,
         object_space_id: ExGuid,
         objects: &'b GroupData,
         packaging: &'a Packaging,
@@ -90,7 +97,7 @@ impl<'a, 'b> Object<'a> {
         let object_space_refs: Vec<_> = referenced_cells
             .iter()
             .filter(|id| id.1 != object_space_id)
-            .map(|id| id.1)
+            .copied()
             .collect();
 
         assert_eq!(props.object_ids().len(), object_refs.len());
@@ -114,12 +121,12 @@ impl<'a, 'b> Object<'a> {
             .zip(object_space_refs);
 
         let mapping = MappingTable::from_entries(
-            mapping_objects
-                .chain(mapping_contexts)
-                .chain(mapping_object_spaces),
+            mapping_objects.chain(mapping_contexts),
+            mapping_object_spaces,
         );
 
         Object {
+            context_id,
             jc_id,
             props,
             file_data,

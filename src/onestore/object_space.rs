@@ -4,6 +4,7 @@ use crate::fsshttpb::data_element::value::DataElementValue;
 use crate::fsshttpb::packaging::Packaging;
 use crate::onestore::object::Object;
 use crate::onestore::revision_role::RevisionRole;
+use crate::types::cell_id::CellId;
 use crate::types::exguid::ExGuid;
 use std::collections::HashMap;
 
@@ -46,11 +47,11 @@ impl<'a, 'b> ObjectSpace<'a> {
         mapping: &'a StorageIndexCellMapping,
         storage_index: &'a StorageIndex,
         packaging: &'a Packaging,
-        revision_cache: &'b mut HashMap<ExGuid, Revision<'a>>,
-    ) -> (ExGuid, ObjectSpace<'a>) {
+        revision_cache: &'b mut HashMap<CellId, Revision<'a>>,
+    ) -> (CellId, ObjectSpace<'a>) {
         let cell_id = mapping.cell_id;
 
-        let context = cell_id.0;
+        let context_id = cell_id.0;
         let object_space_id = cell_id.1;
 
         let cell_manifest_id = ObjectSpace::find_cell_manifest_id(mapping.id, packaging)
@@ -67,6 +68,7 @@ impl<'a, 'b> ObjectSpace<'a> {
         while let Some(revision_manifest_id) = rev_id {
             let (rev, base_rev_id) = Self::parse_revision(
                 revision_manifest_id,
+                context_id,
                 object_space_id,
                 storage_index,
                 packaging,
@@ -80,10 +82,10 @@ impl<'a, 'b> ObjectSpace<'a> {
         }
 
         (
-            object_space_id,
+            cell_id,
             ObjectSpace {
                 id: object_space_id,
-                context,
+                context: context_id,
                 roots,
                 objects,
             },
@@ -92,22 +94,24 @@ impl<'a, 'b> ObjectSpace<'a> {
 
     fn parse_revision(
         revision_manifest_id: ExGuid,
+        context_id: ExGuid,
         object_space_id: ExGuid,
         storage_index: &'a StorageIndex,
         packaging: &'a Packaging,
-        revision_cache: &'b mut HashMap<ExGuid, Revision<'a>>,
+        revision_cache: &'b mut HashMap<CellId, Revision<'a>>,
     ) -> (Revision<'a>, Option<ExGuid>) {
         let revision_manifest = packaging
             .data_element_package
             .find_revision_manifest(revision_manifest_id)
             .expect("revision manifest not found");
+        let revision_id = revision_manifest.rev_id;
         let base_rev = revision_manifest.base_rev_id.as_option().map(|mapping_id| {
             storage_index
                 .find_revision_mapping_id(mapping_id)
                 .expect("revision mapping not found")
         });
 
-        if let Some(objects) = revision_cache.get(&revision_manifest.rev_id) {
+        if let Some(objects) = revision_cache.get(&CellId(context_id, revision_manifest.rev_id)) {
             return (objects.clone(), base_rev);
         }
 
@@ -119,7 +123,13 @@ impl<'a, 'b> ObjectSpace<'a> {
         let mut objects = HashMap::new();
 
         for group_id in revision_manifest.group_references.iter() {
-            Self::parse_group(&mut objects, *group_id, object_space_id, packaging)
+            Self::parse_group(
+                context_id,
+                &mut objects,
+                *group_id,
+                object_space_id,
+                packaging,
+            )
         }
 
         let revision = Revision { objects, roots };
@@ -128,6 +138,7 @@ impl<'a, 'b> ObjectSpace<'a> {
     }
 
     fn parse_group(
+        context_id: ExGuid,
         objects: &'b mut HashMap<ExGuid, Object<'a>>,
         group_id: ExGuid,
         object_space_id: ExGuid,
@@ -154,7 +165,13 @@ impl<'a, 'b> ObjectSpace<'a> {
 
             assert_eq!(group.declarations.len(), group.objects.len());
 
-            let object = Object::parse(object_id, object_space_id, &group_objects, packaging);
+            let object = Object::parse(
+                object_id,
+                context_id,
+                object_space_id,
+                &group_objects,
+                packaging,
+            );
 
             objects.insert(object_id, object);
         }
