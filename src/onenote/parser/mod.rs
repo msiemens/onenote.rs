@@ -1,13 +1,10 @@
-use bytes::Bytes;
-
 use crate::errors::Result;
 use crate::fsshttpb::packaging::Packaging;
-
-use crate::onestore::parse_store;
-
 use crate::onenote::parser::notebook::Notebook;
 use crate::onenote::parser::section::Section;
+use crate::onestore::parse_store;
 use crate::types::guid::Guid;
+use bytes::Bytes;
 use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::Path;

@@ -1,9 +1,8 @@
-use bytes::Buf;
-use num_traits::{FromPrimitive, ToPrimitive};
-
 use crate::types::compact_u64::CompactU64;
 use crate::types::object_types::ObjectType;
 use crate::Reader;
+use bytes::Buf;
+use num_traits::{FromPrimitive, ToPrimitive};
 
 #[derive(Debug)]
 pub struct ObjectHeader {

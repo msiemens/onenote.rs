@@ -1,8 +1,7 @@
-use uuid::Uuid;
-
 use crate::errors::Result;
 use crate::Reader;
 use std::fmt;
+use uuid::Uuid;
 
 #[derive(Clone, Copy, PartialEq, Hash, Eq)]
 pub struct Guid(pub Uuid);

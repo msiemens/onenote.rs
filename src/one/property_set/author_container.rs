@@ -1,5 +1,4 @@
 use crate::one::property::author::Author;
-
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 

@@ -1,7 +1,6 @@
-use std::fmt;
-
 use enum_primitive_derive::Primitive;
 use num_traits::ToPrimitive;
+use std::fmt;
 
 #[derive(Debug, Primitive, PartialEq)]
 pub enum ObjectType {

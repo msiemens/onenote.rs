@@ -1,9 +1,7 @@
 use crate::one::property::time::Timestamp;
 use crate::one::property::{simple, PropertyType};
-
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-
 use crate::types::guid::Guid;
 
 #[derive(Debug)]

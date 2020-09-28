@@ -8,7 +8,6 @@ use crate::types::stream_object::ObjectHeader;
 use crate::Reader;
 use std::fmt;
 
-
 #[derive(Debug)]
 pub(crate) struct ObjectGroup {
     pub(crate) declarations: Vec<ObjectGroupDeclaration>,

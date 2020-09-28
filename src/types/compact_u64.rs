@@ -1,6 +1,5 @@
-use bytes::Buf;
-
 use crate::Reader;
+use bytes::Buf;
 
 #[derive(Debug)]
 pub(crate) struct CompactU64(u64);
