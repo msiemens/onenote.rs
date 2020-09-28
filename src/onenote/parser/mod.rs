@@ -12,19 +12,19 @@ use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::Path;
 
-mod content;
-mod embedded_file;
-mod image;
-mod list;
-mod note_tag;
-mod notebook;
-mod outline;
-mod page;
-mod page_content;
-mod page_series;
-mod rich_text;
-mod section;
-mod table;
+pub(crate) mod content;
+pub(crate) mod embedded_file;
+pub(crate) mod image;
+pub(crate) mod list;
+pub(crate) mod note_tag;
+pub(crate) mod notebook;
+pub(crate) mod outline;
+pub(crate) mod page;
+pub(crate) mod page_content;
+pub(crate) mod page_series;
+pub(crate) mod rich_text;
+pub(crate) mod section;
+pub(crate) mod table;
 
 pub struct Parser {}
 
