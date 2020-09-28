@@ -66,17 +66,16 @@ impl<'a, 'b> ObjectSpace<'a> {
         let mut rev_id = Some(revision_manifest_id);
 
         while let Some(revision_manifest_id) = rev_id {
-            let (rev, base_rev_id) = Self::parse_revision(
+            let base_rev_id = Self::parse_revision(
                 revision_manifest_id,
                 context_id,
                 object_space_id,
                 storage_index,
                 packaging,
                 revision_cache,
+                &mut objects,
+                &mut roots,
             );
-
-            objects.extend(rev.objects.into_iter());
-            roots.extend(rev.roots.into_iter());
 
             rev_id = base_rev_id;
         }
@@ -99,7 +98,9 @@ impl<'a, 'b> ObjectSpace<'a> {
         storage_index: &'a StorageIndex,
         packaging: &'a Packaging,
         revision_cache: &'b mut HashMap<CellId, Revision<'a>>,
-    ) -> (Revision<'a>, Option<ExGuid>) {
+        objects: &'b mut HashMap<ExGuid, Object<'a>>,
+        roots: &'b mut HashMap<RevisionRole, ExGuid>,
+    ) -> Option<ExGuid> {
         let revision_manifest = packaging
             .data_element_package
             .find_revision_manifest(revision_manifest_id)
@@ -111,38 +112,41 @@ impl<'a, 'b> ObjectSpace<'a> {
                 .expect("revision mapping not found")
         });
 
-        if let Some(objects) = revision_cache.get(&CellId(context_id, revision_manifest.rev_id)) {
-            return (objects.clone(), base_rev);
+        if let Some(rev) = revision_cache.get(&CellId(context_id, revision_manifest.rev_id)) {
+            roots.extend(rev.roots.iter());
+            objects.extend(rev.objects.clone().into_iter());
+
+            return base_rev;
         }
 
-        let roots = revision_manifest
-            .root_declare
-            .iter()
-            .map(|root| (RevisionRole::parse(root.root_id), root.object_id))
-            .collect();
-        let mut objects = HashMap::new();
+        roots.extend(
+            revision_manifest
+                .root_declare
+                .iter()
+                .map(|root| (RevisionRole::parse(root.root_id), root.object_id)),
+        );
 
         for group_id in revision_manifest.group_references.iter() {
             Self::parse_group(
                 context_id,
-                &mut objects,
                 *group_id,
+                revision_id,
                 object_space_id,
                 packaging,
+                objects,
             )
         }
 
-        let revision = Revision { objects, roots };
-
-        (revision, base_rev)
+        base_rev
     }
 
     fn parse_group(
         context_id: ExGuid,
-        objects: &'b mut HashMap<ExGuid, Object<'a>>,
         group_id: ExGuid,
+        revision_id: ExGuid,
         object_space_id: ExGuid,
         packaging: &'a Packaging,
+        objects: &'b mut HashMap<ExGuid, Object<'a>>,
     ) {
         let group = packaging
             .data_element_package
