@@ -1,6 +1,6 @@
 macro_rules! guid {
     ({ $p0:tt - $p1:tt - $p2:tt - $p3:tt - $p4:tt }) => {
-        Guid::from_str(concat!(
+        crate::types::guid::Guid::from_str(concat!(
             stringify!($p0),
             '-',
             stringify!($p1),
@@ -17,7 +17,7 @@ macro_rules! guid {
 
 macro_rules! exguid {
     ({$guid:tt , $n:literal}) => {
-        ExGuid::from_guid(guid!($guid), $n)
+        crate::types::exguid::ExGuid::from_guid(guid!($guid), $n)
     };
 }
 
