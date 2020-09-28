@@ -5,15 +5,20 @@ use crate::onestore::OneStore;
 
 #[derive(Debug)]
 pub struct Section {
-    pub display_name: Option<String>,
+    pub display_name: String,
     pub page_series: Vec<PageSeries>,
 }
 
-pub(crate) fn parse_section(store: OneStore) -> Section {
+pub(crate) fn parse_section(store: OneStore, filename: String) -> Section {
     let metadata = parse_metadata(store.data_root());
     let content = parse_content(store.data_root());
 
-    let display_name = metadata.display_name;
+    let display_name = metadata.display_name.unwrap_or_else(|| {
+        filename
+            .strip_suffix(".one")
+            .unwrap_or(&*filename)
+            .to_string()
+    });
 
     let page_series = content
         .page_series

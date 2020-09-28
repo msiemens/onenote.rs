@@ -74,7 +74,13 @@ impl Parser {
             Guid::from_str("1F937CB4-B26F-445F-B9F8-17E20160E461").unwrap()
         );
 
-        Ok(section::parse_section(store.data_root(), &store))
+        Ok(section::parse_section(
+            store,
+            path.file_name()
+                .expect("invalid file")
+                .to_string_lossy()
+                .to_string(),
+        ))
     }
 
     fn read(file: File) -> Result<Vec<u8>> {
