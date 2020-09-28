@@ -16,7 +16,7 @@ pub struct Page {
 
 #[derive(Debug)]
 pub struct Title {
-    pub(crate) contents: Outline,
+    pub(crate) contents: Vec<Outline>,
     pub(crate) offset_horizontal: f32,
     pub(crate) offset_vertical: f32,
     pub(crate) layout_alignment_in_parent: Option<LayoutAlignment>,
@@ -50,13 +50,11 @@ pub(crate) fn parse_page(page_space: &ObjectSpace) -> Page {
 fn parse_title(title_id: ExGuid, space: &ObjectSpace) -> Title {
     let title_object = space.get_object(title_id).expect("title object is missing");
     let title = title_node::parse(title_object);
-    let outline_id = title
+    let contents = title
         .children
-        .first()
-        .copied()
-        .expect("title has no outline");
-
-    let contents = parse_outline(outline_id, space);
+        .into_iter()
+        .map(|outline_id| parse_outline(outline_id, space))
+        .collect();
 
     Title {
         contents,
