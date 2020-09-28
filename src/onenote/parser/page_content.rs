@@ -13,6 +13,16 @@ pub enum PageContent {
     Unknown,
 }
 
+impl PageContent {
+    pub fn outline(&self) -> Option<&Outline> {
+        if let PageContent::Outline(outline) = self {
+            Some(outline)
+        } else {
+            None
+        }
+    }
+}
+
 pub(crate) fn parse_page_content(content_id: ExGuid, space: &ObjectSpace) -> PageContent {
     let content_type = space
         .get_object(content_id)

@@ -15,6 +15,16 @@ pub enum Content {
     Unknown,
 }
 
+impl Content {
+    pub fn rich_text(&self) -> Option<&RichText> {
+        if let Content::RichText(rich_text) = self {
+            Some(rich_text)
+        } else {
+            None
+        }
+    }
+}
+
 pub(crate) fn parse_content(content_id: ExGuid, space: &ObjectSpace) -> Content {
     let content_type = space
         .get_object(content_id)

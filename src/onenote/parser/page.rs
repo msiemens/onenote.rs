@@ -14,6 +14,32 @@ pub struct Page {
     pub contents: Vec<PageContent>,
 }
 
+impl Page {
+    pub fn title_text(&self) -> Option<&str> {
+        self.title
+            .as_ref()
+            .and_then(|title| title.contents.first())
+            .and_then(Self::outline_text)
+            .or_else(|| {
+                self.contents
+                    .iter()
+                    .filter_map(|page_content| page_content.outline())
+                    .filter_map(Self::outline_text)
+                    .next()
+            })
+    }
+
+    fn outline_text(outline: &Outline) -> Option<&str> {
+        outline
+            .items
+            .first()
+            .and_then(|outline_item| outline_item.element())
+            .and_then(|outline_element| outline_element.contents.first())
+            .and_then(|content| content.rich_text())
+            .and_then(|text| Some(&*text.text).filter(|s| !s.is_empty()))
+    }
+}
+
 #[derive(Debug)]
 pub struct Title {
     pub(crate) contents: Vec<Outline>,

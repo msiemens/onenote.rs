@@ -21,6 +21,16 @@ pub enum OutlineItem {
     Element(OutlineElement),
 }
 
+impl OutlineItem {
+    pub fn element(&self) -> Option<&OutlineElement> {
+        if let OutlineItem::Element(element) = self {
+            Some(element)
+        } else {
+            None
+        }
+    }
+}
+
 #[derive(Debug)]
 pub struct OutlineGroup {
     pub(crate) child_level: u8,
