@@ -12,6 +12,7 @@ pub enum Content {
     Table(Table),
     Image(Image),
     EmbeddedFile(EmbeddedFile),
+    Unknown,
 }
 
 pub(crate) fn parse_content(content_id: ExGuid, space: &ObjectSpace) -> Content {
@@ -28,6 +29,7 @@ pub(crate) fn parse_content(content_id: ExGuid, space: &ObjectSpace) -> Content 
         }
         PropertySetId::RichTextNode => Content::RichText(parse_rich_text(content_id, space)),
         PropertySetId::TableNode => Content::Table(parse_table(content_id, space)),
+        PropertySetId::InkNode => Content::Unknown,
         _ => panic!("invalid content type: {:?}", id),
     }
 }
