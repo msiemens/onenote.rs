@@ -105,7 +105,6 @@ impl<'a, 'b> ObjectSpace<'a> {
             .data_element_package
             .find_revision_manifest(revision_manifest_id)
             .expect("revision manifest not found");
-        let revision_id = revision_manifest.rev_id;
         let base_rev = revision_manifest.base_rev_id.as_option().map(|mapping_id| {
             storage_index
                 .find_revision_mapping_id(mapping_id)
@@ -127,14 +126,7 @@ impl<'a, 'b> ObjectSpace<'a> {
         );
 
         for group_id in revision_manifest.group_references.iter() {
-            Self::parse_group(
-                context_id,
-                *group_id,
-                revision_id,
-                object_space_id,
-                packaging,
-                objects,
-            )
+            Self::parse_group(context_id, *group_id, object_space_id, packaging, objects)
         }
 
         base_rev
@@ -143,7 +135,6 @@ impl<'a, 'b> ObjectSpace<'a> {
     fn parse_group(
         context_id: ExGuid,
         group_id: ExGuid,
-        revision_id: ExGuid,
         object_space_id: ExGuid,
         packaging: &'a Packaging,
         objects: &'b mut HashMap<ExGuid, Object<'a>>,
