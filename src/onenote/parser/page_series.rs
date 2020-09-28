@@ -30,10 +30,3 @@ pub(crate) fn parse_page_series(id: ExGuid, store: &OneStore) -> PageSeries {
 
     PageSeries { pages }
 }
-
-fn is_version_object_space(space: &ObjectSpace) -> bool {
-    let version_space_context =
-        ExGuid::parse_str("7111497f-1b6b-4209-9491-c98b04cf4c5a", 1).unwrap();
-
-    space.context() == version_space_context
-}
