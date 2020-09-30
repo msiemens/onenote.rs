@@ -24,7 +24,7 @@ impl ObjectReference {
                     .nth(Self::get_offset(prop_type, object))
                     .expect("object id index corrupt")
             })
-            .map(|id| Self::resolve_id(id, object))
+            .and_then(|id| Self::resolve_id(id, object))
     }
 
     pub(crate) fn parse_vec(prop_type: PropertyType, object: &Object) -> Option<Vec<ExGuid>> {
@@ -43,7 +43,7 @@ impl ObjectReference {
                     .iter()
                     .skip(Self::get_offset(prop_type, object))
                     .take(count as usize)
-                    .map(|id| Self::resolve_id(id, object))
+                    .flat_map(|id| Self::resolve_id(id, object))
                     .collect()
             })
     }
@@ -79,10 +79,7 @@ impl ObjectReference {
             .sum()
     }
 
-    fn resolve_id(id: &CompactId, object: &Object) -> ExGuid {
-        object
-            .mapping()
-            .get_object(*id)
-            .expect("id not defined in mapping")
+    fn resolve_id(id: &CompactId, object: &Object) -> Option<ExGuid> {
+        object.mapping().get_object(*id)
     }
 }

@@ -100,7 +100,7 @@ impl<'a, 'b> Object<'a> {
             .copied()
             .collect();
 
-        assert_eq!(props.object_ids().len(), object_refs.len());
+        assert!(props.object_ids().len() >= object_refs.len());
         assert_eq!(
             props.context_ids().len() + props.object_space_ids().len(),
             referenced_cells.len()
