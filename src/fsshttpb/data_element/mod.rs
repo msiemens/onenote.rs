@@ -1,7 +1,9 @@
+use crate::fsshttpb::data_element::data_element_fragment::DataElementFragment;
+use crate::fsshttpb::data_element::object_data_blob::ObjectDataBlob;
 use crate::fsshttpb::data_element::object_group::ObjectGroup;
 use crate::fsshttpb::data_element::revision_manifest::RevisionManifest;
 use crate::fsshttpb::data_element::storage_index::StorageIndex;
-use crate::fsshttpb::data_element::value::DataElementValue;
+use crate::fsshttpb::data_element::storage_manifest::StorageManifest;
 use crate::types::compact_u64::CompactU64;
 use crate::types::exguid::ExGuid;
 use crate::types::object_types::ObjectType;
@@ -11,19 +13,24 @@ use crate::Reader;
 use std::collections::HashMap;
 use std::fmt::Debug;
 
-pub mod cell_manifest;
-pub mod data_element_fragment;
-pub mod object_data_blob;
-pub mod object_group;
-pub mod revision_manifest;
-pub mod storage_index;
-pub mod storage_manifest;
-pub mod value;
+pub(crate) mod cell_manifest;
+pub(crate) mod data_element_fragment;
+pub(crate) mod object_data_blob;
+pub(crate) mod object_group;
+pub(crate) mod revision_manifest;
+pub(crate) mod storage_index;
+pub(crate) mod storage_manifest;
 
 #[derive(Debug)]
 pub(crate) struct DataElementPackage {
     pub(crate) header: ObjectHeader,
-    pub(crate) elements: HashMap<ExGuid, DataElement>,
+    pub(crate) storage_indexes: HashMap<ExGuid, StorageIndex>,
+    pub(crate) storage_manifests: HashMap<ExGuid, StorageManifest>,
+    pub(crate) cell_manifests: HashMap<ExGuid, ExGuid>,
+    pub(crate) revision_manifests: HashMap<ExGuid, RevisionManifest>,
+    pub(crate) object_groups: HashMap<ExGuid, ObjectGroup>,
+    pub(crate) data_element_fragments: HashMap<ExGuid, DataElementFragment>,
+    pub(crate) object_data_blobs: HashMap<ExGuid, ObjectDataBlob>,
 }
 
 impl DataElementPackage {
@@ -33,18 +40,26 @@ impl DataElementPackage {
 
         assert_eq!(reader.get_u8(), 0);
 
-        let mut elements = HashMap::new();
+        let mut package = DataElementPackage {
+            header,
+            storage_indexes: Default::default(),
+            storage_manifests: Default::default(),
+            cell_manifests: Default::default(),
+            revision_manifests: Default::default(),
+            object_groups: Default::default(),
+            data_element_fragments: Default::default(),
+            object_data_blobs: Default::default(),
+        };
 
         loop {
             if ObjectHeader::try_parse_end_8(reader, ObjectType::DataElementPackage).is_some() {
                 break;
             }
 
-            let (id, element) = DataElement::parse(reader);
-            elements.insert(id, element);
+            DataElement::parse(reader, &mut package)
         }
 
-        DataElementPackage { header, elements }
+        package
     }
 
     pub(crate) fn find_objects(
@@ -73,63 +88,71 @@ impl DataElementPackage {
     }
 
     pub(crate) fn find_blob(&self, id: ExGuid) -> Option<&[u8]> {
-        self.elements.get(&id).map(|element| {
-            if let DataElementValue::ObjectDataBlob(data) = &element.element {
-                data.value()
-            } else {
-                panic!("data element is not a blob")
-            }
-        })
+        self.object_data_blobs.get(&id).map(|blob| blob.value())
     }
 
     pub(crate) fn find_cell_revision_id(&self, id: ExGuid) -> Option<ExGuid> {
-        self.elements.get(&id).map(|element| {
-            if let DataElementValue::CellManifest(revision_id) = &element.element {
-                *revision_id
-            } else {
-                panic!("data element is not a cell manifest")
-            }
-        })
+        self.cell_manifests.get(&id).copied()
     }
 
     pub(crate) fn find_revision_manifest(&self, id: ExGuid) -> Option<&RevisionManifest> {
-        self.elements.get(&id).map(|element| {
-            if let DataElementValue::RevisionManifest(revision_manifest) = &element.element {
-                revision_manifest
-            } else {
-                panic!("data element is not a revision manifest")
-            }
-        })
+        self.revision_manifests.get(&id)
     }
 
     pub(crate) fn find_object_group(&self, id: ExGuid) -> Option<&ObjectGroup> {
-        self.elements.get(&id).map(|element| {
-            if let DataElementValue::ObjectGroup(object_group) = &element.element {
-                object_group
-            } else {
-                panic!("data element is not an object group")
-            }
-        })
+        self.object_groups.get(&id)
     }
 }
 
 #[derive(Debug)]
-pub(crate) struct DataElement {
-    pub(crate) serial: SerialNumber,
-    pub(crate) element: DataElementValue,
-}
+pub(crate) struct DataElement;
 
 impl DataElement {
-    pub(crate) fn parse(reader: Reader) -> (ExGuid, DataElement) {
+    pub(crate) fn parse(reader: Reader, package: &mut DataElementPackage) {
         let header = ObjectHeader::parse_16(reader);
         assert_eq!(header.object_type, ObjectType::DataElement);
 
         let id = ExGuid::parse(reader);
-        let serial = SerialNumber::parse(reader);
+        let _serial = SerialNumber::parse(reader);
         let element_type = CompactU64::parse(reader);
 
-        let element = DataElementValue::parse(element_type.value(), reader);
-
-        (id, DataElement { serial, element })
+        match element_type.value() {
+            0x01 => {
+                package
+                    .storage_indexes
+                    .insert(id, Self::parse_storage_index(reader));
+            }
+            0x02 => {
+                package
+                    .storage_manifests
+                    .insert(id, Self::parse_storage_manifest(reader));
+            }
+            0x03 => {
+                package
+                    .cell_manifests
+                    .insert(id, Self::parse_cell_manifest(reader));
+            }
+            0x04 => {
+                package
+                    .revision_manifests
+                    .insert(id, Self::parse_revision_manifest(reader));
+            }
+            0x05 => {
+                package
+                    .object_groups
+                    .insert(id, Self::parse_object_group(reader));
+            }
+            0x06 => {
+                package
+                    .data_element_fragments
+                    .insert(id, Self::parse_data_element_fragment(reader));
+            }
+            0x0A => {
+                package
+                    .object_data_blobs
+                    .insert(id, Self::parse_object_data_blob(reader));
+            }
+            x => panic!("invalid element type: 0x{:X}", x),
+        }
     }
 }

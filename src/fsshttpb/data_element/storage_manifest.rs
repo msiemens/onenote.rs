@@ -1,4 +1,4 @@
-use crate::fsshttpb::data_element::value::DataElementValue;
+use crate::fsshttpb::data_element::DataElement;
 use crate::types::cell_id::CellId;
 use crate::types::exguid::ExGuid;
 use crate::types::guid::Guid;
@@ -13,8 +13,8 @@ pub(crate) struct StorageManifest {
     pub(crate) roots: HashMap<ExGuid, CellId>,
 }
 
-impl DataElementValue {
-    pub(crate) fn parse_storage_manifest(reader: Reader) -> DataElementValue {
+impl DataElement {
+    pub(crate) fn parse_storage_manifest(reader: Reader) -> StorageManifest {
         let object_header = ObjectHeader::parse_16(reader);
         assert_eq!(object_header.object_type, ObjectType::StorageManifest);
 
@@ -36,6 +36,6 @@ impl DataElementValue {
             roots.insert(root_manifest, cell);
         }
 
-        DataElementValue::StorageManifest(StorageManifest { id, roots })
+        StorageManifest { id, roots }
     }
 }

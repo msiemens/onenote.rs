@@ -1,4 +1,4 @@
-use crate::fsshttpb::data_element::value::DataElementValue;
+use crate::fsshttpb::data_element::DataElement;
 use crate::types::binary_item::BinaryItem;
 use crate::types::object_types::ObjectType;
 use crate::types::stream_object::ObjectHeader;
@@ -19,8 +19,8 @@ impl fmt::Debug for ObjectDataBlob {
     }
 }
 
-impl DataElementValue {
-    pub(crate) fn parse_object_data_blob(reader: Reader) -> DataElementValue {
+impl DataElement {
+    pub(crate) fn parse_object_data_blob(reader: Reader) -> ObjectDataBlob {
         let object_header = ObjectHeader::parse(reader);
         assert_eq!(object_header.object_type, ObjectType::ObjectDataBlob);
 
@@ -28,6 +28,6 @@ impl DataElementValue {
 
         assert_eq!(ObjectHeader::parse_end_8(reader), ObjectType::DataElement);
 
-        DataElementValue::ObjectDataBlob(ObjectDataBlob(data.value()))
+        ObjectDataBlob(data.value())
     }
 }

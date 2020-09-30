@@ -1,7 +1,6 @@
 use crate::errors::Result;
 use crate::fsshttpb::data_element::storage_index::StorageIndex;
 use crate::fsshttpb::data_element::storage_manifest::StorageManifest;
-use crate::fsshttpb::data_element::value::DataElementValue;
 use crate::fsshttpb::data_element::DataElementPackage;
 use crate::types::exguid::ExGuid;
 use crate::types::guid::Guid;
@@ -57,29 +56,17 @@ impl Packaging {
 
     pub(crate) fn find_storage_index(&self) -> &StorageIndex {
         self.data_element_package
-            .elements
+            .storage_indexes
             .values()
-            .find_map(|element| {
-                if let DataElementValue::StorageIndex(index) = &element.element {
-                    Some(index)
-                } else {
-                    None
-                }
-            })
+            .next()
             .expect("no storage index found")
     }
 
     pub(crate) fn find_storage_manifest(&self) -> &StorageManifest {
         self.data_element_package
-            .elements
+            .storage_manifests
             .values()
-            .find_map(|element| {
-                if let DataElementValue::StorageManifest(manifest) = &element.element {
-                    Some(manifest)
-                } else {
-                    None
-                }
-            })
+            .next()
             .expect("no storage manifest found")
     }
 }

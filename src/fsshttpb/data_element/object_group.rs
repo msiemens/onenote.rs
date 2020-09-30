@@ -1,4 +1,4 @@
-use crate::fsshttpb::data_element::value::DataElementValue;
+use crate::fsshttpb::data_element::DataElement;
 use crate::types::binary_item::BinaryItem;
 use crate::types::cell_id::CellId;
 use crate::types::compact_u64::CompactU64;
@@ -133,16 +133,16 @@ impl fmt::Debug for DebugSize {
     }
 }
 
-impl DataElementValue {
-    pub(crate) fn parse_object_group(reader: Reader) -> DataElementValue {
-        let declarations = DataElementValue::parse_object_group_declarations(reader);
+impl DataElement {
+    pub(crate) fn parse_object_group(reader: Reader) -> ObjectGroup {
+        let declarations = DataElement::parse_object_group_declarations(reader);
 
         let mut metadata = vec![];
 
         let object_header = ObjectHeader::parse(reader);
         match object_header.object_type {
             ObjectType::ObjectGroupMetadataBlock => {
-                metadata = DataElementValue::parse_object_group_metadata(reader);
+                metadata = DataElement::parse_object_group_metadata(reader);
 
                 // Parse object header for the group data section
                 let object_header = ObjectHeader::parse(reader);
@@ -151,15 +151,15 @@ impl DataElementValue {
             ObjectType::ObjectGroupData => {} // Skip, will be parsed below
             _ => panic!("unexpected object type: 0x{:x}", object_header.object_type),
         }
-        let objects = DataElementValue::parse_object_group_data(reader);
+        let objects = DataElement::parse_object_group_data(reader);
 
         assert_eq!(ObjectHeader::parse_end_8(reader), ObjectType::DataElement);
 
-        DataElementValue::ObjectGroup(ObjectGroup {
+        ObjectGroup {
             declarations,
             metadata,
             objects,
-        })
+        }
     }
 
     fn parse_object_group_declarations(reader: Reader) -> Vec<ObjectGroupDeclaration> {

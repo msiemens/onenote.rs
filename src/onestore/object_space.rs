@@ -1,6 +1,5 @@
 use crate::fsshttpb::data_element::object_group::ObjectGroupData;
 use crate::fsshttpb::data_element::storage_index::{StorageIndex, StorageIndexCellMapping};
-use crate::fsshttpb::data_element::value::DataElementValue;
 use crate::fsshttpb::packaging::Packaging;
 use crate::onestore::object::Object;
 use crate::onestore::revision_role::RevisionRole;
@@ -175,14 +174,8 @@ impl<'a, 'b> ObjectSpace<'a> {
     fn find_cell_manifest_id(cell_manifest_id: ExGuid, packaging: &'a Packaging) -> Option<ExGuid> {
         packaging
             .data_element_package
-            .elements
+            .cell_manifests
             .get(&cell_manifest_id)
-            .map(|element| {
-                if let DataElementValue::CellManifest(revision_id) = &element.element {
-                    *revision_id
-                } else {
-                    panic!("data element is not a cell manifest")
-                }
-            })
+            .copied()
     }
 }

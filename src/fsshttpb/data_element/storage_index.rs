@@ -1,4 +1,4 @@
-use crate::fsshttpb::data_element::value::DataElementValue;
+use crate::fsshttpb::data_element::DataElement;
 use crate::types::cell_id::CellId;
 use crate::types::exguid::ExGuid;
 use crate::types::object_types::ObjectType;
@@ -45,8 +45,8 @@ pub(crate) struct StorageIndexRevisionMapping {
     pub(crate) serial: SerialNumber,
 }
 
-impl DataElementValue {
-    pub(crate) fn parse_storage_index(reader: Reader) -> DataElementValue {
+impl DataElement {
+    pub(crate) fn parse_storage_index(reader: Reader) -> StorageIndex {
         let mut manifest_mappings = vec![];
         let mut cell_mappings = HashMap::new();
         let mut revision_mappings = HashMap::new();
@@ -75,11 +75,11 @@ impl DataElementValue {
             }
         }
 
-        DataElementValue::StorageIndex(StorageIndex {
+        StorageIndex {
             manifest_mappings,
             cell_mappings,
             revision_mappings,
-        })
+        }
     }
 
     fn parse_storage_index_manifest_mapping(reader: Reader) -> StorageIndexManifestMapping {

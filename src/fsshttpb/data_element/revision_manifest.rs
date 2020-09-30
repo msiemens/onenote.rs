@@ -1,4 +1,4 @@
-use crate::fsshttpb::data_element::value::DataElementValue;
+use crate::fsshttpb::data_element::DataElement;
 use crate::types::exguid::ExGuid;
 use crate::types::object_types::ObjectType;
 use crate::types::stream_object::ObjectHeader;
@@ -27,8 +27,8 @@ impl RevisionManifestRootDeclare {
     }
 }
 
-impl DataElementValue {
-    pub(crate) fn parse_revision_manifest(reader: Reader) -> DataElementValue {
+impl DataElement {
+    pub(crate) fn parse_revision_manifest(reader: Reader) -> RevisionManifest {
         let header = ObjectHeader::parse_16(reader);
         assert_eq!(header.object_type, ObjectType::RevisionManifest);
 
@@ -56,11 +56,11 @@ impl DataElementValue {
             }
         }
 
-        Self::RevisionManifest(RevisionManifest {
+        RevisionManifest {
             rev_id,
             base_rev_id,
             root_declare,
             group_references,
-        })
+        }
     }
 }
