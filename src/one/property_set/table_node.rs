@@ -45,7 +45,7 @@ pub(crate) fn parse(object: &Object) -> Data {
                 .map(|v| f32::from_le_bytes([v[0], v[1], v[2], v[3]]))
                 .collect()
         })
-        .expect("table has no col width definition");
+        .unwrap_or_default();
     let borders_visible =
         simple::parse_bool(PropertyType::TableBordersVisible, object).unwrap_or(true);
     let layout_alignment_in_parent =
