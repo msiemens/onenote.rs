@@ -6,7 +6,8 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub struct Image {
-    pub(crate) data: Vec<u8>,
+    pub(crate) data: Option<Vec<u8>>,
+    pub(crate) extension: Option<String>,
 
     pub(crate) layout_max_width: Option<f32>,
     pub(crate) layout_max_height: Option<f32>,
@@ -41,16 +42,27 @@ pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Image {
     let node_object = space.get_object(image_id).expect("image is missing");
     let node = image_node::parse(node_object);
 
-    let container_object_id = node.picture_container.expect("image container is empty");
-    let container_object = space
-        .get_object(container_object_id)
-        .expect("image container is missing");
-    let container = picture_container::parse(container_object);
+    let container_data = node
+        .picture_container
+        .map(|container_object_id| {
+            space
+                .get_object(container_object_id)
+                .expect("image container is missing")
+        })
+        .map(|container_object| picture_container::parse(container_object))
+        .map(|container| container);
+
+    let (data, extension) = if let Some(data) = container_data {
+        (Some(data.data), data.extension)
+    } else {
+        (None, None)
+    };
 
     // TODO: Parse language code
 
     Image {
-        data: container.into_value(),
+        data,
+        extension,
         layout_max_width: node.layout_max_width,
         layout_max_height: node.layout_max_height,
         alt_text: node.alt_text.map(String::from),

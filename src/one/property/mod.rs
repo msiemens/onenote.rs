@@ -160,6 +160,7 @@ pub(crate) enum PropertyType {
     TocChildren = 0x24001CF6,
     FolderChildFilename = 0x1C001D6B,
     NotebookElementOrderingID = 0x14001CB9,
+    PictureFileExtension = 0x24003424,
     NoteTags = 0x40003489,
     NoteTag = 0x44000811,
 }

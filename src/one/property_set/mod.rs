@@ -58,6 +58,9 @@ pub(crate) enum PropertySetId {
     TableRowNode = 0x00060023,
     TitleNode = 0x0006002C,
     TocContainer = 0x00020001,
+
+    // Undocumented:
+    XpsContainer = 0x0008003A,
 }
 
 impl PropertySetId {
