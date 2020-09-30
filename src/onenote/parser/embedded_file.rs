@@ -17,6 +17,36 @@ pub struct EmbeddedFile {
     pub(crate) note_tags: Vec<NoteTag>,
 }
 
+impl EmbeddedFile {
+    pub fn filename(&self) -> &str {
+        &self.filename
+    }
+
+    pub fn data(&self) -> &[u8] {
+        &self.data
+    }
+
+    pub fn layout_max_width(&self) -> Option<f32> {
+        self.layout_max_width
+    }
+
+    pub fn layout_max_height(&self) -> Option<f32> {
+        self.layout_max_height
+    }
+
+    pub fn offset_from_parent_horizontal(&self) -> Option<f32> {
+        self.offset_from_parent_horizontal
+    }
+
+    pub fn offset_from_parent_vertical(&self) -> Option<f32> {
+        self.offset_from_parent_vertical
+    }
+
+    pub fn note_tags(&self) -> &[NoteTag] {
+        &self.note_tags
+    }
+}
+
 pub(crate) fn parse_embedded_file(file_id: ExGuid, space: &ObjectSpace) -> EmbeddedFile {
     let node_object = space.get_object(file_id).expect("embedded file is missing");
     let node = embedded_file_node::parse(node_object);

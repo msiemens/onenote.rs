@@ -5,8 +5,18 @@ use crate::onestore::OneStore;
 
 #[derive(Debug)]
 pub struct Section {
-    pub display_name: String,
-    pub page_series: Vec<PageSeries>,
+    display_name: String,
+    page_series: Vec<PageSeries>,
+}
+
+impl Section {
+    pub fn display_name(&self) -> &str {
+        &self.display_name
+    }
+
+    pub fn page_series(&self) -> &[PageSeries] {
+        &self.page_series
+    }
 }
 
 pub(crate) fn parse_section(store: OneStore, filename: String) -> Section {

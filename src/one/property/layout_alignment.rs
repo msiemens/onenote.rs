@@ -2,11 +2,29 @@ use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) struct LayoutAlignment {
+pub struct LayoutAlignment {
     alignment_horizontal: HorizontalAlignment,
     alignment_margin_horizontal: HorizontalAlignmentMargin,
     alignment_vertical: VerticalAlignment,
     alignment_margin_vertical: VerticalAlignmentMargin,
+}
+
+impl LayoutAlignment {
+    pub fn alignment_horizontal(&self) -> HorizontalAlignment {
+        self.alignment_horizontal
+    }
+
+    pub fn alignment_margin_horizontal(&self) -> HorizontalAlignmentMargin {
+        self.alignment_margin_horizontal
+    }
+
+    pub fn alignment_vertical(&self) -> VerticalAlignment {
+        self.alignment_vertical
+    }
+
+    pub fn alignment_margin_vertical(&self) -> VerticalAlignmentMargin {
+        self.alignment_margin_vertical
+    }
 }
 
 impl LayoutAlignment {
@@ -37,7 +55,7 @@ impl LayoutAlignment {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) enum HorizontalAlignment {
+pub enum HorizontalAlignment {
     Unknown,
     Left,
     Center,
@@ -61,7 +79,7 @@ impl HorizontalAlignment {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) enum HorizontalAlignmentMargin {
+pub enum HorizontalAlignmentMargin {
     Right,
     Left,
 }
@@ -77,7 +95,7 @@ impl HorizontalAlignmentMargin {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) enum VerticalAlignment {
+pub enum VerticalAlignment {
     Bottom,
     Top,
 }
@@ -93,7 +111,7 @@ impl VerticalAlignment {
 }
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) enum VerticalAlignmentMargin {
+pub enum VerticalAlignmentMargin {
     Bottom,
     Top,
 }

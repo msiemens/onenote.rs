@@ -42,7 +42,7 @@ pub(crate) fn parse(object: &Object) -> Data {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct NoteTagPropertyStatus {
+pub struct NoteTagPropertyStatus {
     has_label: bool,
     has_font_color: bool,
     has_highlight_color: bool,
@@ -53,6 +53,48 @@ pub(crate) struct NoteTagPropertyStatus {
     due_next_week: bool,
     due_later: bool,
     due_custom: bool,
+}
+
+impl NoteTagPropertyStatus {
+    pub fn has_label(&self) -> bool {
+        self.has_label
+    }
+
+    pub fn has_font_color(&self) -> bool {
+        self.has_font_color
+    }
+
+    pub fn has_highlight_color(&self) -> bool {
+        self.has_highlight_color
+    }
+
+    pub fn has_icon(&self) -> bool {
+        self.has_icon
+    }
+
+    pub fn due_today(&self) -> bool {
+        self.due_today
+    }
+
+    pub fn due_tomorrow(&self) -> bool {
+        self.due_tomorrow
+    }
+
+    pub fn due_this_week(&self) -> bool {
+        self.due_this_week
+    }
+
+    pub fn due_next_week(&self) -> bool {
+        self.due_next_week
+    }
+
+    pub fn due_later(&self) -> bool {
+        self.due_later
+    }
+
+    pub fn due_custom(&self) -> bool {
+        self.due_custom
+    }
 }
 
 impl NoteTagPropertyStatus {
@@ -82,7 +124,7 @@ impl NoteTagPropertyStatus {
 
 #[derive(Debug, Copy, Clone)]
 #[allow(dead_code)]
-pub(crate) enum NoteTagShape {
+pub enum NoteTagShape {
     NoIcon,
     GreenCheckBox,
     YellowCheckBox,

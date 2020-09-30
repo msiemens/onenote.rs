@@ -2,10 +2,24 @@ use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) struct ActionItemStatus {
+pub struct ActionItemStatus {
     completed: bool,
     disabled: bool,
     task_tag: bool,
+}
+
+impl ActionItemStatus {
+    pub fn completed(&self) -> bool {
+        self.completed
+    }
+
+    pub fn disabled(&self) -> bool {
+        self.disabled
+    }
+
+    pub fn task_tag(&self) -> bool {
+        self.task_tag
+    }
 }
 
 impl ActionItemStatus {
@@ -24,7 +38,7 @@ impl ActionItemStatus {
 
 #[derive(Debug, Copy, Clone)]
 #[allow(dead_code)]
-pub(crate) enum ActionItemType {
+pub enum ActionItemType {
     Numeric(u16),
     DueToday,
     DueTomorrow,

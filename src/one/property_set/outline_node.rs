@@ -7,7 +7,6 @@ use crate::onestore::object::Object;
 use crate::types::exguid::ExGuid;
 use bytes::Buf;
 
-
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) last_modified: Time,
@@ -33,9 +32,13 @@ pub(crate) struct Data {
 }
 
 #[derive(Debug, Clone)]
-pub(crate) struct OutlineIndentDistance(Vec<f32>);
+pub struct OutlineIndentDistance(Vec<f32>);
 
 impl OutlineIndentDistance {
+    pub fn value(&self) -> &[f32] {
+        &self.0
+    }
+
     pub(crate) fn into_value(self) -> Vec<f32> {
         self.0
     }

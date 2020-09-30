@@ -26,6 +26,52 @@ pub struct RichText {
     pub(crate) note_tags: Vec<NoteTag>,
 }
 
+impl RichText {
+    pub fn text(&self) -> &str {
+        &self.text
+    }
+
+    pub fn text_run_formatting(&self) -> &[ParagraphStyling] {
+        &self.text_run_formatting
+    }
+
+    pub fn text_run_indices(&self) -> &[u32] {
+        &self.text_run_indices
+    }
+
+    pub fn paragraph_style(&self) -> &ParagraphStyling {
+        &self.paragraph_style
+    }
+
+    pub fn paragraph_space_before(&self) -> f32 {
+        self.paragraph_space_before
+    }
+
+    pub fn paragraph_space_after(&self) -> f32 {
+        self.paragraph_space_after
+    }
+
+    pub fn paragraph_line_spacing_exact(&self) -> Option<f32> {
+        self.paragraph_line_spacing_exact
+    }
+
+    pub fn paragraph_alignment(&self) -> ParagraphAlignment {
+        self.paragraph_alignment
+    }
+
+    pub fn layout_alignment_in_parent(&self) -> Option<LayoutAlignment> {
+        self.layout_alignment_in_parent
+    }
+
+    pub fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
+        self.layout_alignment_self
+    }
+
+    pub fn note_tags(&self) -> &[NoteTag] {
+        &self.note_tags
+    }
+}
+
 #[derive(Debug)]
 pub struct ParagraphStyling {
     pub(crate) charset: Option<Charset>,
@@ -48,6 +94,88 @@ pub struct ParagraphStyling {
     pub(crate) language_code: Option<u32>,
     pub(crate) math_formatting: bool,
     pub(crate) hyperlink: bool,
+}
+
+impl ParagraphStyling {
+    pub fn charset(&self) -> Option<Charset> {
+        self.charset
+    }
+
+    pub fn bold(&self) -> bool {
+        self.bold
+    }
+
+    pub fn italic(&self) -> bool {
+        self.italic
+    }
+
+    pub fn underline(&self) -> bool {
+        self.underline
+    }
+
+    pub fn strikethrough(&self) -> bool {
+        self.strikethrough
+    }
+
+    pub fn superscript(&self) -> bool {
+        self.superscript
+    }
+
+    pub fn subscript(&self) -> bool {
+        self.subscript
+    }
+
+    pub fn font(&self) -> Option<&str> {
+        self.font.as_deref()
+    }
+
+    pub fn font_size(&self) -> Option<u16> {
+        self.font_size
+    }
+
+    pub fn font_color(&self) -> Option<ColorRef> {
+        self.font_color
+    }
+
+    pub fn highlight(&self) -> Option<ColorRef> {
+        self.highlight
+    }
+
+    pub fn next_style(&self) -> Option<&str> {
+        self.next_style.as_deref()
+    }
+
+    pub fn style_id(&self) -> Option<&str> {
+        self.style_id.as_deref()
+    }
+
+    pub fn paragraph_alignment(&self) -> Option<ParagraphAlignment> {
+        self.paragraph_alignment
+    }
+
+    pub fn paragraph_space_before(&self) -> Option<f32> {
+        self.paragraph_space_before
+    }
+
+    pub fn paragraph_space_after(&self) -> Option<f32> {
+        self.paragraph_space_after
+    }
+
+    pub fn paragraph_line_spacing_exact(&self) -> Option<f32> {
+        self.paragraph_line_spacing_exact
+    }
+
+    pub fn language_code(&self) -> Option<u32> {
+        self.language_code
+    }
+
+    pub fn math_formatting(&self) -> bool {
+        self.math_formatting
+    }
+
+    pub fn hyperlink(&self) -> bool {
+        self.hyperlink
+    }
 }
 
 pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> RichText {

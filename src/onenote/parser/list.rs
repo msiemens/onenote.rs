@@ -16,6 +16,40 @@ pub struct List {
     pub(crate) font_color: Option<ColorRef>,
 }
 
+impl List {
+    pub fn list_font(&self) -> Option<&str> {
+        self.list_font.as_deref()
+    }
+
+    pub fn list_restart(&self) -> Option<i32> {
+        self.list_restart
+    }
+
+    pub fn list_format(&self) -> &[char] {
+        &self.list_format
+    }
+
+    pub fn bold(&self) -> bool {
+        self.bold
+    }
+
+    pub fn italic(&self) -> bool {
+        self.italic
+    }
+
+    pub fn font(&self) -> Option<&str> {
+        self.font.as_deref()
+    }
+
+    pub fn font_size(&self) -> Option<u16> {
+        self.font_size
+    }
+
+    pub fn font_color(&self) -> Option<ColorRef> {
+        self.font_color
+    }
+}
+
 pub(crate) fn parse_list(list_id: ExGuid, space: &ObjectSpace) -> List {
     let object = space
         .get_object(list_id)

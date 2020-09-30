@@ -2,7 +2,7 @@ use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) enum Charset {
+pub enum Charset {
     Ansi,
     Default,
     Symbol,

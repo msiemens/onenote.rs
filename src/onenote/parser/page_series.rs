@@ -7,7 +7,13 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub struct PageSeries {
-    pub pages: Vec<Page>,
+    pages: Vec<Page>,
+}
+
+impl PageSeries {
+    pub fn pages(&self) -> &[Page] {
+        &self.pages
+    }
 }
 
 pub(crate) fn parse_page_series(id: ExGuid, store: &OneStore) -> PageSeries {

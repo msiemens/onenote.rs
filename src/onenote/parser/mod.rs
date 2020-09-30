@@ -50,12 +50,14 @@ impl Parser {
 
                 file
             })
-            .filter(|p| !p.is_dir())
             .inspect(|path| {
                 dbg!(path.display());
             })
+            .filter(|p| p.is_file())
             .map(|path| self.parse_section(&path))
             .collect::<Result<_>>()?;
+
+        eprintln!("Finished parsing");
 
         Ok(Notebook { sections })
     }

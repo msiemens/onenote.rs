@@ -15,6 +15,32 @@ pub struct Outline {
     pub(crate) alignment_self: Option<LayoutAlignment>,
 }
 
+impl Outline {
+    pub fn items(&self) -> &[OutlineItem] {
+        &self.items
+    }
+
+    pub fn items_level(&self) -> u8 {
+        self.items_level
+    }
+
+    pub fn list_spacing(&self) -> Option<f32> {
+        self.list_spacing
+    }
+
+    pub fn indents(&self) -> &[f32] {
+        &self.indents
+    }
+
+    pub fn alignment_in_parent(&self) -> Option<LayoutAlignment> {
+        self.alignment_in_parent
+    }
+
+    pub fn alignment_self(&self) -> Option<LayoutAlignment> {
+        self.alignment_self
+    }
+}
+
 #[derive(Debug)]
 pub enum OutlineItem {
     Group(OutlineGroup),
@@ -56,6 +82,28 @@ pub struct OutlineElement {
 
     pub(crate) child_level: u8,
     pub(crate) children: Vec<OutlineItem>,
+}
+
+impl OutlineElement {
+    pub fn contents(&self) -> &[Content] {
+        &self.contents
+    }
+
+    pub fn list_contents(&self) -> &[List] {
+        &self.list_contents
+    }
+
+    pub fn list_spacing(&self) -> Option<f32> {
+        self.list_spacing
+    }
+
+    pub fn child_level(&self) -> u8 {
+        self.child_level
+    }
+
+    pub fn children(&self) -> &[OutlineItem] {
+        &self.children
+    }
 }
 
 pub(crate) fn parse_outline(outline_id: ExGuid, space: &ObjectSpace) -> Outline {

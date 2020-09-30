@@ -7,14 +7,34 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub struct Page {
-    pub title: Option<Title>,
-    pub level: i32,
-    pub author: Option<String>,
-    pub height: Option<f32>,
-    pub contents: Vec<PageContent>,
+    title: Option<Title>,
+    level: i32,
+    author: Option<String>,
+    height: Option<f32>,
+    contents: Vec<PageContent>,
 }
 
 impl Page {
+    pub fn title(&self) -> Option<&Title> {
+        self.title.as_ref()
+    }
+
+    pub fn level(&self) -> i32 {
+        self.level
+    }
+
+    pub fn author(&self) -> Option<&str> {
+        self.author.as_deref()
+    }
+
+    pub fn height(&self) -> Option<f32> {
+        self.height
+    }
+
+    pub fn contents(&self) -> &[PageContent] {
+        &self.contents
+    }
+
     pub fn title_text(&self) -> Option<&str> {
         self.title
             .as_ref()
@@ -47,6 +67,28 @@ pub struct Title {
     pub(crate) offset_vertical: f32,
     pub(crate) layout_alignment_in_parent: Option<LayoutAlignment>,
     pub(crate) layout_alignment_self: Option<LayoutAlignment>,
+}
+
+impl Title {
+    pub fn contents(&self) -> &[Outline] {
+        &self.contents
+    }
+
+    pub fn offset_horizontal(&self) -> f32 {
+        self.offset_horizontal
+    }
+
+    pub fn offset_vertical(&self) -> f32 {
+        self.offset_vertical
+    }
+
+    pub fn layout_alignment_in_parent(&self) -> Option<LayoutAlignment> {
+        self.layout_alignment_in_parent
+    }
+
+    pub fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
+        self.layout_alignment_self
+    }
 }
 
 pub(crate) fn parse_page(page_space: &ObjectSpace) -> Page {

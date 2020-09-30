@@ -23,9 +23,53 @@ pub struct Table {
     pub(crate) note_tags: Vec<NoteTag>,
 }
 
+impl Table {
+    pub fn rows(&self) -> u32 {
+        self.rows
+    }
+
+    pub fn cols(&self) -> u32 {
+        self.cols
+    }
+
+    pub fn contents(&self) -> &[TableRow] {
+        &self.contents
+    }
+
+    pub fn cols_locked(&self) -> &[u8] {
+        &self.cols_locked
+    }
+
+    pub fn col_widths(&self) -> &[f32] {
+        &self.col_widths
+    }
+
+    pub fn borders_visible(&self) -> bool {
+        self.borders_visible
+    }
+
+    pub fn layout_alignment_in_parent(&self) -> Option<LayoutAlignment> {
+        self.layout_alignment_in_parent
+    }
+
+    pub fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
+        self.layout_alignment_self
+    }
+
+    pub fn note_tags(&self) -> &[NoteTag] {
+        &self.note_tags
+    }
+}
+
 #[derive(Debug)]
 pub struct TableRow {
     pub(crate) contents: Vec<TableCell>,
+}
+
+impl TableRow {
+    pub fn contents(&self) -> &[TableCell] {
+        &self.contents
+    }
 }
 
 #[derive(Debug)]
@@ -34,6 +78,20 @@ pub struct TableCell {
 
     pub(crate) layout_max_width: Option<f32>,
     pub(crate) outline_indent_distance: OutlineIndentDistance,
+}
+
+impl TableCell {
+    pub fn contents(&self) -> &[OutlineElement] {
+        &self.contents
+    }
+
+    pub fn layout_max_width(&self) -> Option<f32> {
+        self.layout_max_width
+    }
+
+    pub fn outline_indent_distance(&self) -> &OutlineIndentDistance {
+        &self.outline_indent_distance
+    }
 }
 
 pub(crate) fn parse_table(table_id: ExGuid, space: &ObjectSpace) -> Table {

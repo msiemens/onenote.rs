@@ -9,6 +9,12 @@ pub struct Notebook {
     pub(crate) sections: Vec<Section>,
 }
 
+impl Notebook {
+    pub fn sections(&self) -> &[Section] {
+        &self.sections
+    }
+}
+
 pub(crate) fn parse_toc(space: &ObjectSpace) -> Vec<String> {
     let content_id = space.content_root().expect("notebook has no content root");
 

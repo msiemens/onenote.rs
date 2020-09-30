@@ -2,7 +2,7 @@ use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
 #[derive(Debug, Copy, Clone)]
-pub(crate) struct Time(u32);
+pub struct Time(u32);
 
 impl Time {
     pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Option<Time> {

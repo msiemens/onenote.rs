@@ -21,6 +21,22 @@ impl PageContent {
             None
         }
     }
+
+    pub fn image(&self) -> Option<&Image> {
+        if let PageContent::Image(image) = self {
+            Some(image)
+        } else {
+            None
+        }
+    }
+
+    pub fn embedded_file(&self) -> Option<&EmbeddedFile> {
+        if let PageContent::EmbeddedFile(embedded_file) = self {
+            Some(embedded_file)
+        } else {
+            None
+        }
+    }
 }
 
 pub(crate) fn parse_page_content(content_id: ExGuid, space: &ObjectSpace) -> PageContent {

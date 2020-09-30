@@ -10,20 +10,60 @@ use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
-pub(crate) struct NoteTag {
+pub struct NoteTag {
     completed_at: Option<Time>,
     item_status: ActionItemStatus,
     definition: Option<NoteTagDefinition>,
 }
 
+impl NoteTag {
+    pub fn completed_at(&self) -> Option<Time> {
+        self.completed_at
+    }
+
+    pub fn item_status(&self) -> ActionItemStatus {
+        self.item_status
+    }
+
+    pub fn definition(&self) -> Option<&NoteTagDefinition> {
+        self.definition.as_ref()
+    }
+}
+
 #[derive(Debug)]
-pub(crate) struct NoteTagDefinition {
+pub struct NoteTagDefinition {
     label: String,
     status: NoteTagPropertyStatus,
     shape: NoteTagShape,
     highlight_color: Option<ColorRef>,
     text_color: Option<ColorRef>,
     action_item_type: ActionItemType,
+}
+
+impl NoteTagDefinition {
+    pub fn label(&self) -> &str {
+        &self.label
+    }
+
+    pub fn status(&self) -> &NoteTagPropertyStatus {
+        &self.status
+    }
+
+    pub fn shape(&self) -> NoteTagShape {
+        self.shape
+    }
+
+    pub fn highlight_color(&self) -> Option<ColorRef> {
+        self.highlight_color
+    }
+
+    pub fn text_color(&self) -> Option<ColorRef> {
+        self.text_color
+    }
+
+    pub fn action_item_type(&self) -> ActionItemType {
+        self.action_item_type
+    }
 }
 
 pub(crate) fn parse_note_tags(note_tags: Vec<Data>, space: &ObjectSpace) -> Vec<NoteTag> {

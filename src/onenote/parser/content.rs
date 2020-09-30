@@ -23,6 +23,30 @@ impl Content {
             None
         }
     }
+
+    pub fn table(&self) -> Option<&Table> {
+        if let Content::Table(table) = self {
+            Some(table)
+        } else {
+            None
+        }
+    }
+
+    pub fn image(&self) -> Option<&Image> {
+        if let Content::Image(image) = self {
+            Some(image)
+        } else {
+            None
+        }
+    }
+
+    pub fn embedded_file(&self) -> Option<&EmbeddedFile> {
+        if let Content::EmbeddedFile(file) = self {
+            Some(file)
+        } else {
+            None
+        }
+    }
 }
 
 pub(crate) fn parse_content(content_id: ExGuid, space: &ObjectSpace) -> Content {

@@ -38,6 +38,80 @@ pub struct Image {
     pub(crate) note_tags: Vec<NoteTag>,
 }
 
+impl Image {
+    pub fn data(&self) -> Option<&[u8]> {
+        self.data.as_deref()
+    }
+
+    pub fn extension(&self) -> Option<&str> {
+        self.extension.as_deref()
+    }
+
+    pub fn layout_max_width(&self) -> Option<f32> {
+        self.layout_max_width
+    }
+
+    pub fn layout_max_height(&self) -> Option<f32> {
+        self.layout_max_height
+    }
+
+    pub fn alt_text(&self) -> Option<&str> {
+        self.alt_text.as_deref()
+    }
+
+    pub fn layout_alignment_in_parent(&self) -> Option<LayoutAlignment> {
+        self.layout_alignment_in_parent
+    }
+
+    pub fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
+        self.layout_alignment_self
+    }
+
+    pub fn image_filename(&self) -> Option<&str> {
+        self.image_filename.as_deref()
+    }
+
+    pub fn displayed_page_number(&self) -> Option<u32> {
+        self.displayed_page_number
+    }
+
+    pub fn text(&self) -> Option<&str> {
+        self.text.as_deref()
+    }
+
+    pub fn text_language_code(&self) -> Option<u32> {
+        self.text_language_code
+    }
+
+    pub fn picture_width(&self) -> Option<f32> {
+        self.picture_width
+    }
+
+    pub fn picture_height(&self) -> Option<f32> {
+        self.picture_height
+    }
+
+    pub fn hyperlink_url(&self) -> Option<&str> {
+        self.hyperlink_url.as_deref()
+    }
+
+    pub fn offset_from_parent_horizontal(&self) -> Option<f32> {
+        self.offset_from_parent_horizontal
+    }
+
+    pub fn offset_from_parent_vertical(&self) -> Option<f32> {
+        self.offset_from_parent_vertical
+    }
+
+    pub fn is_background(&self) -> bool {
+        self.is_background
+    }
+
+    pub fn note_tags(&self) -> &[NoteTag] {
+        &self.note_tags
+    }
+}
+
 pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Image {
     let node_object = space.get_object(image_id).expect("image is missing");
     let node = image_node::parse(node_object);
