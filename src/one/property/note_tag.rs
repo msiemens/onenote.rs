@@ -49,8 +49,7 @@ impl ActionItemType {
                 103 => ActionItemType::DueNextWeek,
                 104 => ActionItemType::NoDueDate,
                 105 => ActionItemType::CustomDueDate,
-                118 => ActionItemType::Unknown, // undocumented
-                _ => panic!("invalid action item type: {}", value),
+                _ => ActionItemType::Unknown,
             })
     }
 }
