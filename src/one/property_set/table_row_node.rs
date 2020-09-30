@@ -7,15 +7,14 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    pub(crate) last_modified: Time,
+    pub(crate) last_modified: Option<Time>,
     pub(crate) cells: Vec<ExGuid>,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {
     assert_eq!(object.id(), PropertySetId::TableRowNode.as_jcid());
 
-    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)
-        .expect("table row has no last modified time");
+    let last_modified = Time::parse(PropertyType::LastModifiedTime, object);
     let cells = ObjectReference::parse_vec(PropertyType::ElementChildNodes, object)
         .expect("table row has no cells");
 

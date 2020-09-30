@@ -8,7 +8,7 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
-    pub(crate) last_modified: Time,
+    pub(crate) last_modified: Option<Time>,
     pub(crate) contents: Vec<ExGuid>,
     pub(crate) layout_max_width: Option<f32>,
     pub(crate) outline_indent_distance: OutlineIndentDistance,
@@ -17,8 +17,7 @@ pub(crate) struct Data {
 pub(crate) fn parse(object: &Object) -> Data {
     assert_eq!(object.id(), PropertySetId::TableCellNode.as_jcid());
 
-    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)
-        .expect("table cell has no last modified time");
+    let last_modified = Time::parse(PropertyType::LastModifiedTime, object);
     let contents = ObjectReference::parse_vec(PropertyType::ElementChildNodes, object)
         .expect("table cell has no contents");
     let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object);
