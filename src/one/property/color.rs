@@ -10,6 +10,24 @@ pub(crate) struct Color {
 }
 
 impl Color {
+    pub fn alpha(&self) -> u8 {
+        self.alpha
+    }
+
+    pub fn r(&self) -> u8 {
+        self.r
+    }
+
+    pub fn g(&self) -> u8 {
+        self.g
+    }
+
+    pub fn b(&self) -> u8 {
+        self.b
+    }
+}
+
+impl Color {
     pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Option<Color> {
         object
             .props()
