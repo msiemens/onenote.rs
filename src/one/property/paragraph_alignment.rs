@@ -1,7 +1,7 @@
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub enum ParagraphAlignment {
     Unknown,
     Left,

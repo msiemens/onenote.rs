@@ -13,7 +13,7 @@ pub(crate) mod paragraph_alignment;
 pub(crate) mod simple;
 pub(crate) mod time;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 #[allow(dead_code)]
 pub(crate) enum PropertyType {
     ActionItemSchemaVersion = 0x0C003473,
@@ -163,4 +163,6 @@ pub(crate) enum PropertyType {
     PictureFileExtension = 0x24003424,
     NoteTags = 0x40003489,
     NoteTag = 0x44000811,
+    SectionColor = 0x14001cbe,
+    CellBackgroundColor = 0x14001E26,
 }

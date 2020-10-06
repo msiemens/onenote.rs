@@ -1,8 +1,8 @@
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
-#[derive(Debug)]
-pub(crate) struct Color {
+#[derive(Debug, Copy, Clone)]
+pub struct Color {
     alpha: u8,
     r: u8,
     g: u8,
