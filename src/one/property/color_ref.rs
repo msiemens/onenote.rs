@@ -17,9 +17,9 @@ impl ColorRef {
             .map(|value| match value[3] {
                 0xFF => ColorRef::Auto,
                 0x00 => ColorRef::Manual {
-                    r: value[2],
+                    r: value[0],
                     g: value[1],
-                    b: value[0],
+                    b: value[2],
                 },
                 _ => panic!("invalid color ref: 0x{:08X}", u32::from_le_bytes(value)),
             })

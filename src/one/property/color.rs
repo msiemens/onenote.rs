@@ -17,10 +17,10 @@ impl Color {
             .map(|value| value.to_u32().expect("color is not a u32"))
             .map(|value| value.to_le_bytes())
             .map(|value| Color {
-                alpha: value[0],
-                r: value[1],
-                g: value[2],
-                b: value[3],
+                alpha: 255 - value[3],
+                r: value[0],
+                g: value[1],
+                b: value[2],
             })
     }
 }
