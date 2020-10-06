@@ -21,12 +21,12 @@ pub(crate) fn parse(object: &Object) -> Data {
         simple::parse_u32(PropertyType::SchemaRevisionInOrderToWrite, object)
             .expect("section metadata has no schema revision in order to write");
     let display_name = simple::parse_string(PropertyType::SectionDisplayName, object);
-    // let color = Color::parse(PropertyType::NotebookColor)
+    let color = Color::parse(PropertyType::SectionColor, object);
 
     Data {
         schema_revision_in_order_to_read,
         schema_revision_in_order_to_write,
         display_name,
-        color: None, // TODO: Parse this
+        color,
     }
 }

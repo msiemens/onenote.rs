@@ -2,11 +2,13 @@ use crate::one::property_set::{section_metadata_node, section_node};
 use crate::onenote::parser::page_series::{parse_page_series, PageSeries};
 use crate::onestore::object_space::ObjectSpace;
 use crate::onestore::OneStore;
+use crate::Color;
 
 #[derive(Debug)]
 pub struct Section {
     display_name: String,
     page_series: Vec<PageSeries>,
+    color: Option<Color>,
 }
 
 impl Section {
@@ -16,6 +18,10 @@ impl Section {
 
     pub fn page_series(&self) -> &[PageSeries] {
         &self.page_series
+    }
+
+    pub fn color(&self) -> Option<Color> {
+        self.color
     }
 }
 
@@ -39,6 +45,7 @@ pub(crate) fn parse_section(store: OneStore, filename: String) -> Section {
     Section {
         display_name,
         page_series,
+        color: metadata.color,
     }
 }
 
