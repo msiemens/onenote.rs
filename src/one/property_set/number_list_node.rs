@@ -52,7 +52,7 @@ pub(crate) fn parse(object: &Object) -> Data {
 }
 
 fn parse_list_format(data: Vec<u16>) -> Vec<char> {
-    decode_utf16(data[2..].iter().copied())
+    decode_utf16(data[1..].iter().copied())
         .map(|r| r.unwrap_or(REPLACEMENT_CHARACTER))
         .collect()
 }
