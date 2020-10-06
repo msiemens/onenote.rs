@@ -5,6 +5,7 @@ use crate::one::property_set::outline_node::OutlineIndentDistance;
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 use crate::types::exguid::ExGuid;
+use crate::Color;
 
 #[derive(Debug)]
 pub(crate) struct Data {
@@ -12,6 +13,7 @@ pub(crate) struct Data {
     pub(crate) contents: Vec<ExGuid>,
     pub(crate) layout_max_width: Option<f32>,
     pub(crate) outline_indent_distance: OutlineIndentDistance,
+    pub(crate) background_color: Option<Color>,
 }
 
 pub(crate) fn parse(object: &Object) -> Data {
@@ -23,11 +25,13 @@ pub(crate) fn parse(object: &Object) -> Data {
     let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object);
     let outline_indent_distance =
         OutlineIndentDistance::parse(object).expect("table cell has no outline indent distance");
+    let background_color = Color::parse(PropertyType::CellBackgroundColor, object);
 
     Data {
         last_modified,
         contents,
         layout_max_width,
         outline_indent_distance,
+        background_color,
     }
 }

@@ -5,6 +5,7 @@ use crate::onenote::parser::note_tag::{parse_note_tags, NoteTag};
 use crate::onenote::parser::outline::{parse_outline_element, OutlineElement};
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
+use crate::Color;
 
 #[derive(Debug)]
 pub struct Table {
@@ -76,6 +77,7 @@ impl TableRow {
 pub struct TableCell {
     pub(crate) contents: Vec<OutlineElement>,
 
+    pub(crate) background_color: Option<Color>,
     pub(crate) layout_max_width: Option<f32>,
     pub(crate) outline_indent_distance: OutlineIndentDistance,
 }
@@ -91,6 +93,10 @@ impl TableCell {
 
     pub fn outline_indent_distance(&self) -> &OutlineIndentDistance {
         &self.outline_indent_distance
+    }
+
+    pub fn background_color(&self) -> Option<Color> {
+        self.background_color
     }
 }
 
@@ -142,6 +148,7 @@ fn parse_cell(cell_id: ExGuid, space: &ObjectSpace) -> TableCell {
 
     TableCell {
         contents,
+        background_color: data.background_color,
         layout_max_width: data.layout_max_width,
         outline_indent_distance: data.outline_indent_distance,
     }
