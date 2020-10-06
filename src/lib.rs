@@ -27,3 +27,8 @@ pub use crate::onenote::parser::rich_text::{ParagraphStyling, RichText};
 pub use crate::onenote::parser::section::Section;
 pub use crate::onenote::parser::table::{Table, TableCell, TableRow};
 pub use crate::onenote::parser::Parser;
+
+pub use crate::one::property::color::Color;
+pub use crate::one::property::color_ref::ColorRef;
+pub use crate::one::property::paragraph_alignment::ParagraphAlignment;
+pub use crate::one::property_set::embedded_file_node::FileType;
