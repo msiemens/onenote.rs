@@ -31,7 +31,7 @@ pub(crate) struct Data {
 }
 
 #[derive(Debug)]
-pub(crate) enum FileType {
+pub enum FileType {
     Unknown,
     Audio,
     Video,
