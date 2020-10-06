@@ -1,3 +1,4 @@
+use crate::one::property_set::embedded_file_node::FileType;
 use crate::one::property_set::{embedded_file_container, embedded_file_node};
 use crate::onenote::parser::note_tag::{parse_note_tags, NoteTag};
 use crate::onestore::object_space::ObjectSpace;
@@ -6,6 +7,7 @@ use crate::types::exguid::ExGuid;
 #[derive(Debug)]
 pub struct EmbeddedFile {
     pub(crate) filename: String,
+    pub(crate) file_type: FileType,
     pub(crate) data: Vec<u8>,
 
     pub(crate) layout_max_width: Option<f32>,
@@ -20,6 +22,10 @@ pub struct EmbeddedFile {
 impl EmbeddedFile {
     pub fn filename(&self) -> &str {
         &self.filename
+    }
+
+    pub fn file_type(&self) -> &FileType {
+        &self.file_type
     }
 
     pub fn data(&self) -> &[u8] {
@@ -61,6 +67,7 @@ pub(crate) fn parse_embedded_file(file_id: ExGuid, space: &ObjectSpace) -> Embed
 
     EmbeddedFile {
         filename: node.embedded_file_name,
+        file_type: node.file_type,
         data: container.into_value(),
         layout_max_width: node.layout_max_width,
         layout_max_height: node.layout_max_height,
