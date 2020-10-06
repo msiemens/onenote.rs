@@ -18,6 +18,8 @@ pub(crate) struct Data {
     pub(crate) layout_minimum_outline_width: Option<f32>,
     pub(crate) layout_tight_alignment: bool,
     pub(crate) is_layout_size_set_by_user: bool,
+    pub(crate) offset_from_parent_horiz: Option<f32>,
+    pub(crate) offset_from_parent_vert: Option<f32>,
     pub(crate) list_spacing: Option<f32>,
     pub(crate) outline_indent_distance: OutlineIndentDistance,
     pub(crate) layout_alignment_in_parent: Option<LayoutAlignment>,
@@ -86,6 +88,8 @@ pub(crate) fn parse(object: &Object) -> Data {
     let list_spacing = simple::parse_f32(PropertyType::ListSpacingMu, object);
     let outline_indent_distance =
         OutlineIndentDistance::parse(object).expect("outline node has no outline indent distance");
+    let offset_from_parent_horiz = simple::parse_f32(PropertyType::OffsetFromParentHoriz, object);
+    let offset_from_parent_vert = simple::parse_f32(PropertyType::OffsetFromParentVert, object);
 
     let layout_alignment_in_parent =
         LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object);
@@ -113,6 +117,8 @@ pub(crate) fn parse(object: &Object) -> Data {
         layout_max_width,
         layout_tight_alignment,
         is_layout_size_set_by_user,
+        offset_from_parent_horiz,
+        offset_from_parent_vert,
         list_spacing,
         outline_indent_distance,
         layout_alignment_in_parent,

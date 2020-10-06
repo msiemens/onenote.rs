@@ -7,12 +7,22 @@ use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub struct Outline {
-    pub(crate) items: Vec<OutlineItem>,
     pub(crate) items_level: u8,
     pub(crate) list_spacing: Option<f32>,
     pub(crate) indents: Vec<f32>,
+
     pub(crate) alignment_in_parent: Option<LayoutAlignment>,
     pub(crate) alignment_self: Option<LayoutAlignment>,
+
+    pub(crate) layout_max_height: Option<f32>,
+    pub(crate) layout_max_width: Option<f32>,
+    pub(crate) layout_reserved_width: Option<f32>,
+    pub(crate) layout_minimum_outline_width: Option<f32>,
+    pub(crate) is_layout_size_set_by_user: bool,
+    pub(crate) offset_horizontal: Option<f32>,
+    pub(crate) offset_vertical: Option<f32>,
+
+    pub(crate) items: Vec<OutlineItem>,
 }
 
 impl Outline {
@@ -38,6 +48,34 @@ impl Outline {
 
     pub fn alignment_self(&self) -> Option<LayoutAlignment> {
         self.alignment_self
+    }
+
+    pub fn layout_max_height(&self) -> Option<f32> {
+        self.layout_max_height
+    }
+
+    pub fn layout_max_width(&self) -> Option<f32> {
+        self.layout_max_width
+    }
+
+    pub fn layout_reserved_width(&self) -> Option<f32> {
+        self.layout_reserved_width
+    }
+
+    pub fn layout_minimum_outline_width(&self) -> Option<f32> {
+        self.layout_minimum_outline_width
+    }
+
+    pub fn is_layout_size_set_by_user(&self) -> bool {
+        self.is_layout_size_set_by_user
+    }
+
+    pub fn offset_horizontal(&self) -> Option<f32> {
+        self.offset_horizontal
+    }
+
+    pub fn offset_vertical(&self) -> Option<f32> {
+        self.offset_vertical
     }
 }
 
@@ -125,6 +163,13 @@ pub(crate) fn parse_outline(outline_id: ExGuid, space: &ObjectSpace) -> Outline 
         indents: data.outline_indent_distance.into_value(),
         alignment_in_parent: data.layout_alignment_in_parent,
         alignment_self: data.layout_alignment_self,
+        layout_max_height: data.layout_max_height,
+        layout_max_width: data.layout_max_width,
+        layout_reserved_width: data.layout_reserved_width,
+        layout_minimum_outline_width: data.layout_minimum_outline_width,
+        is_layout_size_set_by_user: data.is_layout_size_set_by_user,
+        offset_horizontal: data.offset_from_parent_horiz,
+        offset_vertical: data.offset_from_parent_vert,
     }
 }
 
