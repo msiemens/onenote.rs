@@ -30,5 +30,9 @@ pub use crate::onenote::parser::Parser;
 
 pub use crate::one::property::color::Color;
 pub use crate::one::property::color_ref::ColorRef;
+pub use crate::one::property::note_tag::ActionItemStatus;
 pub use crate::one::property::paragraph_alignment::ParagraphAlignment;
 pub use crate::one::property_set::embedded_file_node::FileType;
+pub use crate::one::property_set::note_tag_shared_definition_container::{
+    NoteTagPropertyStatus, NoteTagShape,
+};

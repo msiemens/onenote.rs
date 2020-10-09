@@ -122,7 +122,7 @@ impl NoteTagPropertyStatus {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 #[allow(dead_code)]
 pub enum NoteTagShape {
     NoIcon,
