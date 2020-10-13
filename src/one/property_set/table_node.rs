@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
@@ -21,21 +22,27 @@ pub(crate) struct Data {
     pub(crate) note_tags: Vec<NoteTagData>,
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(object.id(), PropertySetId::TableNode.as_jcid());
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::TableNode.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)
-        .expect("table has no last modified time");
-    let rows = ObjectReference::parse_vec(PropertyType::ElementChildNodes, object)
-        .expect("table has no rows");
-    let row_count =
-        simple::parse_u32(PropertyType::RowCount, object).expect("table has no row count");
-    let col_count =
-        simple::parse_u32(PropertyType::ColumnCount, object).expect("table has no col count");
-    let cols_locked = simple::parse_vec(PropertyType::TableColumnsLocked, object)
+    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("table has no last modified time".into())
+    })?;
+    let rows = ObjectReference::parse_vec(PropertyType::ElementChildNodes, object)?
+        .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("table has no rows".into()))?;
+    let row_count = simple::parse_u32(PropertyType::RowCount, object)?
+        .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("table has no row count".into()))?;
+    let col_count = simple::parse_u32(PropertyType::ColumnCount, object)?
+        .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("table has no col count".into()))?;
+    let cols_locked = simple::parse_vec(PropertyType::TableColumnsLocked, object)?
         .map(|value| value.into_iter().skip(1).collect())
         .unwrap_or_default();
-    let col_widths = simple::parse_vec(PropertyType::TableColumnWidths, object)
+    let col_widths = simple::parse_vec(PropertyType::TableColumnWidths, object)?
         .map(|value| {
             value
                 .into_iter()
@@ -47,14 +54,14 @@ pub(crate) fn parse(object: &Object) -> Data {
         })
         .unwrap_or_default();
     let borders_visible =
-        simple::parse_bool(PropertyType::TableBordersVisible, object).unwrap_or(true);
+        simple::parse_bool(PropertyType::TableBordersVisible, object)?.unwrap_or(true);
     let layout_alignment_in_parent =
-        LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object);
-    let layout_alignment_self = LayoutAlignment::parse(PropertyType::LayoutAlignmentSelf, object);
+        LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object)?;
+    let layout_alignment_self = LayoutAlignment::parse(PropertyType::LayoutAlignmentSelf, object)?;
 
-    let note_tags = NoteTagData::parse(object).unwrap_or_default();
+    let note_tags = NoteTagData::parse(object)?.unwrap_or_default();
 
-    Data {
+    let data = Data {
         last_modified,
         rows,
         row_count,
@@ -65,5 +72,7 @@ pub(crate) fn parse(object: &Object) -> Data {
         layout_alignment_in_parent,
         layout_alignment_self,
         note_tags,
-    }
+    };
+
+    Ok(data)
 }

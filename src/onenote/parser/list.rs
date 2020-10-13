@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property_set::number_list_node;
 use crate::onestore::object_space::ObjectSpace;
@@ -50,15 +51,15 @@ impl List {
     }
 }
 
-pub(crate) fn parse_list(list_id: ExGuid, space: &ObjectSpace) -> List {
+pub(crate) fn parse_list(list_id: ExGuid, space: &ObjectSpace) -> Result<List> {
     let object = space
         .get_object(list_id)
-        .expect("rich text content is missing");
-    let data = number_list_node::parse(object);
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("rich text content is missing".into()))?;
+    let data = number_list_node::parse(object)?;
 
     // TODO: Parse language code
 
-    List {
+    let list = List {
         list_font: data.list_font,
         list_restart: data.list_restart,
         list_format: data.list_format,
@@ -67,5 +68,7 @@ pub(crate) fn parse_list(list_id: ExGuid, space: &ObjectSpace) -> List {
         font: data.font,
         font_size: data.font_size,
         font_color: data.font_color,
-    }
+    };
+
+    Ok(list)
 }

@@ -1,9 +1,11 @@
+use crate::errors::Result;
 use crate::one::property::charset::Charset;
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property::paragraph_alignment::ParagraphAlignment;
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
+use crate::ErrorKind;
 
 #[derive(Debug)]
 pub(crate) struct Data {
@@ -32,38 +34,44 @@ pub(crate) struct Data {
     pub(crate) text_run_is_embedded_object: bool,
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(object.id(), PropertySetId::ParagraphStyleObject.as_jcid());
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::ParagraphStyleObject.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let charset = Charset::parse(PropertyType::Charset, object);
-    let bold = simple::parse_bool(PropertyType::Bold, object).unwrap_or_default();
-    let italic = simple::parse_bool(PropertyType::Italic, object).unwrap_or_default();
-    let underline = simple::parse_bool(PropertyType::Underline, object).unwrap_or_default();
-    let strikethrough = simple::parse_bool(PropertyType::Strikethrough, object).unwrap_or_default();
-    let superscript = simple::parse_bool(PropertyType::Superscript, object).unwrap_or_default();
-    let subscript = simple::parse_bool(PropertyType::Subscript, object).unwrap_or_default();
-    let font = simple::parse_string(PropertyType::Font, object);
-    let font_size = simple::parse_u16(PropertyType::FontSize, object);
-    let font_color = ColorRef::parse(PropertyType::FontColor, object);
-    let highlight = ColorRef::parse(PropertyType::Highlight, object);
-    let next_style = simple::parse_string(PropertyType::NextStyle, object);
-    let style_id = simple::parse_string(PropertyType::ParagraphStyleId, object);
-    let paragraph_alignment = ParagraphAlignment::parse(object);
-    let paragraph_space_before = simple::parse_f32(PropertyType::ParagraphSpaceBefore, object);
-    let paragraph_space_after = simple::parse_f32(PropertyType::ParagraphSpaceAfter, object);
+    let charset = Charset::parse(PropertyType::Charset, object)?;
+    let bold = simple::parse_bool(PropertyType::Bold, object)?.unwrap_or_default();
+    let italic = simple::parse_bool(PropertyType::Italic, object)?.unwrap_or_default();
+    let underline = simple::parse_bool(PropertyType::Underline, object)?.unwrap_or_default();
+    let strikethrough =
+        simple::parse_bool(PropertyType::Strikethrough, object)?.unwrap_or_default();
+    let superscript = simple::parse_bool(PropertyType::Superscript, object)?.unwrap_or_default();
+    let subscript = simple::parse_bool(PropertyType::Subscript, object)?.unwrap_or_default();
+    let font = simple::parse_string(PropertyType::Font, object)?;
+    let font_size = simple::parse_u16(PropertyType::FontSize, object)?;
+    let font_color = ColorRef::parse(PropertyType::FontColor, object)?;
+    let highlight = ColorRef::parse(PropertyType::Highlight, object)?;
+    let next_style = simple::parse_string(PropertyType::NextStyle, object)?;
+    let style_id = simple::parse_string(PropertyType::ParagraphStyleId, object)?;
+    let paragraph_alignment = ParagraphAlignment::parse(object)?;
+    let paragraph_space_before = simple::parse_f32(PropertyType::ParagraphSpaceBefore, object)?;
+    let paragraph_space_after = simple::parse_f32(PropertyType::ParagraphSpaceAfter, object)?;
     let paragraph_line_spacing_exact =
-        simple::parse_f32(PropertyType::ParagraphLineSpacingExact, object);
-    let language_code = simple::parse_u32(PropertyType::LanguageID, object);
+        simple::parse_f32(PropertyType::ParagraphLineSpacingExact, object)?;
+    let language_code = simple::parse_u32(PropertyType::LanguageID, object)?;
     let math_formatting =
-        simple::parse_bool(PropertyType::MathFormatting, object).unwrap_or_default();
-    let hyperlink = simple::parse_bool(PropertyType::Hyperlink, object).unwrap_or_default();
+        simple::parse_bool(PropertyType::MathFormatting, object)?.unwrap_or_default();
+    let hyperlink = simple::parse_bool(PropertyType::Hyperlink, object)?.unwrap_or_default();
     let hyperlink_protected =
-        simple::parse_bool(PropertyType::HyperlinkProtected, object).unwrap_or_default();
-    let hidden = simple::parse_bool(PropertyType::Hidden, object).unwrap_or_default();
+        simple::parse_bool(PropertyType::HyperlinkProtected, object)?.unwrap_or_default();
+    let hidden = simple::parse_bool(PropertyType::Hidden, object)?.unwrap_or_default();
     let text_run_is_embedded_object =
-        simple::parse_bool(PropertyType::TextRunIsEmbeddedObject, object).unwrap_or_default();
+        simple::parse_bool(PropertyType::TextRunIsEmbeddedObject, object)?.unwrap_or_default();
 
-    Data {
+    let data = Data {
         charset,
         bold,
         italic,
@@ -87,5 +95,7 @@ pub(crate) fn parse(object: &Object) -> Data {
         hyperlink_protected,
         hidden,
         text_run_is_embedded_object,
-    }
+    };
+
+    Ok(data)
 }

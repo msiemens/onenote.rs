@@ -1,3 +1,4 @@
+use crate::errors::Result;
 use crate::fsshttpb::data_element::DataElement;
 use crate::types::cell_id::CellId;
 use crate::types::exguid::ExGuid;
@@ -14,28 +15,28 @@ pub(crate) struct StorageManifest {
 }
 
 impl DataElement {
-    pub(crate) fn parse_storage_manifest(reader: Reader) -> StorageManifest {
-        let object_header = ObjectHeader::parse_16(reader);
-        assert_eq!(object_header.object_type, ObjectType::StorageManifest);
+    pub(crate) fn parse_storage_manifest(reader: Reader) -> Result<StorageManifest> {
+        ObjectHeader::try_parse_16(reader, ObjectType::StorageManifest)?;
 
-        let id = Guid::parse(reader);
+        let id = Guid::parse(reader)?;
 
         let mut roots = HashMap::new();
 
         loop {
-            if ObjectHeader::try_parse_end_8(reader, ObjectType::DataElement).is_some() {
+            if ObjectHeader::has_end_8(reader, ObjectType::DataElement)? {
                 break;
             }
 
-            let object_header = ObjectHeader::parse_16(reader);
-            assert_eq!(object_header.object_type, ObjectType::StorageManifestRoot);
+            ObjectHeader::try_parse_16(reader, ObjectType::StorageManifestRoot)?;
 
-            let root_manifest = ExGuid::parse(reader);
-            let cell = CellId::parse(reader);
+            let root_manifest = ExGuid::parse(reader)?;
+            let cell = CellId::parse(reader)?;
 
             roots.insert(root_manifest, cell);
         }
 
-        StorageManifest { id, roots }
+        ObjectHeader::try_parse_end_8(reader, ObjectType::DataElement)?;
+
+        Ok(StorageManifest { id, roots })
     }
 }

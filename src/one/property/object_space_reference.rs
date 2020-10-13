@@ -1,22 +1,28 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 use crate::onestore::types::compact_id::CompactId;
 use crate::onestore::types::property::{PropertyId, PropertyValue};
 use crate::types::cell_id::CellId;
 
-
 pub(crate) struct ObjectSpaceReference;
 
 impl ObjectSpaceReference {
-    pub(crate) fn parse_vec(prop_type: PropertyType, object: &Object) -> Option<Vec<CellId>> {
+    pub(crate) fn parse_vec(
+        prop_type: PropertyType,
+        object: &Object,
+    ) -> Result<Option<Vec<CellId>>> {
         object
             .props()
             .get(prop_type)
             .map(|value| {
-                value
-                    .to_object_space_ids()
-                    .expect("object space reference array is not a object space array")
+                value.to_object_space_ids().ok_or_else(|| {
+                    ErrorKind::MalformedOneNoteFileData(
+                        "object space reference array is not a object space id array".into(),
+                    )
+                })
             })
+            .transpose()?
             .map(|count| {
                 object
                     .props()
@@ -25,8 +31,9 @@ impl ObjectSpaceReference {
                     .skip(Self::get_offset(prop_type, object))
                     .take(count as usize)
                     .map(|id| Self::resolve_id(id, object))
-                    .collect()
+                    .collect::<Result<_>>()
             })
+            .transpose()
     }
 
     pub(crate) fn get_offset(prop_type: PropertyType, object: &Object) -> usize {
@@ -60,10 +67,11 @@ impl ObjectSpaceReference {
             .sum()
     }
 
-    fn resolve_id(id: &CompactId, object: &Object) -> CellId {
+    fn resolve_id(id: &CompactId, object: &Object) -> Result<CellId> {
         object
             .mapping()
             .get_object_space(*id)
-            .expect("id not defined in mapping")
+            .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("id not defined in mapping".into()))
+            .map_err(|e| e.into())
     }
 }

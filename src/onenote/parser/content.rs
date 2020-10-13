@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property_set::PropertySetId;
 use crate::onenote::parser::embedded_file::{parse_embedded_file, EmbeddedFile};
 use crate::onenote::parser::image::{parse_image, Image};
@@ -49,21 +50,32 @@ impl Content {
     }
 }
 
-pub(crate) fn parse_content(content_id: ExGuid, space: &ObjectSpace) -> Content {
+pub(crate) fn parse_content(content_id: ExGuid, space: &ObjectSpace) -> Result<Content> {
     let content_type = space
         .get_object(content_id)
-        .expect("page content is missing")
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("page content is missing".into()))?
         .id();
-    let id = PropertySetId::from_jcid(content_type).unwrap();
+    let id = PropertySetId::from_jcid(content_type).ok_or_else(|| {
+        ErrorKind::MalformedOneNoteData(
+            format!("invalid property set id: 0x{:X}", content_type.0).into(),
+        )
+    })?;
 
-    match id {
-        PropertySetId::ImageNode => Content::Image(parse_image(content_id, space)),
+    let content = match id {
+        PropertySetId::ImageNode => Content::Image(parse_image(content_id, space)?),
         PropertySetId::EmbeddedFileNode => {
-            Content::EmbeddedFile(parse_embedded_file(content_id, space))
+            Content::EmbeddedFile(parse_embedded_file(content_id, space)?)
         }
-        PropertySetId::RichTextNode => Content::RichText(parse_rich_text(content_id, space)),
-        PropertySetId::TableNode => Content::Table(parse_table(content_id, space)),
+        PropertySetId::RichTextNode => Content::RichText(parse_rich_text(content_id, space)?),
+        PropertySetId::TableNode => Content::Table(parse_table(content_id, space)?),
         PropertySetId::InkNode => Content::Unknown,
-        _ => panic!("invalid content type: {:?}", id),
-    }
+        _ => {
+            return Err(ErrorKind::MalformedOneNoteData(
+                format!("invalid content type: {:?}", id).into(),
+            )
+            .into())
+        }
+    };
+
+    Ok(content)
 }

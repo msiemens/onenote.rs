@@ -1,3 +1,4 @@
+use crate::errors::Result;
 use crate::one::property::PropertyType;
 use crate::onestore::types::compact_id::CompactId;
 use crate::onestore::types::object_stream_header::ObjectStreamHeader;
@@ -32,38 +33,38 @@ impl ObjectPropSet {
 }
 
 impl ObjectPropSet {
-    pub(crate) fn parse(reader: Reader) -> ObjectPropSet {
-        let header = ObjectStreamHeader::parse(reader);
+    pub(crate) fn parse(reader: Reader) -> Result<ObjectPropSet> {
+        let header = ObjectStreamHeader::parse(reader)?;
         let object_ids = (0..header.count)
             .map(|_| CompactId::parse(reader))
-            .collect();
+            .collect::<Result<Vec<_>>>()?;
 
         let mut object_space_ids = vec![];
         let mut context_ids = vec![];
 
         if !header.osid_stream_not_present {
-            let header = ObjectStreamHeader::parse(reader);
+            let header = ObjectStreamHeader::parse(reader)?;
 
             object_space_ids = (0..header.count)
                 .map(|_| CompactId::parse(reader))
-                .collect();
+                .collect::<Result<Vec<_>>>()?;
 
             if header.extended_streams_present {
-                let header = ObjectStreamHeader::parse(reader);
+                let header = ObjectStreamHeader::parse(reader)?;
                 context_ids = (0..header.count)
                     .map(|_| CompactId::parse(reader))
-                    .collect();
+                    .collect::<Result<Vec<_>>>()?;
             };
         }
 
-        let properties = PropertySet::parse(reader);
+        let properties = PropertySet::parse(reader)?;
 
-        ObjectPropSet {
+        Ok(ObjectPropSet {
             object_ids,
             object_space_ids,
             context_ids,
             properties,
-        }
+        })
     }
 
     pub(crate) fn get(&self, prop_type: PropertyType) -> Option<&PropertyValue> {

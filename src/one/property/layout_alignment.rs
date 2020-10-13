@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
@@ -28,29 +29,42 @@ impl LayoutAlignment {
 }
 
 impl LayoutAlignment {
-    pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Option<LayoutAlignment> {
+    pub(crate) fn parse(
+        prop_type: PropertyType,
+        object: &Object,
+    ) -> Result<Option<LayoutAlignment>> {
         object
             .props()
             .get(prop_type)
-            .map(|value| value.to_u32().expect("layout alignment is not a u32"))
+            .map(|value| {
+                value.to_u32().ok_or_else(|| {
+                    ErrorKind::MalformedOneNoteFileData("layout alignment is not a u32".into())
+                })
+            })
+            .transpose()?
             .and_then(|value| {
                 if (value >> 31) & 0x1 != 0 {
-                    return None;
+                    None
+                } else {
+                    Some(value)
                 }
-
-                let alignment_horizontal = HorizontalAlignment::parse(value & 0x7);
+            })
+            .map(|value| {
+                let alignment_horizontal = HorizontalAlignment::parse(value & 0x7)?;
                 let alignment_margin_horizontal =
-                    HorizontalAlignmentMargin::parse((value >> 3) & 0x1);
-                let alignment_vertical = VerticalAlignment::parse((value >> 16) & 0x1);
-                let alignment_margin_vertical = VerticalAlignmentMargin::parse((value >> 19) & 0x1);
+                    HorizontalAlignmentMargin::parse((value >> 3) & 0x1)?;
+                let alignment_vertical = VerticalAlignment::parse((value >> 16) & 0x1)?;
+                let alignment_margin_vertical =
+                    VerticalAlignmentMargin::parse((value >> 19) & 0x1)?;
 
-                Some(LayoutAlignment {
+                Ok(LayoutAlignment {
                     alignment_horizontal,
                     alignment_margin_horizontal,
                     alignment_vertical,
                     alignment_margin_vertical,
                 })
             })
+            .transpose()
     }
 }
 
@@ -65,15 +79,18 @@ pub enum HorizontalAlignment {
 }
 
 impl HorizontalAlignment {
-    pub(crate) fn parse(value: u32) -> HorizontalAlignment {
+    pub(crate) fn parse(value: u32) -> Result<HorizontalAlignment> {
         match value {
-            0 => HorizontalAlignment::Unknown,
-            1 => HorizontalAlignment::Left,
-            2 => HorizontalAlignment::Center,
-            3 => HorizontalAlignment::Right,
-            4 => HorizontalAlignment::BiDiNormal,
-            5 => HorizontalAlignment::BiDiReverse,
-            _ => panic!("invalid horizontal alignment: {}", value),
+            0 => Ok(HorizontalAlignment::Unknown),
+            1 => Ok(HorizontalAlignment::Left),
+            2 => Ok(HorizontalAlignment::Center),
+            3 => Ok(HorizontalAlignment::Right),
+            4 => Ok(HorizontalAlignment::BiDiNormal),
+            5 => Ok(HorizontalAlignment::BiDiReverse),
+            _ => Err(ErrorKind::MalformedOneNoteFileData(
+                format!("invalid horizontal alignment: {}", value).into(),
+            )
+            .into()),
         }
     }
 }
@@ -85,11 +102,14 @@ pub enum HorizontalAlignmentMargin {
 }
 
 impl HorizontalAlignmentMargin {
-    pub(crate) fn parse(value: u32) -> HorizontalAlignmentMargin {
+    pub(crate) fn parse(value: u32) -> Result<HorizontalAlignmentMargin> {
         match value {
-            0 => HorizontalAlignmentMargin::Right,
-            1 => HorizontalAlignmentMargin::Left,
-            _ => panic!("invalid horizontal alignment margin: {}", value),
+            0 => Ok(HorizontalAlignmentMargin::Right),
+            1 => Ok(HorizontalAlignmentMargin::Left),
+            _ => Err(ErrorKind::MalformedOneNoteFileData(
+                format!("invalid horizontal alignment margin: {}", value).into(),
+            )
+            .into()),
         }
     }
 }
@@ -101,11 +121,14 @@ pub enum VerticalAlignment {
 }
 
 impl VerticalAlignment {
-    pub(crate) fn parse(value: u32) -> VerticalAlignment {
+    pub(crate) fn parse(value: u32) -> Result<VerticalAlignment> {
         match value {
-            0 => VerticalAlignment::Bottom,
-            1 => VerticalAlignment::Top,
-            _ => panic!("invalid vertical alignment: {}", value),
+            0 => Ok(VerticalAlignment::Bottom),
+            1 => Ok(VerticalAlignment::Top),
+            _ => Err(ErrorKind::MalformedOneNoteFileData(
+                format!("invalid vertical alignment: {}", value).into(),
+            )
+            .into()),
         }
     }
 }
@@ -117,11 +140,14 @@ pub enum VerticalAlignmentMargin {
 }
 
 impl VerticalAlignmentMargin {
-    pub(crate) fn parse(value: u32) -> VerticalAlignmentMargin {
+    pub(crate) fn parse(value: u32) -> Result<VerticalAlignmentMargin> {
         match value {
-            0 => VerticalAlignmentMargin::Bottom,
-            1 => VerticalAlignmentMargin::Top,
-            _ => panic!("invalid vertical alignment margin: {}", value),
+            0 => Ok(VerticalAlignmentMargin::Bottom),
+            1 => Ok(VerticalAlignmentMargin::Top),
+            _ => Err(ErrorKind::MalformedOneNoteFileData(
+                format!("invalid vertical alignment margin: {}", value).into(),
+            )
+            .into()),
         }
     }
 }

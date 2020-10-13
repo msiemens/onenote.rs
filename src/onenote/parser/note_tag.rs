@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property::note_tag::{ActionItemStatus, ActionItemType};
 use crate::one::property::time::Time;
@@ -66,15 +67,18 @@ impl NoteTagDefinition {
     }
 }
 
-pub(crate) fn parse_note_tags(note_tags: Vec<Data>, space: &ObjectSpace) -> Vec<NoteTag> {
+pub(crate) fn parse_note_tags(note_tags: Vec<Data>, space: &ObjectSpace) -> Result<Vec<NoteTag>> {
     note_tags
         .into_iter()
-        .map(|data| NoteTag {
-            completed_at: data.completed_at,
-            item_status: data.item_status,
-            definition: data
-                .definition
-                .map(|definition_id| parse_note_tag_definition(definition_id, space)),
+        .map(|data| {
+            Ok(NoteTag {
+                completed_at: data.completed_at,
+                item_status: data.item_status,
+                definition: data
+                    .definition
+                    .map(|definition_id| parse_note_tag_definition(definition_id, space))
+                    .transpose()?,
+            })
         })
         .collect()
 }
@@ -82,19 +86,21 @@ pub(crate) fn parse_note_tags(note_tags: Vec<Data>, space: &ObjectSpace) -> Vec<
 pub(crate) fn parse_note_tag_definition(
     definition_id: ExGuid,
     space: &ObjectSpace,
-) -> NoteTagDefinition {
+) -> Result<NoteTagDefinition> {
     let object = space
         .get_object(definition_id)
-        .expect("note tag definition is missing");
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("note tag definition is missing".into()))?;
 
-    let data = note_tag_shared_definition_container::parse(object);
+    let data = note_tag_shared_definition_container::parse(object)?;
 
-    NoteTagDefinition {
+    let definition = NoteTagDefinition {
         label: data.label,
         status: data.status,
         shape: data.shape,
         highlight_color: data.highlight_color,
         text_color: data.text_color,
         action_item_type: data.action_item_type,
-    }
+    };
+
+    Ok(definition)
 }

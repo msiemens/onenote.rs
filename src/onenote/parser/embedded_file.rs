@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property_set::embedded_file_node::FileType;
 use crate::one::property_set::{embedded_file_container, embedded_file_node};
 use crate::onenote::parser::note_tag::{parse_note_tags, NoteTag};
@@ -53,19 +54,21 @@ impl EmbeddedFile {
     }
 }
 
-pub(crate) fn parse_embedded_file(file_id: ExGuid, space: &ObjectSpace) -> EmbeddedFile {
-    let node_object = space.get_object(file_id).expect("embedded file is missing");
-    let node = embedded_file_node::parse(node_object);
+pub(crate) fn parse_embedded_file(file_id: ExGuid, space: &ObjectSpace) -> Result<EmbeddedFile> {
+    let node_object = space
+        .get_object(file_id)
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("embedded file is missing".into()))?;
+    let node = embedded_file_node::parse(node_object)?;
 
     let container_object_id = node.embedded_file_container;
-    let container_object = space
-        .get_object(container_object_id)
-        .expect("embedded file container is missing");
-    let container = embedded_file_container::parse(container_object);
+    let container_object = space.get_object(container_object_id).ok_or_else(|| {
+        ErrorKind::MalformedOneNoteData("embedded file container is missing".into())
+    })?;
+    let container = embedded_file_container::parse(container_object)?;
 
     // TODO: Resolve picture container
 
-    EmbeddedFile {
+    let file = EmbeddedFile {
         filename: node.embedded_file_name,
         file_type: node.file_type,
         data: container.into_value(),
@@ -73,6 +76,8 @@ pub(crate) fn parse_embedded_file(file_id: ExGuid, space: &ObjectSpace) -> Embed
         layout_max_height: node.layout_max_height,
         offset_from_parent_horizontal: node.offset_from_parent_horiz,
         offset_from_parent_vertical: node.offset_from_parent_vert,
-        note_tags: parse_note_tags(node.note_tags, space),
-    }
+        note_tags: parse_note_tags(node.note_tags, space)?,
+    };
+
+    Ok(file)
 }

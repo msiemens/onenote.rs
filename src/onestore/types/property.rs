@@ -1,6 +1,6 @@
+use crate::errors::{ErrorKind, Result};
 use crate::onestore::types::prop_set::PropertySet;
 use crate::Reader;
-use bytes::Buf;
 use std::fmt;
 
 #[derive(Debug, Clone)]
@@ -111,53 +111,62 @@ impl PropertyValue {
     //     }
     // }
 
-    pub(crate) fn parse(property_id: PropertyId, reader: Reader) -> PropertyValue {
+    pub(crate) fn parse(property_id: PropertyId, reader: Reader) -> Result<PropertyValue> {
         let prop_type = property_id.prop_type();
 
-        match prop_type {
+        let value = match prop_type {
             0x1 => PropertyValue::Empty,
             0x2 => PropertyValue::Bool(property_id.bool()),
-            0x3 => PropertyValue::U8(reader.get_u8()),
-            0x4 => PropertyValue::U16(reader.get_u16_le()),
-            0x5 => PropertyValue::U32(reader.get_u32_le()),
-            0x6 => PropertyValue::U64(reader.get_u64_le()),
-            0x7 => PropertyValue::parse_vec(reader),
+            0x3 => PropertyValue::U8(reader.get_u8()?),
+            0x4 => PropertyValue::U16(reader.get_u16()?),
+            0x5 => PropertyValue::U32(reader.get_u32()?),
+            0x6 => PropertyValue::U64(reader.get_u64()?),
+            0x7 => PropertyValue::parse_vec(reader)?,
 
             0x8 => PropertyValue::ObjectId,
-            0x9 => PropertyValue::ObjectIds(reader.get_u32_le()),
+            0x9 => PropertyValue::ObjectIds(reader.get_u32()?),
 
             0xA => PropertyValue::ObjectSpaceId,
-            0xB => PropertyValue::ObjectSpaceIds(reader.get_u32_le()),
+            0xB => PropertyValue::ObjectSpaceIds(reader.get_u32()?),
 
             0xC => PropertyValue::ContextId,
-            0xD => PropertyValue::ContextIds(reader.get_u32_le()),
+            0xD => PropertyValue::ContextIds(reader.get_u32()?),
 
-            0x10 => PropertyValue::parse_property_values(reader),
-            0x11 => PropertyValue::PropertySet(PropertySet::parse(reader)),
-            v => panic!("unexpected property type: 0x{:x}", v),
-        }
+            0x10 => PropertyValue::parse_property_values(reader)?,
+            0x11 => PropertyValue::PropertySet(PropertySet::parse(reader)?),
+
+            v => {
+                return Err(ErrorKind::MalformedOneStoreData(
+                    format!("unexpected property type: 0x{:x}", v).into(),
+                )
+                .into())
+            }
+        };
+
+        Ok(value)
     }
 
-    fn parse_vec(reader: Reader) -> PropertyValue {
-        let size = reader.get_u32_le();
-        let data = reader.bytes()[0..(size as usize)].to_vec();
-        reader.advance(size as usize);
+    fn parse_vec(reader: Reader) -> Result<PropertyValue> {
+        let size = reader.get_u32()?;
+        let data = reader.read(size as usize)?.to_vec();
 
-        PropertyValue::Vec(data)
+        Ok(PropertyValue::Vec(data))
     }
 
-    fn parse_property_values(reader: Reader) -> PropertyValue {
-        let size = reader.get_u32_le();
+    fn parse_property_values(reader: Reader) -> Result<PropertyValue> {
+        let size = reader.get_u32()?;
 
         // Parse property ID
 
-        let id = PropertyId::parse(reader);
+        let id = PropertyId::parse(reader)?;
 
         // Parse property values
 
-        let values = (0..size).map(|_| PropertySet::parse(reader)).collect();
+        let values = (0..size)
+            .map(|_| PropertySet::parse(reader))
+            .collect::<Result<_>>()?;
 
-        PropertyValue::PropertyValues(id, values)
+        Ok(PropertyValue::PropertyValues(id, values))
     }
 }
 
@@ -185,8 +194,8 @@ impl PropertyId {
         self.0 >> 31 == 1
     }
 
-    pub(crate) fn parse(reader: Reader) -> PropertyId {
-        PropertyId(reader.get_u32_le())
+    pub(crate) fn parse(reader: Reader) -> Result<PropertyId> {
+        reader.get_u32().map(PropertyId::new)
     }
 }
 

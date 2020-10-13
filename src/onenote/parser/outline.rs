@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::{outline_element_node, outline_group, outline_node, PropertySetId};
 use crate::onenote::parser::content::{parse_content, Content};
@@ -144,19 +145,19 @@ impl OutlineElement {
     }
 }
 
-pub(crate) fn parse_outline(outline_id: ExGuid, space: &ObjectSpace) -> Outline {
+pub(crate) fn parse_outline(outline_id: ExGuid, space: &ObjectSpace) -> Result<Outline> {
     let outline_object = space
         .get_object(outline_id)
-        .expect("outline node is missing");
-    let data = outline_node::parse(outline_object);
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("outline node is missing".into()))?;
+    let data = outline_node::parse(outline_object)?;
 
     let items = data
         .children
         .into_iter()
         .map(|item_id| parse_outline_item(item_id, space))
-        .collect();
+        .collect::<Result<_>>()?;
 
-    Outline {
+    let outline = Outline {
         items,
         items_level: data.child_level,
         list_spacing: data.list_spacing,
@@ -170,72 +171,92 @@ pub(crate) fn parse_outline(outline_id: ExGuid, space: &ObjectSpace) -> Outline 
         is_layout_size_set_by_user: data.is_layout_size_set_by_user,
         offset_horizontal: data.offset_from_parent_horiz,
         offset_vertical: data.offset_from_parent_vert,
-    }
+    };
+
+    Ok(outline)
 }
 
-fn parse_outline_item(item_id: ExGuid, space: &ObjectSpace) -> OutlineItem {
+fn parse_outline_item(item_id: ExGuid, space: &ObjectSpace) -> Result<OutlineItem> {
     let content_type = space
         .get_object(item_id)
-        .expect("outline item is missing")
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("outline item is missing".into()))?
         .id();
-    let id = PropertySetId::from_jcid(content_type).unwrap();
+    let id = PropertySetId::from_jcid(content_type).ok_or_else(|| {
+        ErrorKind::MalformedOneNoteData(
+            format!("invalid property set id: 0x{:X}", content_type.0).into(),
+        )
+    })?;
 
-    match id {
-        PropertySetId::OutlineGroup => OutlineItem::Group(parse_outline_group(item_id, space)),
+    let item = match id {
+        PropertySetId::OutlineGroup => OutlineItem::Group(parse_outline_group(item_id, space)?),
         PropertySetId::OutlineElementNode => {
-            OutlineItem::Element(parse_outline_element(item_id, space))
+            OutlineItem::Element(parse_outline_element(item_id, space)?)
         }
-        _ => panic!("invalid outline item type: {:?}", id),
-    }
+        _ => {
+            return Err(ErrorKind::MalformedOneNoteData(
+                format!("invalid outline item type: {:?}", id).into(),
+            )
+            .into())
+        }
+    };
+
+    Ok(item)
 }
 
-fn parse_outline_group(group_id: ExGuid, space: &ObjectSpace) -> OutlineGroup {
+fn parse_outline_group(group_id: ExGuid, space: &ObjectSpace) -> Result<OutlineGroup> {
     let group_object = space
         .get_object(group_id)
-        .expect("outline group is missing");
-    let data = outline_group::parse(group_object);
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("outline group is missing".into()))?;
+    let data = outline_group::parse(group_object)?;
 
     let outlines = data
         .children
         .into_iter()
         .map(|item_id| parse_outline_item(item_id, space))
-        .collect();
+        .collect::<Result<_>>()?;
 
-    OutlineGroup {
+    let group = OutlineGroup {
         child_level: data.child_level,
         outlines,
-    }
+    };
+
+    Ok(group)
 }
 
-pub(crate) fn parse_outline_element(element_id: ExGuid, space: &ObjectSpace) -> OutlineElement {
+pub(crate) fn parse_outline_element(
+    element_id: ExGuid,
+    space: &ObjectSpace,
+) -> Result<OutlineElement> {
     let element_object = space
         .get_object(element_id)
-        .expect("outline element is missing");
-    let data = outline_element_node::parse(element_object);
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("outline element is missing".into()))?;
+    let data = outline_element_node::parse(element_object)?;
 
     let children = data
         .children
         .into_iter()
         .map(|item_id| parse_outline_item(item_id, space))
-        .collect();
+        .collect::<Result<_>>()?;
 
     let contents = data
         .contents
         .into_iter()
         .map(|content_id| parse_content(content_id, space))
-        .collect();
+        .collect::<Result<_>>()?;
 
     let list_contents = data
         .list_contents
         .into_iter()
         .map(|list_id| parse_list(list_id, space))
-        .collect();
+        .collect::<Result<_>>()?;
 
-    OutlineElement {
+    let element = OutlineElement {
         child_level: data.child_level,
         list_spacing: data.list_spacing,
         children,
         contents,
         list_contents,
-    }
+    };
+
+    Ok(element)
 }

@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
@@ -22,34 +23,47 @@ pub(crate) struct Data {
     pub(crate) is_title_text: bool,
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(object.id(), PropertySetId::OutlineElementNode.as_jcid());
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::OutlineElementNode.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let created_at = Time::parse(PropertyType::CreationTimeStamp, object)
-        .expect("outline element has no creation timestamp");
-    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)
-        .expect("outline element has no last modified time");
+    let created_at = Time::parse(PropertyType::CreationTimeStamp, object)?.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("outline element has no creation timestamp".into())
+    })?;
+    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("outline element has no last modified time".into())
+    })?;
     let children =
-        ObjectReference::parse_vec(PropertyType::ElementChildNodes, object).unwrap_or_default();
-    let child_level = simple::parse_u8(PropertyType::OutlineElementChildLevel, object)
-        .expect("outline has no child element level");
+        ObjectReference::parse_vec(PropertyType::ElementChildNodes, object)?.unwrap_or_default();
+    let child_level = simple::parse_u8(PropertyType::OutlineElementChildLevel, object)?
+        .ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("outline has no child element level".into())
+        })?;
     let contents =
-        ObjectReference::parse_vec(PropertyType::ContentChildNodes, object).unwrap_or_default();
+        ObjectReference::parse_vec(PropertyType::ContentChildNodes, object)?.unwrap_or_default();
     let list_contents =
-        ObjectReference::parse_vec(PropertyType::ListNodes, object).unwrap_or_default();
-    let list_spacing = simple::parse_f32(PropertyType::ListSpacingMu, object);
-    let author_original = ObjectReference::parse(PropertyType::AuthorOriginal, object)
-        .expect("outline element has no original author");
-    let author_most_recent = ObjectReference::parse(PropertyType::AuthorMostRecent, object)
-        .expect("outline element has no most recent author");
-    let rtl = simple::parse_bool(PropertyType::OutlineElementRTL, object).unwrap_or_default();
-    let is_deletable = simple::parse_bool(PropertyType::Deletable, object).unwrap_or_default();
-    let is_selectable = simple::parse_bool(PropertyType::CannotBeSelected, object)
+        ObjectReference::parse_vec(PropertyType::ListNodes, object)?.unwrap_or_default();
+    let list_spacing = simple::parse_f32(PropertyType::ListSpacingMu, object)?;
+    let author_original = ObjectReference::parse(PropertyType::AuthorOriginal, object)?
+        .ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("outline element has no original author".into())
+        })?;
+    let author_most_recent = ObjectReference::parse(PropertyType::AuthorMostRecent, object)?
+        .ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("outline element has no most recent author".into())
+        })?;
+    let rtl = simple::parse_bool(PropertyType::OutlineElementRTL, object)?.unwrap_or_default();
+    let is_deletable = simple::parse_bool(PropertyType::Deletable, object)?.unwrap_or_default();
+    let is_selectable = simple::parse_bool(PropertyType::CannotBeSelected, object)?
         .map(|value| !value)
         .unwrap_or_default();
-    let is_title_text = simple::parse_bool(PropertyType::IsTitleText, object).unwrap_or_default();
+    let is_title_text = simple::parse_bool(PropertyType::IsTitleText, object)?.unwrap_or_default();
 
-    Data {
+    let data = Data {
         created_at,
         last_modified,
         children,
@@ -63,5 +77,7 @@ pub(crate) fn parse(object: &Object) -> Data {
         is_deletable,
         is_selectable,
         is_title_text,
-    }
+    };
+
+    Ok(data)
 }

@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property::note_tag::ActionItemType;
 use crate::one::property::{simple, PropertyType};
@@ -14,31 +15,41 @@ pub(crate) struct Data {
     pub(crate) action_item_type: ActionItemType,
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(
-        object.id(),
-        PropertySetId::NoteTagSharedDefinitionContainer.as_jcid()
-    );
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::NoteTagSharedDefinitionContainer.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let label = simple::parse_string(PropertyType::NoteTagLabel, object)
-        .expect("note tag container has no label");
-    let status = NoteTagPropertyStatus::parse(object).expect("note tag container has no status");
-    let shape = simple::parse_u16(PropertyType::NoteTagShape, object)
+    let label = simple::parse_string(PropertyType::NoteTagLabel, object)?.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("note tag container has no label".into())
+    })?;
+    let status = NoteTagPropertyStatus::parse(object)?.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("note tag container has no status".into())
+    })?;
+    let shape = simple::parse_u16(PropertyType::NoteTagShape, object)?
         .map(NoteTagShape::parse)
-        .expect("note tag container has no shape");
-    let highlight_color = ColorRef::parse(PropertyType::NoteTagHighlightColor, object);
-    let text_color = ColorRef::parse(PropertyType::NoteTagTextColor, object);
-    let action_item_type =
-        ActionItemType::parse(object).expect("note tag container has no action item type");
+        .ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("note tag container has no shape".into())
+        })?;
+    let highlight_color = ColorRef::parse(PropertyType::NoteTagHighlightColor, object)?;
+    let text_color = ColorRef::parse(PropertyType::NoteTagTextColor, object)?;
+    let action_item_type = ActionItemType::parse(object)?.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("note tag container has no action item type".into())
+    })?;
 
-    Data {
+    let data = Data {
         label,
         status,
         shape,
         highlight_color,
         text_color,
         action_item_type,
-    }
+    };
+
+    Ok(data)
 }
 
 #[derive(Debug, Clone)]
@@ -98,15 +109,18 @@ impl NoteTagPropertyStatus {
 }
 
 impl NoteTagPropertyStatus {
-    fn parse(object: &Object) -> Option<NoteTagPropertyStatus> {
-        object
+    fn parse(object: &Object) -> Result<Option<NoteTagPropertyStatus>> {
+        let status = object
             .props()
             .get(PropertyType::NoteTagPropertyStatus)
             .map(|value| {
-                value
-                    .to_u32()
-                    .expect("note tag property status is not a u32")
+                value.to_u32().ok_or_else(|| {
+                    ErrorKind::MalformedOneNoteFileData(
+                        "note tag property status is not a u32".into(),
+                    )
+                })
             })
+            .transpose()?
             .map(|value| NoteTagPropertyStatus {
                 has_label: value & 0x1 != 0,
                 has_font_color: (value >> 1) & 0x1 != 0,
@@ -118,7 +132,9 @@ impl NoteTagPropertyStatus {
                 due_next_week: (value >> 9) & 0x1 != 0,
                 due_later: (value >> 10) & 0x1 != 0,
                 due_custom: (value >> 11) & 0x1 != 0,
-            })
+            });
+
+        Ok(status)
     }
 }
 

@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 use crate::onestore::types::compact_id::CompactId;
@@ -7,15 +8,18 @@ use crate::types::exguid::ExGuid;
 pub(crate) struct ObjectReference;
 
 impl ObjectReference {
-    pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Option<ExGuid> {
-        object
+    pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Result<Option<ExGuid>> {
+        let reference = object
             .props()
             .get(prop_type)
             .map(|value| {
-                value
-                    .to_object_id()
-                    .expect("object reference is not a object id")
+                value.to_object_id().ok_or_else(|| {
+                    ErrorKind::MalformedOneNoteFileData(
+                        "object reference is not a object id".into(),
+                    )
+                })
             })
+            .transpose()?
             .map(|_| {
                 object
                     .props()
@@ -24,18 +28,26 @@ impl ObjectReference {
                     .nth(Self::get_offset(prop_type, object))
                     .expect("object id index corrupt")
             })
-            .and_then(|id| Self::resolve_id(id, object))
+            .and_then(|id| Self::resolve_id(id, object));
+
+        Ok(reference)
     }
 
-    pub(crate) fn parse_vec(prop_type: PropertyType, object: &Object) -> Option<Vec<ExGuid>> {
-        object
+    pub(crate) fn parse_vec(
+        prop_type: PropertyType,
+        object: &Object,
+    ) -> Result<Option<Vec<ExGuid>>> {
+        let references = object
             .props()
             .get(prop_type)
             .map(|value| {
-                value
-                    .to_object_ids()
-                    .expect("object reference array is not a object id array")
+                value.to_object_ids().ok_or_else(|| {
+                    ErrorKind::MalformedOneNoteFileData(
+                        "object reference array is not a object id array".into(),
+                    )
+                })
             })
+            .transpose()?
             .map(|count| {
                 object
                     .props()
@@ -45,7 +57,9 @@ impl ObjectReference {
                     .take(count as usize)
                     .flat_map(|id| Self::resolve_id(id, object))
                     .collect()
-            })
+            });
+
+        Ok(references)
     }
 
     pub(crate) fn get_offset(prop_type: PropertyType, object: &Object) -> usize {

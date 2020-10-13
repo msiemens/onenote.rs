@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::object_space_reference::ObjectSpaceReference;
 use crate::one::property::time::Timestamp;
@@ -16,23 +17,30 @@ pub(crate) struct Data {
     pub(crate) created_at: Option<Timestamp>, // FIXME: Force this?
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(object.id(), PropertySetId::PageSeriesNode.as_jcid());
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::PageSeriesNode.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let entity_guid = simple::parse_guid(PropertyType::NotebookManagementEntityGuid, object)
-        .expect("page series has no guid");
+    let entity_guid = simple::parse_guid(PropertyType::NotebookManagementEntityGuid, object)?
+        .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("page series has no guid".into()))?;
     let page_spaces =
-        ObjectSpaceReference::parse_vec(PropertyType::ChildGraphSpaceElementNodes, object)
+        ObjectSpaceReference::parse_vec(PropertyType::ChildGraphSpaceElementNodes, object)?
             .unwrap_or_default();
     let page_metadata =
-        ObjectReference::parse_vec(PropertyType::MetaDataObjectsAboveGraphSpace, object)
+        ObjectReference::parse_vec(PropertyType::MetaDataObjectsAboveGraphSpace, object)?
             .unwrap_or_default();
-    let created_at = Timestamp::parse(PropertyType::TopologyCreationTimeStamp, object);
+    let created_at = Timestamp::parse(PropertyType::TopologyCreationTimeStamp, object)?;
 
-    Data {
+    let data = Data {
         entity_guid,
         page_spaces,
         page_metadata,
         created_at,
-    }
+    };
+
+    Ok(data)
 }

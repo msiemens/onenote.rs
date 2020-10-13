@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
@@ -31,36 +32,42 @@ pub(crate) struct Data {
     pub(crate) is_background: bool,
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(object.id(), PropertySetId::ImageNode.as_jcid());
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::ImageNode.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)
-        .expect("image has no last modified time");
-    let picture_container = ObjectReference::parse(PropertyType::PictureContainer, object);
-    let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object);
-    let layout_max_height = simple::parse_f32(PropertyType::LayoutMaxHeight, object);
+    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("image has no last modified time".into())
+    })?;
+    let picture_container = ObjectReference::parse(PropertyType::PictureContainer, object)?;
+    let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object)?;
+    let layout_max_height = simple::parse_f32(PropertyType::LayoutMaxHeight, object)?;
     let is_layout_size_set_by_user =
-        simple::parse_bool(PropertyType::IsLayoutSizeSetByUser, object).unwrap_or_default();
-    let language_code = simple::parse_u32(PropertyType::LanguageID, object);
-    let alt_text = simple::parse_string(PropertyType::ImageAltText, object);
+        simple::parse_bool(PropertyType::IsLayoutSizeSetByUser, object)?.unwrap_or_default();
+    let language_code = simple::parse_u32(PropertyType::LanguageID, object)?;
+    let alt_text = simple::parse_string(PropertyType::ImageAltText, object)?;
     let layout_alignment_in_parent =
-        LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object);
-    let layout_alignment_self = LayoutAlignment::parse(PropertyType::LayoutAlignmentSelf, object);
-    let image_filename = simple::parse_string(PropertyType::ImageFilename, object);
-    let displayed_page_number = simple::parse_u32(PropertyType::DisplayedPageNumber, object);
-    let text = simple::parse_string(PropertyType::RichEditTextUnicode, object);
+        LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object)?;
+    let layout_alignment_self = LayoutAlignment::parse(PropertyType::LayoutAlignmentSelf, object)?;
+    let image_filename = simple::parse_string(PropertyType::ImageFilename, object)?;
+    let displayed_page_number = simple::parse_u32(PropertyType::DisplayedPageNumber, object)?;
+    let text = simple::parse_string(PropertyType::RichEditTextUnicode, object)?;
     let text_language_code =
-        simple::parse_u16(PropertyType::RichEditTextLangID, object).map(|value| value as u32);
-    let picture_width = simple::parse_f32(PropertyType::PictureWidth, object);
-    let picture_height = simple::parse_f32(PropertyType::PictureHeight, object);
-    let hyperlink_url = simple::parse_string(PropertyType::WzHyperlinkUrl, object);
-    let offset_from_parent_horiz = simple::parse_f32(PropertyType::OffsetFromParentHoriz, object);
-    let offset_from_parent_vert = simple::parse_f32(PropertyType::OffsetFromParentVert, object);
-    let is_background = simple::parse_bool(PropertyType::IsBackground, object).unwrap_or_default();
+        simple::parse_u16(PropertyType::RichEditTextLangID, object)?.map(|value| value as u32);
+    let picture_width = simple::parse_f32(PropertyType::PictureWidth, object)?;
+    let picture_height = simple::parse_f32(PropertyType::PictureHeight, object)?;
+    let hyperlink_url = simple::parse_string(PropertyType::WzHyperlinkUrl, object)?;
+    let offset_from_parent_horiz = simple::parse_f32(PropertyType::OffsetFromParentHoriz, object)?;
+    let offset_from_parent_vert = simple::parse_f32(PropertyType::OffsetFromParentVert, object)?;
+    let is_background = simple::parse_bool(PropertyType::IsBackground, object)?.unwrap_or_default();
 
-    let note_tags = NoteTagData::parse(object).unwrap_or_default();
+    let note_tags = NoteTagData::parse(object)?.unwrap_or_default();
 
-    Data {
+    let data = Data {
         last_modified,
         picture_container,
         layout_max_width,
@@ -81,5 +88,7 @@ pub(crate) fn parse(object: &Object) -> Data {
         offset_from_parent_horiz,
         offset_from_parent_vert,
         is_background,
-    }
+    };
+
+    Ok(data)
 }

@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
@@ -19,25 +20,33 @@ pub(crate) struct Data {
     pub(crate) font_color: Option<ColorRef>,
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(object.id(), PropertySetId::NumberListNode.as_jcid());
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::NumberListNode.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)
-        .expect("number list has no last modified time");
-    let list_font = simple::parse_string(PropertyType::ListFont, object);
+    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("number list has no last modified time".into())
+    })?;
+    let list_font = simple::parse_string(PropertyType::ListFont, object)?;
     let list_restart =
-        simple::parse_u32(PropertyType::ListRestart, object).map(|value| value as i32);
-    let list_format = simple::parse_vec_u16(PropertyType::NumberListFormat, object)
+        simple::parse_u32(PropertyType::ListRestart, object)?.map(|value| value as i32);
+    let list_format = simple::parse_vec_u16(PropertyType::NumberListFormat, object)?
         .map(parse_list_format)
-        .expect("number list has no list format");
-    let bold = simple::parse_bool(PropertyType::Bold, object).unwrap_or_default();
-    let italic = simple::parse_bool(PropertyType::Italic, object).unwrap_or_default();
-    let language_code = simple::parse_u32(PropertyType::LanguageID, object);
-    let font = simple::parse_string(PropertyType::Font, object);
-    let font_size = simple::parse_u16(PropertyType::FontSize, object);
-    let font_color = ColorRef::parse(PropertyType::FontColor, object);
+        .ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("number list has no list format".into())
+        })?;
+    let bold = simple::parse_bool(PropertyType::Bold, object)?.unwrap_or_default();
+    let italic = simple::parse_bool(PropertyType::Italic, object)?.unwrap_or_default();
+    let language_code = simple::parse_u32(PropertyType::LanguageID, object)?;
+    let font = simple::parse_string(PropertyType::Font, object)?;
+    let font_size = simple::parse_u16(PropertyType::FontSize, object)?;
+    let font_color = ColorRef::parse(PropertyType::FontColor, object)?;
 
-    Data {
+    let data = Data {
         last_modified,
         list_font,
         list_restart,
@@ -48,7 +57,9 @@ pub(crate) fn parse(object: &Object) -> Data {
         font,
         font_size,
         font_color,
-    }
+    };
+
+    Ok(data)
 }
 
 fn parse_list_format(data: Vec<u16>) -> Vec<char> {

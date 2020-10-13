@@ -1,3 +1,4 @@
+use crate::errors::Result;
 use crate::Reader;
 use std::fmt;
 
@@ -5,8 +6,8 @@ use std::fmt;
 pub(crate) struct JcId(pub(crate) u32);
 
 impl JcId {
-    pub(crate) fn parse(reader: Reader) -> JcId {
-        JcId(reader.get_u32_le())
+    pub(crate) fn parse(reader: Reader) -> Result<JcId> {
+        reader.get_u32().map(JcId)
     }
 }
 

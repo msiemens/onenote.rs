@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
@@ -12,19 +13,29 @@ pub(crate) struct Data {
     pub(crate) child_level: u8,
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(object.id(), PropertySetId::OutlineGroup.as_jcid());
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::OutlineGroup.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)
-        .expect("outline group has no last modified time");
+    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("outline group has no last modified time".into())
+    })?;
     let children =
-        ObjectReference::parse_vec(PropertyType::ElementChildNodes, object).unwrap_or_default();
-    let child_level = simple::parse_u8(PropertyType::OutlineElementChildLevel, object)
-        .expect("outline group has no child level");
+        ObjectReference::parse_vec(PropertyType::ElementChildNodes, object)?.unwrap_or_default();
+    let child_level = simple::parse_u8(PropertyType::OutlineElementChildLevel, object)?
+        .ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("outline group has no child level".into())
+        })?;
 
-    Data {
+    let data = Data {
         last_modified,
         children,
         child_level,
-    }
+    };
+
+    Ok(data)
 }

@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::charset::Charset;
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property::layout_alignment::LayoutAlignment;
@@ -178,24 +179,24 @@ impl ParagraphStyling {
     }
 }
 
-pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> RichText {
+pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result<RichText> {
     let object = space
         .get_object(content_id)
-        .expect("rich text content is missing");
-    let data = rich_text_node::parse(object);
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("rich text content is missing".into()))?;
+    let data = rich_text_node::parse(object)?;
 
-    let style = parse_style(data.paragraph_style, space);
+    let style = parse_style(data.paragraph_style, space)?;
 
     let styles = data
         .text_run_formatting
         .into_iter()
         .map(|style_id| parse_style(style_id, space))
-        .collect();
+        .collect::<Result<_>>()?;
 
     // TODO: Parse lang code into iso code
     // dia-i18n = "0.8.0"
 
-    RichText {
+    let text = RichText {
         text: data.text.unwrap_or_default(),
         text_run_formatting: styles,
         text_run_indices: data.text_run_indices,
@@ -206,17 +207,19 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> RichTe
         paragraph_alignment: data.paragraph_alignment,
         layout_alignment_in_parent: data.layout_alignment_in_parent,
         layout_alignment_self: data.layout_alignment_self,
-        note_tags: parse_note_tags(data.note_tags, space),
-    }
+        note_tags: parse_note_tags(data.note_tags, space)?,
+    };
+
+    Ok(text)
 }
 
-fn parse_style(style_id: ExGuid, space: &ObjectSpace) -> ParagraphStyling {
+fn parse_style(style_id: ExGuid, space: &ObjectSpace) -> Result<ParagraphStyling> {
     let object = space
         .get_object(style_id)
-        .expect("paragraph styling is missing");
-    let data = paragraph_style_object::parse(object);
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("paragraph styling is missing".into()))?;
+    let data = paragraph_style_object::parse(object)?;
 
-    ParagraphStyling {
+    let styling = ParagraphStyling {
         charset: data.charset,
         bold: data.bold,
         italic: data.italic,
@@ -237,5 +240,7 @@ fn parse_style(style_id: ExGuid, space: &ObjectSpace) -> ParagraphStyling {
         language_code: data.language_code,
         math_formatting: data.math_formatting,
         hyperlink: data.hyperlink,
-    }
+    };
+
+    Ok(styling)
 }

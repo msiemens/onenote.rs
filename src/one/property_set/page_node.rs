@@ -1,3 +1,4 @@
+use crate::errors::Result;
 use crate::one::property::author::Author;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::page_size::PageSize;
@@ -6,6 +7,7 @@ use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 use crate::types::exguid::ExGuid;
+use crate::ErrorKind;
 
 #[derive(Debug)]
 pub(crate) struct Data {
@@ -27,32 +29,37 @@ pub(crate) struct Data {
     pub(crate) rtl: bool,
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(object.id(), PropertySetId::PageNode.as_jcid());
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::PageNode.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let last_modified = Time::parse(PropertyType::LastModifiedTime, object);
-    let cached_title = simple::parse_string(PropertyType::CachedTitleStringFromPage, object);
-    let author = Author::parse(object);
+    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?;
+    let cached_title = simple::parse_string(PropertyType::CachedTitleStringFromPage, object)?;
+    let author = Author::parse(object)?;
     let content =
-        ObjectReference::parse_vec(PropertyType::ElementChildNodes, object).unwrap_or_default();
-    let title = ObjectReference::parse_vec(PropertyType::StructureElementChildNodes, object)
+        ObjectReference::parse_vec(PropertyType::ElementChildNodes, object)?.unwrap_or_default();
+    let title = ObjectReference::parse_vec(PropertyType::StructureElementChildNodes, object)?
         .unwrap_or_default()
         .first()
         .copied();
     let orientation_portrait =
-        simple::parse_bool(PropertyType::PortraitPage, object).unwrap_or_default();
-    let page_width = simple::parse_f32(PropertyType::PageWidth, object);
-    let page_height = simple::parse_f32(PropertyType::PageHeight, object);
-    let page_margin_origin_x = simple::parse_f32(PropertyType::PageMarginOriginX, object);
-    let page_margin_origin_y = simple::parse_f32(PropertyType::PageMarginOriginY, object);
-    let page_margin_left = simple::parse_f32(PropertyType::PageMarginLeft, object);
-    let page_margin_right = simple::parse_f32(PropertyType::PageMarginRight, object);
-    let page_margin_top = simple::parse_f32(PropertyType::PageMarginTop, object);
-    let page_margin_bottom = simple::parse_f32(PropertyType::PageMarginBottom, object);
-    let page_size = PageSize::parse(PropertyType::PageSize, object).unwrap_or_default();
-    let rtl = simple::parse_bool(PropertyType::EditRootRTL, object).unwrap_or_default();
+        simple::parse_bool(PropertyType::PortraitPage, object)?.unwrap_or_default();
+    let page_width = simple::parse_f32(PropertyType::PageWidth, object)?;
+    let page_height = simple::parse_f32(PropertyType::PageHeight, object)?;
+    let page_margin_origin_x = simple::parse_f32(PropertyType::PageMarginOriginX, object)?;
+    let page_margin_origin_y = simple::parse_f32(PropertyType::PageMarginOriginY, object)?;
+    let page_margin_left = simple::parse_f32(PropertyType::PageMarginLeft, object)?;
+    let page_margin_right = simple::parse_f32(PropertyType::PageMarginRight, object)?;
+    let page_margin_top = simple::parse_f32(PropertyType::PageMarginTop, object)?;
+    let page_margin_bottom = simple::parse_f32(PropertyType::PageMarginBottom, object)?;
+    let page_size = PageSize::parse(PropertyType::PageSize, object)?.unwrap_or_default();
+    let rtl = simple::parse_bool(PropertyType::EditRootRTL, object)?.unwrap_or_default();
 
-    Data {
+    let data = Data {
         last_modified,
         cached_title,
         author,
@@ -69,5 +76,7 @@ pub(crate) fn parse(object: &Object) -> Data {
         page_margin_bottom,
         page_size,
         rtl,
-    }
+    };
+
+    Ok(data)
 }

@@ -1,9 +1,11 @@
+use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data_element::object_group::ObjectGroupData;
 use crate::fsshttpb::packaging::Packaging;
 use crate::onestore::mapping_table::MappingTable;
 use crate::onestore::object_space::GroupData;
 use crate::onestore::types::jcid::JcId;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
+use crate::reader::Reader;
 use crate::types::exguid::ExGuid;
 
 #[derive(Debug, Clone)]
@@ -45,28 +47,31 @@ impl<'a> Object<'a> {
     }
 }
 
-impl<'a, 'b> Object<'a> {
-    pub(crate) fn parse(
+impl<'a> Object<'a> {
+    pub(crate) fn parse<'b>(
         object_id: ExGuid,
         context_id: ExGuid,
         object_space_id: ExGuid,
         objects: &'b GroupData,
         packaging: &'a Packaging,
-    ) -> Object<'a> {
+    ) -> Result<Object<'a>> {
         let metadata_object = Object::find_object(object_id, Partition::Metadata, objects)
-            .expect("object metadata is missing");
+            .ok_or_else(|| ErrorKind::MalformedOneStoreData("object metadata is missing".into()))?;
         let data_object = Object::find_object(object_id, Partition::ObjectData, objects)
-            .expect("object data is missing");
+            .ok_or_else(|| ErrorKind::MalformedOneStoreData("object data is missing".into()))?;
 
         // Parse metadata
 
         let metadata = if let ObjectGroupData::Object { data, .. } = metadata_object {
             data
         } else {
-            panic!("object metadata it not an object")
+            return Err(ErrorKind::MalformedOneStoreData(
+                "object metadata it not an object".into(),
+            )
+            .into());
         };
 
-        let jc_id = JcId::parse(&mut metadata.as_slice());
+        let jc_id = JcId::parse(&mut Reader::new(metadata.as_slice()))?;
 
         // Parse data
 
@@ -74,19 +79,24 @@ impl<'a, 'b> Object<'a> {
             if let ObjectGroupData::Object { group, cells, data } = data_object {
                 (data, group, cells)
             } else {
-                panic!("object data it not an object")
+                return Err(ErrorKind::MalformedOneStoreData(
+                    "object data it not an object".into(),
+                )
+                .into());
             };
 
-        let props = ObjectPropSet::parse(&mut data.as_slice());
+        let props = ObjectPropSet::parse(&mut Reader::new(data.as_slice()))?;
 
         // Parse file data
 
-        let file_data = Object::find_blob_id(object_id, objects).map(|blob_id| {
-            packaging
-                .data_element_package
-                .find_blob(blob_id)
-                .expect("blob not found")
-        });
+        let file_data = Object::find_blob_id(object_id, objects)?
+            .map(|blob_id| {
+                packaging
+                    .data_element_package
+                    .find_blob(blob_id)
+                    .ok_or_else(|| ErrorKind::MalformedOneStoreData("blob not found".into()))
+            })
+            .transpose()?;
 
         let context_refs: Vec<_> = referenced_cells
             .iter()
@@ -100,11 +110,19 @@ impl<'a, 'b> Object<'a> {
             .copied()
             .collect();
 
-        assert!(props.object_ids().len() >= object_refs.len());
-        assert_eq!(
-            props.context_ids().len() + props.object_space_ids().len(),
-            referenced_cells.len()
-        );
+        if props.object_ids().len() < object_refs.len() {
+            return Err(ErrorKind::MalformedOneStoreData(
+                "object ref array sizes do not match".into(),
+            )
+            .into());
+        }
+
+        if props.context_ids().len() + props.object_space_ids().len() != referenced_cells.len() {
+            return Err(ErrorKind::MalformedOneStoreData(
+                "object space/context array sizes do not match".into(),
+            )
+            .into());
+        }
 
         let mapping_objects = props
             .object_ids()
@@ -125,27 +143,31 @@ impl<'a, 'b> Object<'a> {
             mapping_object_spaces,
         );
 
-        Object {
+        Ok(Object {
             context_id,
             jc_id,
             props,
             file_data,
             mapping,
-        }
+        })
     }
 
-    fn find_object(
+    fn find_object<'b>(
         id: ExGuid,
         partition_id: Partition,
-        objects: &'a GroupData,
-    ) -> Option<&'a ObjectGroupData> {
+        objects: &'b GroupData,
+    ) -> Option<&'b ObjectGroupData> {
         objects.get(&(id, partition_id as u64)).cloned()
     }
 
-    fn find_blob_id(id: ExGuid, objects: &'a GroupData) -> Option<ExGuid> {
-        Self::find_object(id, Partition::FileData, objects).map(|object| match object {
-            ObjectGroupData::BlobReference { blob, .. } => *blob,
-            _ => panic!("blob object is not a blob"),
-        })
+    fn find_blob_id(id: ExGuid, objects: &'a GroupData) -> Result<Option<ExGuid>> {
+        Self::find_object(id, Partition::FileData, objects)
+            .map(|object| match object {
+                ObjectGroupData::BlobReference { blob, .. } => Ok(*blob),
+                _ => {
+                    Err(ErrorKind::MalformedOneStoreData("blob object is not a blob".into()).into())
+                }
+            })
+            .transpose()
     }
 }

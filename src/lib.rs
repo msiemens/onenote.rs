@@ -1,4 +1,5 @@
-use bytes::Buf;
+#![deny(unused_must_use)]
+#![cfg_attr(feature = "backtrace", feature(backtrace))]
 
 mod errors;
 mod fsshttpb;
@@ -7,12 +8,13 @@ mod macros;
 mod one;
 mod onenote;
 mod onestore;
+mod reader;
 mod types;
 mod utils;
 
-pub(crate) type Reader<'a> = &'a mut dyn Buf;
+pub(crate) type Reader<'a, 'b> = &'b mut crate::reader::Reader<'a>;
 
-pub use crate::errors::Result;
+pub use crate::errors::{Error, ErrorKind, Result};
 pub use crate::onenote::parser::content::Content;
 pub use crate::onenote::parser::embedded_file::EmbeddedFile;
 pub use crate::onenote::parser::image::Image;

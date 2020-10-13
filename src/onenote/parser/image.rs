@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::{image_node, picture_container};
 use crate::onenote::parser::note_tag::{parse_note_tags, NoteTag};
@@ -112,19 +113,22 @@ impl Image {
     }
 }
 
-pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Image {
-    let node_object = space.get_object(image_id).expect("image is missing");
-    let node = image_node::parse(node_object);
+pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Result<Image> {
+    let node_object = space
+        .get_object(image_id)
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("image is missing".into()))?;
+    let node = image_node::parse(node_object)?;
 
     let container_data = node
         .picture_container
         .map(|container_object_id| {
             space
                 .get_object(container_object_id)
-                .expect("image container is missing")
+                .ok_or_else(|| ErrorKind::MalformedOneNoteData("image container is missing".into()))
         })
+        .transpose()?
         .map(|container_object| picture_container::parse(container_object))
-        .map(|container| container);
+        .transpose()?;
 
     let (data, extension) = if let Some(data) = container_data {
         (Some(data.data), data.extension)
@@ -134,7 +138,7 @@ pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Image {
 
     // TODO: Parse language code
 
-    Image {
+    let image = Image {
         data,
         extension,
         layout_max_width: node.layout_max_width,
@@ -152,6 +156,8 @@ pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Image {
         offset_from_parent_horizontal: node.offset_from_parent_horiz,
         offset_from_parent_vertical: node.offset_from_parent_vert,
         is_background: node.is_background,
-        note_tags: parse_note_tags(node.note_tags, space),
-    }
+        note_tags: parse_note_tags(node.note_tags, space)?,
+    };
+
+    Ok(image)
 }

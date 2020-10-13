@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
@@ -23,16 +24,23 @@ impl ActionItemStatus {
 }
 
 impl ActionItemStatus {
-    pub(crate) fn parse(object: &Object) -> Option<ActionItemStatus> {
-        object
+    pub(crate) fn parse(object: &Object) -> Result<Option<ActionItemStatus>> {
+        let status = object
             .props()
             .get(PropertyType::ActionItemStatus)
-            .map(|value| value.to_u16().expect("action item status is not a u16"))
+            .map(|value| {
+                value.to_u16().ok_or_else(|| {
+                    ErrorKind::MalformedOneNoteFileData("action item status is not a u16".into())
+                })
+            })
+            .transpose()?
             .map(|value| ActionItemStatus {
                 completed: value & 0x1 != 0,
                 disabled: (value >> 1) & 0x1 != 0,
                 task_tag: (value >> 2) & 0x1 != 0,
-            })
+            });
+
+        Ok(status)
     }
 }
 
@@ -50,11 +58,16 @@ pub enum ActionItemType {
 }
 
 impl ActionItemType {
-    pub(crate) fn parse(object: &Object) -> Option<ActionItemType> {
-        object
+    pub(crate) fn parse(object: &Object) -> Result<Option<ActionItemType>> {
+        let item_type = object
             .props()
             .get(PropertyType::ActionItemType)
-            .map(|value| value.to_u16().expect("action item type is no u16"))
+            .map(|value| {
+                value.to_u16().ok_or_else(|| {
+                    ErrorKind::MalformedOneNoteFileData("action item type is no u16".into())
+                })
+            })
+            .transpose()?
             .map(|value| match value {
                 0..=99 => ActionItemType::Numeric(value),
                 100 => ActionItemType::DueToday,
@@ -64,6 +77,8 @@ impl ActionItemType {
                 104 => ActionItemType::NoDueDate,
                 105 => ActionItemType::CustomDueDate,
                 _ => ActionItemType::Unknown,
-            })
+            });
+
+        Ok(item_type)
     }
 }

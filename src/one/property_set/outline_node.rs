@@ -1,11 +1,12 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
+use crate::reader::Reader;
 use crate::types::exguid::ExGuid;
-use bytes::Buf;
 
 #[derive(Debug)]
 pub(crate) struct Data {
@@ -45,69 +46,85 @@ impl OutlineIndentDistance {
         self.0
     }
 
-    pub(crate) fn parse(object: &Object) -> Option<OutlineIndentDistance> {
+    pub(crate) fn parse(object: &Object) -> Result<Option<OutlineIndentDistance>> {
         object
             .props()
             .get(PropertyType::RgOutlineIndentDistance)
             .map(|value| {
-                value
-                    .to_vec()
-                    .expect("outline indent distance is not a vec")
+                value.to_vec().ok_or_else(|| {
+                    ErrorKind::MalformedOneNoteFileData(
+                        "outline indent distance is not a vec".into(),
+                    )
+                })
             })
-            .map(|mut value| {
-                let count = value.get_u8();
-                value.advance(3);
+            .transpose()?
+            .map(|value| {
+                let mut reader = Reader::new(value);
+                let count = reader.get_u8()?;
+                reader.advance(3)?;
 
-                let values = (0..count).map(|_| value.get_f32_le()).collect();
-
-                OutlineIndentDistance(values)
+                (0..count)
+                    .map(|_| reader.get_f32())
+                    .collect::<Result<Vec<_>>>()
+                    .map(OutlineIndentDistance)
             })
+            .transpose()
     }
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(object.id(), PropertySetId::OutlineNode.as_jcid());
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::OutlineNode.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)
-        .expect("outline has no last modified time");
+    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("outline has no last modified time".into())
+    })?;
     let children =
-        ObjectReference::parse_vec(PropertyType::ElementChildNodes, object).unwrap_or_default();
-    let child_level = simple::parse_u8(PropertyType::OutlineElementChildLevel, object)
-        .expect("outline node has no child level");
+        ObjectReference::parse_vec(PropertyType::ElementChildNodes, object)?.unwrap_or_default();
+    let child_level = simple::parse_u8(PropertyType::OutlineElementChildLevel, object)?
+        .ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("outline node has no child level".into())
+        })?;
 
-    let layout_max_height = simple::parse_f32(PropertyType::LayoutMaxHeight, object);
-    let layout_reserved_width = simple::parse_f32(PropertyType::LayoutOutlineReservedWidth, object);
+    let layout_max_height = simple::parse_f32(PropertyType::LayoutMaxHeight, object)?;
+    let layout_reserved_width =
+        simple::parse_f32(PropertyType::LayoutOutlineReservedWidth, object)?;
     let layout_minimum_outline_width =
-        simple::parse_f32(PropertyType::LayoutMinimumOutlineWidth, object);
-    let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object);
+        simple::parse_f32(PropertyType::LayoutMinimumOutlineWidth, object)?;
+    let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object)?;
     let layout_tight_alignment =
-        simple::parse_bool(PropertyType::LayoutTightAlignment, object).unwrap_or_default();
+        simple::parse_bool(PropertyType::LayoutTightAlignment, object)?.unwrap_or_default();
 
     let is_layout_size_set_by_user =
-        simple::parse_bool(PropertyType::IsLayoutSizeSetByUser, object).unwrap_or_default();
-    let list_spacing = simple::parse_f32(PropertyType::ListSpacingMu, object);
-    let outline_indent_distance =
-        OutlineIndentDistance::parse(object).expect("outline node has no outline indent distance");
-    let offset_from_parent_horiz = simple::parse_f32(PropertyType::OffsetFromParentHoriz, object);
-    let offset_from_parent_vert = simple::parse_f32(PropertyType::OffsetFromParentVert, object);
+        simple::parse_bool(PropertyType::IsLayoutSizeSetByUser, object)?.unwrap_or_default();
+    let list_spacing = simple::parse_f32(PropertyType::ListSpacingMu, object)?;
+    let outline_indent_distance = OutlineIndentDistance::parse(object)?.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("outline node has no outline indent distance".into())
+    })?;
+    let offset_from_parent_horiz = simple::parse_f32(PropertyType::OffsetFromParentHoriz, object)?;
+    let offset_from_parent_vert = simple::parse_f32(PropertyType::OffsetFromParentVert, object)?;
 
     let layout_alignment_in_parent =
-        LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object);
-    let layout_alignment_self = LayoutAlignment::parse(PropertyType::LayoutAlignmentSelf, object);
+        LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object)?;
+    let layout_alignment_self = LayoutAlignment::parse(PropertyType::LayoutAlignmentSelf, object)?;
 
-    let is_deletable = simple::parse_bool(PropertyType::Deletable, object).unwrap_or_default();
-    let is_title_date = simple::parse_bool(PropertyType::IsTitleDate, object).unwrap_or_default();
-    let is_selectable = simple::parse_bool(PropertyType::CannotBeSelected, object)
+    let is_deletable = simple::parse_bool(PropertyType::Deletable, object)?.unwrap_or_default();
+    let is_title_date = simple::parse_bool(PropertyType::IsTitleDate, object)?.unwrap_or_default();
+    let is_selectable = simple::parse_bool(PropertyType::CannotBeSelected, object)?
         .map(|value| !value)
         .unwrap_or(true);
-    let is_title_text = simple::parse_bool(PropertyType::IsTitleText, object).unwrap_or_default();
-    let is_read_only = simple::parse_bool(PropertyType::IsReadOnly, object).unwrap_or_default();
+    let is_title_text = simple::parse_bool(PropertyType::IsTitleText, object)?.unwrap_or_default();
+    let is_read_only = simple::parse_bool(PropertyType::IsReadOnly, object)?.unwrap_or_default();
     let descendants_cannot_be_moved =
-        simple::parse_bool(PropertyType::DescendantsCannotBeMoved, object).unwrap_or_default();
+        simple::parse_bool(PropertyType::DescendantsCannotBeMoved, object)?.unwrap_or_default();
     let tight_layout =
-        simple::parse_bool(PropertyType::LayoutTightLayout, object).unwrap_or_default();
+        simple::parse_bool(PropertyType::LayoutTightLayout, object)?.unwrap_or_default();
 
-    Data {
+    let data = Data {
         last_modified,
         children,
         child_level,
@@ -130,5 +147,7 @@ pub(crate) fn parse(object: &Object) -> Data {
         is_read_only,
         descendants_cannot_be_moved,
         tight_layout,
-    }
+    };
+
+    Ok(data)
 }

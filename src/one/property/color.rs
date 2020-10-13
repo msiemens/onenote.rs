@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
@@ -28,17 +29,24 @@ impl Color {
 }
 
 impl Color {
-    pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Option<Color> {
-        object
+    pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Result<Option<Color>> {
+        let color = object
             .props()
             .get(prop_type)
-            .map(|value| value.to_u32().expect("color is not a u32"))
+            .map(|value| {
+                value
+                    .to_u32()
+                    .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("color is not a u32".into()))
+            })
+            .transpose()?
             .map(|value| value.to_le_bytes())
             .map(|value| Color {
                 alpha: 255 - value[3],
                 r: value[0],
                 g: value[1],
                 b: value[2],
-            })
+            });
+
+        Ok(color)
     }
 }

@@ -1,3 +1,4 @@
+use crate::errors::Result;
 use crate::fsshttpb::data_element::DataElement;
 use crate::types::binary_item::BinaryItem;
 use crate::types::object_types::ObjectType;
@@ -20,14 +21,13 @@ impl fmt::Debug for ObjectDataBlob {
 }
 
 impl DataElement {
-    pub(crate) fn parse_object_data_blob(reader: Reader) -> ObjectDataBlob {
-        let object_header = ObjectHeader::parse(reader);
-        assert_eq!(object_header.object_type, ObjectType::ObjectDataBlob);
+    pub(crate) fn parse_object_data_blob(reader: Reader) -> Result<ObjectDataBlob> {
+        ObjectHeader::try_parse(reader, ObjectType::ObjectDataBlob)?;
 
-        let data = BinaryItem::parse(reader);
+        let data = BinaryItem::parse(reader)?;
 
-        assert_eq!(ObjectHeader::parse_end_8(reader), ObjectType::DataElement);
+        ObjectHeader::try_parse_end_8(reader, ObjectType::DataElement)?;
 
-        ObjectDataBlob(data.value())
+        Ok(ObjectDataBlob(data.value()))
     }
 }

@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
@@ -38,52 +39,71 @@ pub enum FileType {
 }
 
 impl FileType {
-    fn parse(object: &Object) -> FileType {
-        object
+    fn parse(object: &Object) -> Result<FileType> {
+        let file_type = object
             .props()
             .get(PropertyType::IRecordMedia)
-            .map(|value| value.to_u32().expect("file type is not a u32"))
-            .map(|value| match value {
-                1 => FileType::Audio,
-                2 => FileType::Video,
-                _ => panic!("invalid file type: {}", value),
+            .map(|value| {
+                value.to_u32().ok_or_else(|| {
+                    ErrorKind::MalformedOneNoteFileData("file type is not a u32".into())
+                })
             })
-            .unwrap_or(FileType::Unknown)
+            .transpose()?
+            .map(|value| match value {
+                1 => Ok(FileType::Audio),
+                2 => Ok(FileType::Video),
+                _ => Err(ErrorKind::MalformedOneNoteFileData(
+                    format!("invalid file type: {}", value).into(),
+                )),
+            })
+            .transpose()?
+            .unwrap_or(FileType::Unknown);
+
+        Ok(file_type)
     }
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(object.id(), PropertySetId::EmbeddedFileNode.as_jcid());
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::EmbeddedFileNode.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)
-        .expect("embedded file has no last modified time");
-    let picture_container = ObjectReference::parse(PropertyType::PictureContainer, object);
-    let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object);
-    let layout_max_height = simple::parse_f32(PropertyType::LayoutMaxHeight, object);
+    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("embedded file has no last modified time".into())
+    })?;
+    let picture_container = ObjectReference::parse(PropertyType::PictureContainer, object)?;
+    let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object)?;
+    let layout_max_height = simple::parse_f32(PropertyType::LayoutMaxHeight, object)?;
     let is_layout_size_set_by_user =
-        simple::parse_bool(PropertyType::IsLayoutSizeSetByUser, object).unwrap_or_default();
-    let text = simple::parse_string(PropertyType::RichEditTextUnicode, object);
+        simple::parse_bool(PropertyType::IsLayoutSizeSetByUser, object)?.unwrap_or_default();
+    let text = simple::parse_string(PropertyType::RichEditTextUnicode, object)?;
     let text_language_code =
-        simple::parse_u16(PropertyType::RichEditTextLangID, object).map(|value| value as u32);
+        simple::parse_u16(PropertyType::RichEditTextLangID, object)?.map(|value| value as u32);
     let layout_alignment_in_parent =
-        LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object);
-    let layout_alignment_self = LayoutAlignment::parse(PropertyType::LayoutAlignmentSelf, object);
+        LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object)?;
+    let layout_alignment_self = LayoutAlignment::parse(PropertyType::LayoutAlignmentSelf, object)?;
     let embedded_file_container =
-        ObjectReference::parse(PropertyType::EmbeddedFileContainer, object)
-            .expect("embedded file has no file container");
-    let embedded_file_name = simple::parse_string(PropertyType::EmbeddedFileName, object)
-        .expect("embedded file has no file name");
-    let source_path = simple::parse_string(PropertyType::SourceFilepath, object);
-    let file_type = FileType::parse(object);
-    let picture_width = simple::parse_f32(PropertyType::PictureWidth, object);
-    let picture_height = simple::parse_f32(PropertyType::PictureHeight, object);
-    let offset_from_parent_horiz = simple::parse_f32(PropertyType::OffsetFromParentHoriz, object);
-    let offset_from_parent_vert = simple::parse_f32(PropertyType::OffsetFromParentVert, object);
+        ObjectReference::parse(PropertyType::EmbeddedFileContainer, object)?.ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("embedded file has no file container".into())
+        })?;
+    let embedded_file_name = simple::parse_string(PropertyType::EmbeddedFileName, object)?
+        .ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("embedded file has no file name".into())
+        })?;
+    let source_path = simple::parse_string(PropertyType::SourceFilepath, object)?;
+    let file_type = FileType::parse(object)?;
+    let picture_width = simple::parse_f32(PropertyType::PictureWidth, object)?;
+    let picture_height = simple::parse_f32(PropertyType::PictureHeight, object)?;
+    let offset_from_parent_horiz = simple::parse_f32(PropertyType::OffsetFromParentHoriz, object)?;
+    let offset_from_parent_vert = simple::parse_f32(PropertyType::OffsetFromParentVert, object)?;
     // let recording_duration = simple::parse_u32(PropertyType::Duration) // FIXME: Record duration property id not known
 
-    let note_tags = NoteTagData::parse(object).unwrap_or_default();
+    let note_tags = NoteTagData::parse(object)?.unwrap_or_default();
 
-    Data {
+    let data = Data {
         last_modified,
         picture_container,
         layout_max_width,
@@ -103,5 +123,7 @@ pub(crate) fn parse(object: &Object) -> Data {
         offset_from_parent_horiz,
         offset_from_parent_vert,
         recording_duration: None, // FIXME: Parse this
-    }
+    };
+
+    Ok(data)
 }

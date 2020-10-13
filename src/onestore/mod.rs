@@ -1,4 +1,4 @@
-use crate::errors::Result;
+use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data_element::storage_index::StorageIndex;
 use crate::fsshttpb::data_element::storage_manifest::StorageManifest;
 use crate::fsshttpb::packaging::Packaging;
@@ -41,24 +41,34 @@ pub(crate) fn parse_store(package: &Packaging) -> Result<OneStore> {
     let mut parsed_object_spaces = HashSet::new();
 
     // [ONESTORE] 2.7.1: Parse storage manifest
-    let storage_index = package.find_storage_index();
-    let storage_manifest = package.find_storage_manifest();
+    let storage_index = package
+        .data_element_package
+        .find_storage_index()
+        .ok_or_else(|| ErrorKind::MalformedOneStoreData("storage index is missing".into()))?;
+    let storage_manifest = package
+        .data_element_package
+        .find_storage_manifest()
+        .ok_or_else(|| ErrorKind::MalformedOneStoreData("storage manifest is missing".into()))?;
 
-    let header_cell_id = find_header_cell_id(storage_manifest);
+    let header_cell_id = find_header_cell_id(storage_manifest)?;
 
     let header_cell_mapping_id = storage_index
         .find_cell_mapping_id(header_cell_id)
-        .expect("header cell mapping id not found");
+        .ok_or_else(|| {
+            ErrorKind::MalformedOneStoreData("header cell mapping id not found".into())
+        })?;
 
     // [ONESTORE] 2.7.2: Parse header cell
     let header_cell = package
         .data_element_package
-        .find_objects(header_cell_mapping_id, &storage_index)
+        .find_objects(header_cell_mapping_id, &storage_index)?
         .into_iter()
         .next()
-        .expect("no header object in header cell");
+        .ok_or_else(|| {
+            ErrorKind::MalformedOneStoreData("no header object in header cell".into())
+        })?;
 
-    let header = StoreHeader::parse(header_cell);
+    let header = StoreHeader::parse(header_cell)?;
 
     parsed_object_spaces.insert(header_cell_id);
 
@@ -67,13 +77,13 @@ pub(crate) fn parse_store(package: &Packaging) -> Result<OneStore> {
 
     // Parse data root
 
-    let data_root_cell_id = find_data_root_cell_id(storage_manifest);
+    let data_root_cell_id = find_data_root_cell_id(storage_manifest)?;
     let (_, data_root) = parse_object_space(
         data_root_cell_id,
         storage_index,
         &package,
         &mut revision_cache,
-    );
+    )?;
 
     parsed_object_spaces.insert(data_root_cell_id);
 
@@ -95,7 +105,7 @@ pub(crate) fn parse_store(package: &Packaging) -> Result<OneStore> {
             storage_index,
             &package,
             &mut revision_cache,
-        );
+        )?;
         object_spaces.insert(id, group);
     }
 
@@ -112,27 +122,27 @@ fn parse_object_space<'a, 'b>(
     storage_index: &'a StorageIndex,
     package: &'a Packaging,
     revision_cache: &'b mut HashMap<CellId, Revision<'a>>,
-) -> (CellId, ObjectSpace<'a>) {
+) -> Result<(CellId, ObjectSpace<'a>)> {
     let mapping = storage_index
         .cell_mappings
         .get(&cell_id)
-        .expect("cell mapping not found");
+        .ok_or_else(|| ErrorKind::MalformedOneStoreData("cell mapping not found".into()))?;
 
     ObjectSpace::parse(mapping, storage_index, package, revision_cache)
 }
 
-fn find_header_cell_id(manifest: &StorageManifest) -> CellId {
+fn find_header_cell_id(manifest: &StorageManifest) -> Result<CellId> {
     manifest
         .roots
         .get(&exguid!({{1A5A319C-C26B-41AA-B9C5-9BD8C44E07D4}, 1}))
         .copied()
-        .expect("no header cell root")
+        .ok_or_else(|| ErrorKind::MalformedOneStoreData("no header cell root".into()).into())
 }
 
-fn find_data_root_cell_id(manifest: &StorageManifest) -> CellId {
+fn find_data_root_cell_id(manifest: &StorageManifest) -> Result<CellId> {
     manifest
         .roots
         .get(&exguid!({{84DEFAB9-AAA3-4A0D-A3A8-520C77AC7073}, 2}))
         .copied()
-        .expect("no header cell root")
+        .ok_or_else(|| ErrorKind::MalformedOneStoreData("no header cell root".into()).into())
 }

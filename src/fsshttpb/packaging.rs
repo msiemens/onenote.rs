@@ -1,12 +1,10 @@
 use crate::errors::Result;
-use crate::fsshttpb::data_element::storage_index::StorageIndex;
-use crate::fsshttpb::data_element::storage_manifest::StorageManifest;
 use crate::fsshttpb::data_element::DataElementPackage;
 use crate::types::exguid::ExGuid;
 use crate::types::guid::Guid;
 use crate::types::object_types::ObjectType;
 use crate::types::stream_object::ObjectHeader;
-use crate::Reader;
+use crate::{ErrorKind, Reader};
 
 #[derive(Debug)]
 pub(crate) struct Packaging {
@@ -21,27 +19,29 @@ pub(crate) struct Packaging {
 
 impl Packaging {
     pub(crate) fn parse(reader: Reader) -> Result<Packaging> {
-        let file_type = Guid::parse(reader);
-        let file = Guid::parse(reader);
-        let legacy_file_version = Guid::parse(reader);
-        let file_format = Guid::parse(reader);
+        let file_type = Guid::parse(reader)?;
+        let file = Guid::parse(reader)?;
+        let legacy_file_version = Guid::parse(reader)?;
+        let file_format = Guid::parse(reader)?;
 
-        assert_eq!(file, legacy_file_version);
+        if file != legacy_file_version {
+            return Err(
+                ErrorKind::MalformedOneStoreData("not a legacy OneStore file".into()).into(),
+            );
+        }
 
-        assert_eq!(reader.get_u32_le(), 0);
+        if reader.get_u32()? != 0 {
+            return Err(ErrorKind::MalformedFssHttpBData("invalid padding data".into()).into());
+        }
 
-        let header = ObjectHeader::parse_32(reader);
-        assert_eq!(header.object_type, ObjectType::OneNotePackaging);
+        ObjectHeader::try_parse_32(reader, ObjectType::OneNotePackaging)?;
 
-        let storage_index = ExGuid::parse(reader);
-        let cell_schema = Guid::parse(reader);
+        let storage_index = ExGuid::parse(reader)?;
+        let cell_schema = Guid::parse(reader)?;
 
-        let data_element_package = DataElementPackage::parse(reader);
+        let data_element_package = DataElementPackage::parse(reader)?;
 
-        assert_eq!(
-            ObjectHeader::parse_end_16(reader),
-            ObjectType::OneNotePackaging
-        );
+        ObjectHeader::try_parse_end_16(reader, ObjectType::OneNotePackaging)?;
 
         Ok(Packaging {
             file_type,
@@ -52,21 +52,5 @@ impl Packaging {
             cell_schema,
             data_element_package,
         })
-    }
-
-    pub(crate) fn find_storage_index(&self) -> &StorageIndex {
-        self.data_element_package
-            .storage_indexes
-            .values()
-            .next()
-            .expect("no storage index found")
-    }
-
-    pub(crate) fn find_storage_manifest(&self) -> &StorageManifest {
-        self.data_element_package
-            .storage_manifests
-            .values()
-            .next()
-            .expect("no storage manifest found")
     }
 }

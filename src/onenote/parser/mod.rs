@@ -1,10 +1,9 @@
-use crate::errors::Result;
+use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::packaging::Packaging;
 use crate::onenote::parser::notebook::Notebook;
 use crate::onenote::parser::section::Section;
 use crate::onestore::parse_store;
-use crate::types::guid::Guid;
-use bytes::Bytes;
+use crate::reader::Reader;
 use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::Path;
@@ -33,16 +32,18 @@ impl Parser {
     pub fn parse_notebook(&mut self, path: &Path) -> Result<Notebook> {
         let file = File::open(path)?;
         let data = Parser::read(file)?;
-        let packaging = Packaging::parse(&mut Bytes::from(data))?;
+        let packaging = Packaging::parse(&mut Reader::new(data.as_slice()))?;
         let store = parse_store(&packaging)?;
 
-        assert_eq!(
-            store.schema_guid(),
-            Guid::from_str("E4DBFD38-E5C7-408B-A8A1-0E7B421E1F5F").unwrap()
-        );
+        if store.schema_guid() != guid!({E4DBFD38-E5C7-408B-A8A1-0E7B421E1F5F}) {
+            return Err(ErrorKind::NotATocFile {
+                file: path.to_string_lossy().to_string(),
+            }
+            .into());
+        }
 
         let base_dir = path.parent().expect("no base dir found");
-        let sections = notebook::parse_toc(store.data_root())
+        let sections = notebook::parse_toc(store.data_root())?
             .iter()
             .map(|name| {
                 let mut file = base_dir.to_path_buf();
@@ -50,14 +51,12 @@ impl Parser {
 
                 file
             })
-            .inspect(|path| {
-                dbg!(path.display());
-            })
+            // .inspect(|path| {
+            //     dbg!(path.display());
+            // })
             .filter(|p| p.is_file())
             .map(|path| self.parse_section(&path))
             .collect::<Result<_>>()?;
-
-        eprintln!("Finished parsing");
 
         Ok(Notebook { sections })
     }
@@ -65,21 +64,23 @@ impl Parser {
     pub fn parse_section(&mut self, path: &Path) -> Result<Section> {
         let file = File::open(path)?;
         let data = Parser::read(file)?;
-        let packaging = Packaging::parse(&mut Bytes::from(data))?;
+        let packaging = Packaging::parse(&mut Reader::new(data.as_slice()))?;
         let store = parse_store(&packaging)?;
 
-        assert_eq!(
-            store.schema_guid(),
-            Guid::from_str("1F937CB4-B26F-445F-B9F8-17E20160E461").unwrap()
-        );
+        if store.schema_guid() != guid!({1F937CB4-B26F-445F-B9F8-17E20160E461}) {
+            return Err(ErrorKind::NotASectionFile {
+                file: path.to_string_lossy().to_string(),
+            }
+            .into());
+        }
 
-        Ok(section::parse_section(
+        section::parse_section(
             store,
             path.file_name()
-                .expect("invalid file")
+                .expect("file without file name")
                 .to_string_lossy()
                 .to_string(),
-        ))
+        )
     }
 
     fn read(file: File) -> Result<Vec<u8>> {

@@ -1,4 +1,4 @@
-use crate::errors::Result;
+use crate::errors::{ErrorKind, Result};
 use crate::types::compact_u64::CompactU64;
 use crate::types::guid::Guid;
 use crate::Reader;
@@ -27,62 +27,65 @@ impl ExGuid {
         ExGuid { guid, value }
     }
 
-    pub(crate) fn parse(reader: Reader) -> ExGuid {
-        let data = reader.get_u8();
+    pub(crate) fn parse(reader: Reader) -> Result<ExGuid> {
+        let data = reader.get_u8()?;
 
         if data == 0 {
-            return ExGuid {
+            return Ok(ExGuid {
                 guid: Guid::nil(),
                 value: 0,
-            };
+            });
         }
 
         if data & 0b111 == 4 {
-            return ExGuid {
-                guid: Guid::parse(reader),
+            return Ok(ExGuid {
+                guid: Guid::parse(reader)?,
                 value: (data >> 3) as u32,
-            };
+            });
         }
 
         if data & 0b111111 == 32 {
-            let value = (reader.get_u8() as u16) << 2 | (data >> 6) as u16;
+            let value = (reader.get_u8()? as u16) << 2 | (data >> 6) as u16;
 
-            return ExGuid {
-                guid: Guid::parse(reader),
+            return Ok(ExGuid {
+                guid: Guid::parse(reader)?,
                 value: value as u32,
-            };
+            });
         }
 
         if data & 0b1111111 == 64 {
-            let value = (reader.get_u16() as u32) << 1 | (data >> 7) as u32;
+            let value = (reader.get_u16()? as u32) << 1 | (data >> 7) as u32;
 
-            return ExGuid {
-                guid: Guid::parse(reader),
+            return Ok(ExGuid {
+                guid: Guid::parse(reader)?,
                 value,
-            };
+            });
         }
 
         if data == 128 {
-            let value = reader.get_u32_le();
+            let value = reader.get_u32()?;
 
-            return ExGuid {
-                guid: Guid::parse(reader),
+            return Ok(ExGuid {
+                guid: Guid::parse(reader)?,
                 value,
-            };
+            });
         }
 
-        panic!("unexpected ExGuid first byte: {:b}", data)
+        Err(
+            ErrorKind::MalformedData(format!("unexpected ExGuid first byte: {:b}", data).into())
+                .into(),
+        )
     }
 
-    pub(crate) fn parse_array(reader: Reader) -> Vec<ExGuid> {
+    pub(crate) fn parse_array(reader: Reader) -> Result<Vec<ExGuid>> {
         let mut values = vec![];
 
-        let count = CompactU64::parse(reader).value();
+        let count = CompactU64::parse(reader)?.value();
         for _ in 0..count {
-            values.push(ExGuid::parse(reader));
+            values.push(ExGuid::parse(reader)?);
         }
 
-        values
+        Ok(values)
     }
 
     pub(crate) fn parse_str(guid: &str, n: u32) -> Result<ExGuid> {

@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::time::Timestamp;
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
@@ -15,24 +16,33 @@ pub(crate) struct Data {
     pub(crate) is_deleted: bool,
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(object.id(), PropertySetId::PageMetadata.as_jcid());
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::PageMetadata.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let entity_guid = simple::parse_guid(PropertyType::NotebookManagementEntityGuid, object)
-        .expect("page metadata has no guid");
-    let cached_title = simple::parse_string(PropertyType::CachedTitleString, object)
-        .expect("page metadata has no cached title");
+    let entity_guid = simple::parse_guid(PropertyType::NotebookManagementEntityGuid, object)?
+        .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("page metadata has no guid".into()))?;
+    let cached_title =
+        simple::parse_string(PropertyType::CachedTitleString, object)?.ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("page metadata has no cached title".into())
+        })?;
     let schema_revision_in_order_to_read =
-        simple::parse_u32(PropertyType::SchemaRevisionInOrderToRead, object);
+        simple::parse_u32(PropertyType::SchemaRevisionInOrderToRead, object)?;
     let schema_revision_in_order_to_write =
-        simple::parse_u32(PropertyType::SchemaRevisionInOrderToWrite, object);
-    let page_level = simple::parse_u32(PropertyType::PageLevel, object).unwrap_or(0) as i32;
-    let created_at = Timestamp::parse(PropertyType::TopologyCreationTimeStamp, object)
-        .expect("page metadata has no creation timestamp");
+        simple::parse_u32(PropertyType::SchemaRevisionInOrderToWrite, object)?;
+    let page_level = simple::parse_u32(PropertyType::PageLevel, object)?.unwrap_or(0) as i32;
+    let created_at = Timestamp::parse(PropertyType::TopologyCreationTimeStamp, object)?
+        .ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("page metadata has no creation timestamp".into())
+        })?;
     let is_deleted =
-        simple::parse_bool(PropertyType::IsDeletedGraphSpaceContent, object).unwrap_or_default();
+        simple::parse_bool(PropertyType::IsDeletedGraphSpaceContent, object)?.unwrap_or_default();
 
-    Data {
+    let data = Data {
         entity_guid,
         cached_title,
         schema_revision_in_order_to_read,
@@ -40,5 +50,7 @@ pub(crate) fn parse(object: &Object) -> Data {
         page_level,
         created_at,
         is_deleted,
-    }
+    };
+
+    Ok(data)
 }

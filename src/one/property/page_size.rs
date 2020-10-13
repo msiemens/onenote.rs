@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
@@ -22,30 +23,40 @@ pub(crate) enum PageSize {
 }
 
 impl PageSize {
-    pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Option<PageSize> {
+    pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Result<Option<PageSize>> {
         object
             .props()
             .get(prop_type)
-            .map(|value| value.to_u8().expect("page size is not a u8"))
-            .map(|value| match value {
-                0 => PageSize::Auto,
-                1 => PageSize::US,
-                2 => PageSize::AnsiLetter,
-                3 => PageSize::AnsiTabloid,
-                4 => PageSize::USLegal,
-                5 => PageSize::IsoA3,
-                6 => PageSize::IsoA4,
-                7 => PageSize::IsoA5,
-                8 => PageSize::IsoA6,
-                9 => PageSize::JisB4,
-                10 => PageSize::JisB5,
-                11 => PageSize::JisB6,
-                12 => PageSize::JapanesePostcard,
-                13 => PageSize::IndexCard,
-                14 => PageSize::Billfold,
-                15 => PageSize::Custom,
-                _ => panic!("invalid page size: {}", value),
+            .map(|value| {
+                value
+                    .to_u8()
+                    .ok_or_else(|| {
+                        ErrorKind::MalformedOneNoteFileData("page size is not a u8".into())
+                    })
+                    .and_then(|value| match value {
+                        0 => Ok(PageSize::Auto),
+                        1 => Ok(PageSize::US),
+                        2 => Ok(PageSize::AnsiLetter),
+                        3 => Ok(PageSize::AnsiTabloid),
+                        4 => Ok(PageSize::USLegal),
+                        5 => Ok(PageSize::IsoA3),
+                        6 => Ok(PageSize::IsoA4),
+                        7 => Ok(PageSize::IsoA5),
+                        8 => Ok(PageSize::IsoA6),
+                        9 => Ok(PageSize::JisB4),
+                        10 => Ok(PageSize::JisB5),
+                        11 => Ok(PageSize::JisB6),
+                        12 => Ok(PageSize::JapanesePostcard),
+                        13 => Ok(PageSize::IndexCard),
+                        14 => Ok(PageSize::Billfold),
+                        15 => Ok(PageSize::Custom),
+                        _ => Err(ErrorKind::MalformedOneNoteFileData(
+                            format!("invalid page size: {}", value).into(),
+                        )),
+                    })
             })
+            .transpose()
+            .map_err(|e| e.into())
     }
 }
 

@@ -12,6 +12,8 @@ impl Utf16ToString for &[u8] {
             .map(|v| u16::from_le_bytes([v[0], v[1]]))
             .collect();
 
-        Ok(U16CString::from_vec_with_nul(data)?.to_string()?)
+        let value = U16CString::from_vec_with_nul(data)?;
+
+        Ok(value.to_string()?)
     }
 }

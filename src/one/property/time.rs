@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
@@ -5,11 +6,19 @@ use crate::onestore::object::Object;
 pub struct Time(u32);
 
 impl Time {
-    pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Option<Time> {
-        object
+    pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Result<Option<Time>> {
+        let time = object
             .props()
             .get(prop_type)
-            .map(|value| Time(value.to_u32().expect("time value is not a u32")))
+            .map(|value| {
+                value.to_u32().ok_or_else(|| {
+                    ErrorKind::MalformedOneNoteFileData("time value is not a u32".into())
+                })
+            })
+            .transpose()?
+            .map(Time);
+
+        Ok(time)
     }
 }
 
@@ -17,10 +26,18 @@ impl Time {
 pub(crate) struct Timestamp(u64);
 
 impl Timestamp {
-    pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Option<Timestamp> {
-        object
+    pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Result<Option<Timestamp>> {
+        let timestamp = object
             .props()
             .get(prop_type)
-            .map(|value| Timestamp(value.to_u64().expect("timestamp value is not a u64")))
+            .map(|value| {
+                value.to_u64().ok_or_else(|| {
+                    ErrorKind::MalformedOneNoteFileData("timestamp value is not a u64".into())
+                })
+            })
+            .transpose()?
+            .map(Timestamp);
+
+        Ok(timestamp)
     }
 }

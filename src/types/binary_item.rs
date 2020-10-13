@@ -1,15 +1,15 @@
+use crate::errors::Result;
 use crate::types::compact_u64::CompactU64;
 use crate::Reader;
 
 pub(crate) struct BinaryItem(Vec<u8>);
 
 impl BinaryItem {
-    pub(crate) fn parse(reader: Reader) -> BinaryItem {
-        let size = CompactU64::parse(reader).value();
-        let data = reader.bytes()[0..(size as usize)].to_vec();
-        reader.advance(size as usize);
+    pub(crate) fn parse(reader: Reader) -> Result<BinaryItem> {
+        let size = CompactU64::parse(reader)?.value();
+        let data = reader.read(size as usize)?.to_vec();
 
-        BinaryItem(data)
+        Ok(BinaryItem(data))
     }
 
     pub(crate) fn value(self) -> Vec<u8> {

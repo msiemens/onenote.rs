@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property_set::{section_metadata_node, section_node};
 use crate::onenote::parser::page_series::{parse_page_series, PageSeries};
 use crate::onestore::object_space::ObjectSpace;
@@ -25,9 +26,9 @@ impl Section {
     }
 }
 
-pub(crate) fn parse_section(store: OneStore, filename: String) -> Section {
-    let metadata = parse_metadata(store.data_root());
-    let content = parse_content(store.data_root());
+pub(crate) fn parse_section(store: OneStore, filename: String) -> Result<Section> {
+    let metadata = parse_metadata(store.data_root())?;
+    let content = parse_content(store.data_root())?;
 
     let display_name = metadata.display_name.unwrap_or_else(|| {
         filename
@@ -40,29 +41,33 @@ pub(crate) fn parse_section(store: OneStore, filename: String) -> Section {
         .page_series
         .into_iter()
         .map(|page_series_id| parse_page_series(page_series_id, &store))
-        .collect();
+        .collect::<Result<_>>()?;
 
-    Section {
+    Ok(Section {
         display_name,
         page_series,
         color: metadata.color,
-    }
+    })
 }
 
-fn parse_content(space: &ObjectSpace) -> section_node::Data {
-    let content_root_id = space.content_root().expect("section has no content root");
-    let content_object = space
-        .get_object(content_root_id)
-        .expect("section content object is missing");
+fn parse_content(space: &ObjectSpace) -> Result<section_node::Data> {
+    let content_root_id = space
+        .content_root()
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("section has no content root".into()))?;
+    let content_object = space.get_object(content_root_id).ok_or_else(|| {
+        ErrorKind::MalformedOneNoteData("section content object is missing".into())
+    })?;
 
     section_node::parse(content_object)
 }
 
-fn parse_metadata(space: &ObjectSpace) -> section_metadata_node::Data {
-    let metadata_root_id = space.metadata_root().expect("section has no metadata root");
-    let metadata_object = space
-        .get_object(metadata_root_id)
-        .expect("section metadata object is missing");
+fn parse_metadata(space: &ObjectSpace) -> Result<section_metadata_node::Data> {
+    let metadata_root_id = space
+        .metadata_root()
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("section has no metadata root".into()))?;
+    let metadata_object = space.get_object(metadata_root_id).ok_or_else(|| {
+        ErrorKind::MalformedOneNoteData("section metadata object is missing".into())
+    })?;
 
     section_metadata_node::parse(metadata_object)
 }

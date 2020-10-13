@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
@@ -10,17 +11,24 @@ pub enum ParagraphAlignment {
 }
 
 impl ParagraphAlignment {
-    pub(crate) fn parse(object: &Object) -> Option<ParagraphAlignment> {
-        object
+    pub(crate) fn parse(object: &Object) -> Result<Option<ParagraphAlignment>> {
+        let alignment = object
             .props()
             .get(PropertyType::ParagraphAlignment)
-            .map(|value| value.to_u8().expect("paragraph alignment is not a u8"))
+            .map(|value| {
+                value.to_u8().ok_or_else(|| {
+                    ErrorKind::MalformedOneNoteFileData("paragraph alignment is not a u8".into())
+                })
+            })
+            .transpose()?
             .map(|value| match value {
                 0 => ParagraphAlignment::Left,
                 1 => ParagraphAlignment::Center,
                 2 => ParagraphAlignment::Right,
                 _ => ParagraphAlignment::Unknown,
-            })
+            });
+
+        Ok(alignment)
     }
 }
 

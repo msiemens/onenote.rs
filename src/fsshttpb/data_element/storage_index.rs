@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data_element::DataElement;
 use crate::types::cell_id::CellId;
 use crate::types::exguid::ExGuid;
@@ -46,77 +47,84 @@ pub(crate) struct StorageIndexRevisionMapping {
 }
 
 impl DataElement {
-    pub(crate) fn parse_storage_index(reader: Reader) -> StorageIndex {
+    pub(crate) fn parse_storage_index(reader: Reader) -> Result<StorageIndex> {
         let mut manifest_mappings = vec![];
         let mut cell_mappings = HashMap::new();
         let mut revision_mappings = HashMap::new();
 
         loop {
-            if ObjectHeader::try_parse_end_8(reader, ObjectType::DataElement).is_some() {
+            if ObjectHeader::has_end_8(reader, ObjectType::DataElement)? {
                 break;
             }
 
-            let object_header = ObjectHeader::parse_16(reader);
+            let object_header = ObjectHeader::parse_16(reader)?;
             match object_header.object_type {
                 ObjectType::StorageIndexManifestMapping => {
-                    manifest_mappings.push(Self::parse_storage_index_manifest_mapping(reader))
+                    manifest_mappings.push(Self::parse_storage_index_manifest_mapping(reader)?)
                 }
                 ObjectType::StorageIndexCellMapping => {
-                    let (id, mapping) = Self::parse_storage_index_cell_mapping(reader);
+                    let (id, mapping) = Self::parse_storage_index_cell_mapping(reader)?;
 
                     cell_mappings.insert(id, mapping);
                 }
                 ObjectType::StorageIndexRevisionMapping => {
-                    let (id, mapping) = Self::parse_storage_index_revision_mapping(reader);
+                    let (id, mapping) = Self::parse_storage_index_revision_mapping(reader)?;
 
                     revision_mappings.insert(id, mapping);
                 }
-                _ => panic!("unexpected object type: 0x{:x}", object_header.object_type),
+                _ => {
+                    return Err(ErrorKind::MalformedFssHttpBData(
+                        format!("unexpected object type: {:x}", object_header.object_type).into(),
+                    )
+                    .into())
+                }
             }
         }
 
-        StorageIndex {
+        ObjectHeader::try_parse_end_8(reader, ObjectType::DataElement)?;
+
+        Ok(StorageIndex {
             manifest_mappings,
             cell_mappings,
             revision_mappings,
-        }
+        })
     }
 
-    fn parse_storage_index_manifest_mapping(reader: Reader) -> StorageIndexManifestMapping {
-        let mapping_id = ExGuid::parse(reader);
-        let serial = SerialNumber::parse(reader);
+    fn parse_storage_index_manifest_mapping(reader: Reader) -> Result<StorageIndexManifestMapping> {
+        let mapping_id = ExGuid::parse(reader)?;
+        let serial = SerialNumber::parse(reader)?;
 
-        StorageIndexManifestMapping { mapping_id, serial }
+        Ok(StorageIndexManifestMapping { mapping_id, serial })
     }
 
-    fn parse_storage_index_cell_mapping(reader: Reader) -> (CellId, StorageIndexCellMapping) {
-        let cell_id = CellId::parse(reader);
-        let id = ExGuid::parse(reader);
-        let serial = SerialNumber::parse(reader);
+    fn parse_storage_index_cell_mapping(
+        reader: Reader,
+    ) -> Result<(CellId, StorageIndexCellMapping)> {
+        let cell_id = CellId::parse(reader)?;
+        let id = ExGuid::parse(reader)?;
+        let serial = SerialNumber::parse(reader)?;
 
-        (
+        let mapping = StorageIndexCellMapping {
             cell_id,
-            StorageIndexCellMapping {
-                cell_id,
-                id,
-                serial,
-            },
-        )
+            id,
+            serial,
+        };
+
+        Ok((cell_id, mapping))
     }
 
     fn parse_storage_index_revision_mapping(
         reader: Reader,
-    ) -> (ExGuid, StorageIndexRevisionMapping) {
-        let id = ExGuid::parse(reader);
-        let revision_mapping = ExGuid::parse(reader);
-        let serial = SerialNumber::parse(reader);
+    ) -> Result<(ExGuid, StorageIndexRevisionMapping)> {
+        let id = ExGuid::parse(reader)?;
+        let revision_mapping = ExGuid::parse(reader)?;
+        let serial = SerialNumber::parse(reader)?;
 
-        (
-            id,
-            StorageIndexRevisionMapping {
-                revision_mapping,
-                serial,
-            },
-        )
+        let mapping = StorageIndexRevisionMapping {
+            revision_mapping,
+            serial,
+        };
+
+        Ok((id, mapping))
     }
 }

@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::outline_node::OutlineIndentDistance;
 use crate::one::property_set::{table_cell_node, table_node, table_row_node};
@@ -100,17 +101,19 @@ impl TableCell {
     }
 }
 
-pub(crate) fn parse_table(table_id: ExGuid, space: &ObjectSpace) -> Table {
-    let table_object = space.get_object(table_id).expect("table object is missing");
-    let data = table_node::parse(table_object);
+pub(crate) fn parse_table(table_id: ExGuid, space: &ObjectSpace) -> Result<Table> {
+    let table_object = space
+        .get_object(table_id)
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("table object is missing".into()))?;
+    let data = table_node::parse(table_object)?;
 
     let contents = data
         .rows
         .into_iter()
         .map(|row_id| parse_row(row_id, space))
-        .collect();
+        .collect::<Result<_>>()?;
 
-    Table {
+    let table = Table {
         rows: data.row_count,
         cols: data.col_count,
         contents,
@@ -119,37 +122,47 @@ pub(crate) fn parse_table(table_id: ExGuid, space: &ObjectSpace) -> Table {
         borders_visible: data.borders_visible,
         layout_alignment_in_parent: data.layout_alignment_in_parent,
         layout_alignment_self: data.layout_alignment_self,
-        note_tags: parse_note_tags(data.note_tags, space),
-    }
+        note_tags: parse_note_tags(data.note_tags, space)?,
+    };
+
+    Ok(table)
 }
 
-fn parse_row(row_id: ExGuid, space: &ObjectSpace) -> TableRow {
-    let row_object = space.get_object(row_id).expect("row object is missing");
-    let data = table_row_node::parse(row_object);
+fn parse_row(row_id: ExGuid, space: &ObjectSpace) -> Result<TableRow> {
+    let row_object = space
+        .get_object(row_id)
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("row object is missing".into()))?;
+    let data = table_row_node::parse(row_object)?;
 
     let contents = data
         .cells
         .into_iter()
         .map(|cell_id| parse_cell(cell_id, space))
-        .collect();
+        .collect::<Result<_>>()?;
 
-    TableRow { contents }
+    let row = TableRow { contents };
+
+    Ok(row)
 }
 
-fn parse_cell(cell_id: ExGuid, space: &ObjectSpace) -> TableCell {
-    let cell_object = space.get_object(cell_id).expect("cell object is missing");
-    let data = table_cell_node::parse(cell_object);
+fn parse_cell(cell_id: ExGuid, space: &ObjectSpace) -> Result<TableCell> {
+    let cell_object = space
+        .get_object(cell_id)
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("cell object is missing".into()))?;
+    let data = table_cell_node::parse(cell_object)?;
 
     let contents = data
         .contents
         .into_iter()
         .map(|element_id| parse_outline_element(element_id, space))
-        .collect();
+        .collect::<Result<_>>()?;
 
-    TableCell {
+    let cell = TableCell {
         contents,
         background_color: data.background_color,
         layout_max_width: data.layout_max_width,
         outline_indent_distance: data.outline_indent_distance,
-    }
+    };
+
+    Ok(cell)
 }

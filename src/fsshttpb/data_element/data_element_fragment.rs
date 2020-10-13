@@ -1,3 +1,4 @@
+use crate::errors::Result;
 use crate::fsshttpb::data_element::DataElement;
 use crate::types::compact_u64::CompactU64;
 use crate::types::exguid::ExGuid;
@@ -20,24 +21,24 @@ pub(crate) struct DataElementFragmentChunkReference {
 }
 
 impl DataElement {
-    pub(crate) fn parse_data_element_fragment(reader: Reader) -> DataElementFragment {
-        let object_header = ObjectHeader::parse(reader);
-        assert_eq!(object_header.object_type, ObjectType::DataElementFragment);
+    pub(crate) fn parse_data_element_fragment(reader: Reader) -> Result<DataElementFragment> {
+        ObjectHeader::try_parse(reader, ObjectType::DataElementFragment)?;
 
-        let id = ExGuid::parse(reader);
-        let size = CompactU64::parse(reader).value();
-        let offset = CompactU64::parse(reader).value();
-        let length = CompactU64::parse(reader).value();
+        let id = ExGuid::parse(reader)?;
+        let size = CompactU64::parse(reader)?.value();
+        let offset = CompactU64::parse(reader)?.value();
+        let length = CompactU64::parse(reader)?.value();
 
-        let data = reader.bytes()[0..(size as usize)].to_vec();
-        reader.advance(size as usize);
+        let data = reader.read(size as usize)?.to_vec();
 
         let chunk_reference = DataElementFragmentChunkReference { offset, length };
-        DataElementFragment {
+        let fragment = DataElementFragment {
             id,
             size,
             chunk_reference,
             data,
-        }
+        };
+
+        Ok(fragment)
     }
 }

@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data_element::DataElement;
 use crate::types::binary_item::BinaryItem;
 use crate::types::cell_id::CellId;
@@ -134,56 +135,62 @@ impl fmt::Debug for DebugSize {
 }
 
 impl DataElement {
-    pub(crate) fn parse_object_group(reader: Reader) -> ObjectGroup {
-        let declarations = DataElement::parse_object_group_declarations(reader);
+    pub(crate) fn parse_object_group(reader: Reader) -> Result<ObjectGroup> {
+        let declarations = DataElement::parse_object_group_declarations(reader)?;
 
         let mut metadata = vec![];
 
-        let object_header = ObjectHeader::parse(reader);
+        let object_header = ObjectHeader::parse(reader)?;
         match object_header.object_type {
             ObjectType::ObjectGroupMetadataBlock => {
-                metadata = DataElement::parse_object_group_metadata(reader);
+                metadata = DataElement::parse_object_group_metadata(reader)?;
 
                 // Parse object header for the group data section
-                let object_header = ObjectHeader::parse(reader);
-                assert_eq!(object_header.object_type, ObjectType::ObjectGroupData);
+                let object_header = ObjectHeader::parse(reader)?;
+                if object_header.object_type != ObjectType::ObjectGroupData {
+                    return Err(ErrorKind::MalformedFssHttpBData(
+                        format!("unexpected object type: {:x}", object_header.object_type).into(),
+                    )
+                    .into());
+                }
             }
             ObjectType::ObjectGroupData => {} // Skip, will be parsed below
-            _ => panic!("unexpected object type: 0x{:x}", object_header.object_type),
+            _ => {
+                return Err(ErrorKind::MalformedFssHttpBData(
+                    format!("unexpected object type: {:x}", object_header.object_type).into(),
+                )
+                .into())
+            }
         }
-        let objects = DataElement::parse_object_group_data(reader);
+        let objects = DataElement::parse_object_group_data(reader)?;
 
-        assert_eq!(ObjectHeader::parse_end_8(reader), ObjectType::DataElement);
+        ObjectHeader::try_parse_end_8(reader, ObjectType::DataElement)?;
 
-        ObjectGroup {
+        Ok(ObjectGroup {
             declarations,
             metadata,
             objects,
-        }
+        })
     }
 
-    fn parse_object_group_declarations(reader: Reader) -> Vec<ObjectGroupDeclaration> {
-        let object_header = ObjectHeader::parse(reader);
-        assert_eq!(
-            object_header.object_type,
-            ObjectType::ObjectGroupDeclaration
-        );
+    fn parse_object_group_declarations(reader: Reader) -> Result<Vec<ObjectGroupDeclaration>> {
+        ObjectHeader::try_parse(reader, ObjectType::ObjectGroupDeclaration)?;
 
         let mut declarations = vec![];
 
         loop {
-            if ObjectHeader::try_parse_end_8(reader, ObjectType::ObjectGroupDeclaration).is_some() {
+            if ObjectHeader::has_end_8(reader, ObjectType::ObjectGroupDeclaration)? {
                 break;
             }
 
-            let object_header = ObjectHeader::parse(reader);
+            let object_header = ObjectHeader::parse(reader)?;
             match object_header.object_type {
                 ObjectType::ObjectGroupObject => {
-                    let object_id = ExGuid::parse(reader);
-                    let partition_id = CompactU64::parse(reader).value();
-                    let data_size = CompactU64::parse(reader).value();
-                    let object_reference_count = CompactU64::parse(reader).value();
-                    let cell_reference_count = CompactU64::parse(reader).value();
+                    let object_id = ExGuid::parse(reader)?;
+                    let partition_id = CompactU64::parse(reader)?.value();
+                    let data_size = CompactU64::parse(reader)?.value();
+                    let object_reference_count = CompactU64::parse(reader)?.value();
+                    let cell_reference_count = CompactU64::parse(reader)?.value();
 
                     declarations.push(ObjectGroupDeclaration::Object {
                         object_id,
@@ -194,11 +201,11 @@ impl DataElement {
                     })
                 }
                 ObjectType::ObjectGroupDataBlob => {
-                    let object_id = ExGuid::parse(reader);
-                    let blob_id = ExGuid::parse(reader);
-                    let partition_id = CompactU64::parse(reader).value();
-                    let object_reference_count = CompactU64::parse(reader).value();
-                    let cell_reference_count = CompactU64::parse(reader).value();
+                    let object_id = ExGuid::parse(reader)?;
+                    let blob_id = ExGuid::parse(reader)?;
+                    let partition_id = CompactU64::parse(reader)?.value();
+                    let object_reference_count = CompactU64::parse(reader)?.value();
+                    let cell_reference_count = CompactU64::parse(reader)?.value();
 
                     declarations.push(ObjectGroupDeclaration::Blob {
                         object_id,
@@ -208,62 +215,69 @@ impl DataElement {
                         cell_reference_count,
                     })
                 }
-                _ => panic!("unexpected object type: 0x{:x}", object_header.object_type),
+                _ => {
+                    return Err(ErrorKind::MalformedFssHttpBData(
+                        format!("unexpected object type: {:x}", object_header.object_type).into(),
+                    )
+                    .into())
+                }
             }
         }
 
-        declarations
+        ObjectHeader::try_parse_end_8(reader, ObjectType::ObjectGroupDeclaration)?;
+
+        Ok(declarations)
     }
 
-    fn parse_object_group_metadata(reader: Reader) -> Vec<ObjectGroupMetadata> {
+    fn parse_object_group_metadata(reader: Reader) -> Result<Vec<ObjectGroupMetadata>> {
         let mut declarations = vec![];
 
         loop {
-            if ObjectHeader::try_parse_end_8(reader, ObjectType::ObjectGroupMetadataBlock).is_some()
-            {
+            if ObjectHeader::has_end_8(reader, ObjectType::ObjectGroupMetadataBlock)? {
                 break;
             }
 
-            let object_header = ObjectHeader::parse_32(reader);
-            assert_eq!(object_header.object_type, ObjectType::ObjectGroupMetadata);
+            ObjectHeader::try_parse_32(reader, ObjectType::ObjectGroupMetadata)?;
 
-            let frequency = CompactU64::parse(reader);
+            let frequency = CompactU64::parse(reader)?;
             declarations.push(ObjectGroupMetadata {
                 change_frequency: ObjectChangeFrequency::parse(frequency.value()),
             })
         }
 
-        declarations
+        ObjectHeader::try_parse_end_8(reader, ObjectType::ObjectGroupMetadataBlock)?;
+
+        Ok(declarations)
     }
 
-    fn parse_object_group_data(reader: Reader) -> Vec<ObjectGroupData> {
+    fn parse_object_group_data(reader: Reader) -> Result<Vec<ObjectGroupData>> {
         let mut objects = vec![];
 
         loop {
-            if ObjectHeader::try_parse_end_8(reader, ObjectType::ObjectGroupData).is_some() {
+            if ObjectHeader::has_end_8(reader, ObjectType::ObjectGroupData)? {
                 break;
             }
 
-            let object_header = ObjectHeader::parse(reader);
+            let object_header = ObjectHeader::parse(reader)?;
             match object_header.object_type {
                 ObjectType::ObjectGroupDataExcluded => {
-                    let group = ExGuid::parse_array(reader);
-                    let cells = CellId::parse_array(reader);
-                    let size = CompactU64::parse(reader).value();
+                    let group = ExGuid::parse_array(reader)?;
+                    let cells = CellId::parse_array(reader)?;
+                    let size = CompactU64::parse(reader)?.value();
 
                     objects.push(ObjectGroupData::ObjectExcluded { group, cells, size })
                 }
                 ObjectType::ObjectGroupDataObject => {
-                    let group = ExGuid::parse_array(reader);
-                    let cells = CellId::parse_array(reader);
-                    let data = BinaryItem::parse(reader).value();
+                    let group = ExGuid::parse_array(reader)?;
+                    let cells = CellId::parse_array(reader)?;
+                    let data = BinaryItem::parse(reader)?.value();
 
                     objects.push(ObjectGroupData::Object { group, cells, data })
                 }
                 ObjectType::ObjectGroupBlobReference => {
-                    let references = ExGuid::parse_array(reader);
-                    let cells = CellId::parse_array(reader);
-                    let blob = ExGuid::parse(reader);
+                    let references = ExGuid::parse_array(reader)?;
+                    let cells = CellId::parse_array(reader)?;
+                    let blob = ExGuid::parse(reader)?;
 
                     objects.push(ObjectGroupData::BlobReference {
                         objects: references,
@@ -271,10 +285,17 @@ impl DataElement {
                         blob,
                     })
                 }
-                _ => panic!("unexpected object type: 0x{:x}", object_header.object_type),
+                _ => {
+                    return Err(ErrorKind::MalformedFssHttpBData(
+                        format!("unexpected object type: {:x}", object_header.object_type).into(),
+                    )
+                    .into())
+                }
             }
         }
 
-        objects
+        ObjectHeader::try_parse_end_8(reader, ObjectType::ObjectGroupData)?;
+
+        Ok(objects)
     }
 }

@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::paragraph_alignment::ParagraphAlignment;
@@ -31,45 +32,57 @@ pub(crate) struct Data {
     pub(crate) note_tags: Vec<NoteTagData>,
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(object.id(), PropertySetId::RichTextNode.as_jcid());
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::RichTextNode.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let last_modified_time = Time::parse(PropertyType::LastModifiedTime, object)
-        .expect("rich text node has no last_modified time");
+    let last_modified_time =
+        Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("rich text node has no last_modified time".into())
+        })?;
     let tight_layout =
-        simple::parse_bool(PropertyType::LayoutTightLayout, object).unwrap_or_default();
+        simple::parse_bool(PropertyType::LayoutTightLayout, object)?.unwrap_or_default();
     let text_run_formatting =
-        ObjectReference::parse_vec(PropertyType::TextRunFormatting, object).unwrap_or_default();
+        ObjectReference::parse_vec(PropertyType::TextRunFormatting, object)?.unwrap_or_default();
     let text_run_indices =
-        simple::parse_vec_u32(PropertyType::TextRunIndex, object).unwrap_or_default();
-    let paragraph_style = ObjectReference::parse(PropertyType::ParagraphStyle, object)
-        .expect("rich text has no paragraph style");
+        simple::parse_vec_u32(PropertyType::TextRunIndex, object)?.unwrap_or_default();
+    let paragraph_style = ObjectReference::parse(PropertyType::ParagraphStyle, object)?
+        .ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("rich text has no paragraph style".into())
+        })?;
     let paragraph_space_before =
-        simple::parse_f32(PropertyType::ParagraphSpaceBefore, object).unwrap_or_default();
+        simple::parse_f32(PropertyType::ParagraphSpaceBefore, object)?.unwrap_or_default();
     let paragraph_space_after =
-        simple::parse_f32(PropertyType::ParagraphSpaceAfter, object).unwrap_or_default();
+        simple::parse_f32(PropertyType::ParagraphSpaceAfter, object)?.unwrap_or_default();
     let paragraph_line_spacing_exact =
-        simple::parse_f32(PropertyType::ParagraphLineSpacingExact, object);
-    let paragraph_alignment = ParagraphAlignment::parse(object).unwrap_or_default();
+        simple::parse_f32(PropertyType::ParagraphLineSpacingExact, object)?;
+    let paragraph_alignment = ParagraphAlignment::parse(object)?.unwrap_or_default();
 
-    let text = simple::parse_string(PropertyType::RichEditTextUnicode, object)
-        .or_else(|| simple::parse_ascii(PropertyType::TextExtendedAscii, object));
+    let text = match simple::parse_string(PropertyType::RichEditTextUnicode, object)? {
+        None => simple::parse_ascii(PropertyType::TextExtendedAscii, object)?,
+        text => text,
+    };
 
     let layout_alignment_in_parent =
-        LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object);
-    let layout_alignment_self = LayoutAlignment::parse(PropertyType::LayoutAlignmentSelf, object);
+        LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object)?;
+    let layout_alignment_self = LayoutAlignment::parse(PropertyType::LayoutAlignmentSelf, object)?;
 
-    let is_title_time = simple::parse_bool(PropertyType::IsTitleTime, object).unwrap_or_default();
-    let is_boiler_text = simple::parse_bool(PropertyType::IsBoilerText, object).unwrap_or_default();
-    let is_title_date = simple::parse_bool(PropertyType::IsTitleDate, object).unwrap_or_default();
-    let is_title_text = simple::parse_bool(PropertyType::IsTitleText, object).unwrap_or_default();
+    let is_title_time = simple::parse_bool(PropertyType::IsTitleTime, object)?.unwrap_or_default();
+    let is_boiler_text =
+        simple::parse_bool(PropertyType::IsBoilerText, object)?.unwrap_or_default();
+    let is_title_date = simple::parse_bool(PropertyType::IsTitleDate, object)?.unwrap_or_default();
+    let is_title_text = simple::parse_bool(PropertyType::IsTitleText, object)?.unwrap_or_default();
     let language_code =
-        simple::parse_u16(PropertyType::RichEditTextLangID, object).map(|value| value as u32);
-    let rtl = simple::parse_bool(PropertyType::ReadingOrderRTL, object).unwrap_or_default();
+        simple::parse_u16(PropertyType::RichEditTextLangID, object)?.map(|value| value as u32);
+    let rtl = simple::parse_bool(PropertyType::ReadingOrderRTL, object)?.unwrap_or_default();
 
-    let note_tags = NoteTagData::parse(object).unwrap_or_default();
+    let note_tags = NoteTagData::parse(object)?.unwrap_or_default();
 
-    Data {
+    let data = Data {
         last_modified_time,
         tight_layout,
         text_run_formatting,
@@ -89,5 +102,7 @@ pub(crate) fn parse(object: &Object) -> Data {
         language_code,
         rtl,
         note_tags,
-    }
+    };
+
+    Ok(data)
 }

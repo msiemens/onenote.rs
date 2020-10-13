@@ -1,3 +1,4 @@
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
@@ -16,22 +17,30 @@ pub(crate) struct Data {
     pub(crate) background_color: Option<Color>,
 }
 
-pub(crate) fn parse(object: &Object) -> Data {
-    assert_eq!(object.id(), PropertySetId::TableCellNode.as_jcid());
+pub(crate) fn parse(object: &Object) -> Result<Data> {
+    if object.id() != PropertySetId::TableCellNode.as_jcid() {
+        return Err(ErrorKind::MalformedOneNoteFileData(
+            format!("unexpected object type: 0x{:X}", object.id().0).into(),
+        )
+        .into());
+    }
 
-    let last_modified = Time::parse(PropertyType::LastModifiedTime, object);
-    let contents = ObjectReference::parse_vec(PropertyType::ElementChildNodes, object)
-        .expect("table cell has no contents");
-    let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object);
-    let outline_indent_distance =
-        OutlineIndentDistance::parse(object).expect("table cell has no outline indent distance");
-    let background_color = Color::parse(PropertyType::CellBackgroundColor, object);
+    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?;
+    let contents = ObjectReference::parse_vec(PropertyType::ElementChildNodes, object)?
+        .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("table cell has no contents".into()))?;
+    let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object)?;
+    let outline_indent_distance = OutlineIndentDistance::parse(object)?.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("table cell has no outline indent distance".into())
+    })?;
+    let background_color = Color::parse(PropertyType::CellBackgroundColor, object)?;
 
-    Data {
+    let data = Data {
         last_modified,
         contents,
         layout_max_width,
         outline_indent_distance,
         background_color,
-    }
+    };
+
+    Ok(data)
 }

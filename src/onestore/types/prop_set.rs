@@ -1,3 +1,4 @@
+use crate::errors::Result;
 use crate::onestore::types::property::{PropertyId, PropertyValue};
 use crate::Reader;
 use std::collections::HashMap;
@@ -8,18 +9,20 @@ pub(crate) struct PropertySet {
 }
 
 impl PropertySet {
-    pub(crate) fn parse(reader: Reader) -> PropertySet {
-        let count = reader.get_u16_le();
+    pub(crate) fn parse(reader: Reader) -> Result<PropertySet> {
+        let count = reader.get_u16()?;
 
-        let property_ids: Vec<_> = (0..count).map(|_| PropertyId::parse(reader)).collect();
+        let property_ids: Vec<_> = (0..count)
+            .map(|_| PropertyId::parse(reader))
+            .collect::<Result<_>>()?;
 
         let values = property_ids
             .into_iter()
             .enumerate()
-            .map(|(idx, id)| (id.id(), (idx, PropertyValue::parse(id, reader))))
-            .collect();
+            .map(|(idx, id)| Ok((id.id(), (idx, PropertyValue::parse(id, reader)?))))
+            .collect::<Result<_>>()?;
 
-        PropertySet { values }
+        Ok(PropertySet { values })
     }
 
     pub(crate) fn get(&self, id: PropertyId) -> Option<&PropertyValue> {
