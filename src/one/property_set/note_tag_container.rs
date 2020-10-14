@@ -33,19 +33,24 @@ impl Data {
             })
             .transpose()?
             .map(|(id, sets)| {
-                sets.iter()
-                    .map(|props| Object {
-                        context_id: object.context_id,
-                        jc_id: JcId(id.value()),
-                        props: ObjectPropSet {
-                            object_ids: Self::get_object_ids(props, object),
-                            object_space_ids: Self::get_object_space_ids(props, object),
-                            context_ids: vec![],
-                            properties: props.clone(),
-                        },
-                        file_data: None,
-                        mapping: object.mapping.clone(),
+                Ok(sets
+                    .iter()
+                    .map(|props| {
+                        Ok(Object {
+                            context_id: object.context_id,
+                            jc_id: JcId(id.value()),
+                            props: ObjectPropSet {
+                                object_ids: Self::get_object_ids(props, object)?,
+                                object_space_ids: Self::get_object_space_ids(props, object)?,
+                                context_ids: vec![],
+                                properties: props.clone(),
+                            },
+                            file_data: None,
+                            mapping: object.mapping.clone(),
+                        })
                     })
+                    .collect::<Result<Vec<_>>>()?
+                    .iter()
                     .map(|object| {
                         let definition =
                             ObjectReference::parse(PropertyType::NoteTagDefinitionOid, &object)?;
@@ -72,33 +77,33 @@ impl Data {
                             item_status,
                         })
                     })
-                    .collect::<Result<Vec<_>>>()
+                    .collect::<Result<Vec<_>>>()?)
             })
             .transpose()
     }
 
-    fn get_object_ids(props: &PropertySet, object: &Object) -> Vec<CompactId> {
-        object
+    fn get_object_ids(props: &PropertySet, object: &Object) -> Result<Vec<CompactId>> {
+        Ok(object
             .props
             .object_ids
             .iter()
-            .skip(ObjectReference::get_offset(PropertyType::NoteTags, object))
+            .skip(ObjectReference::get_offset(PropertyType::NoteTags, object)?)
             .take(ObjectReference::count_references(props.values()))
             .copied()
-            .collect()
+            .collect())
     }
 
-    fn get_object_space_ids(props: &PropertySet, object: &Object) -> Vec<CompactId> {
-        object
+    fn get_object_space_ids(props: &PropertySet, object: &Object) -> Result<Vec<CompactId>> {
+        Ok(object
             .props
             .object_ids
             .iter()
             .skip(ObjectSpaceReference::get_offset(
                 PropertyType::NoteTags,
                 object,
-            ))
+            )?)
             .take(ObjectSpaceReference::count_references(props.values()))
             .copied()
-            .collect()
+            .collect())
     }
 }

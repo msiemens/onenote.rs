@@ -1,82 +1,58 @@
 use crate::errors::{ErrorKind, Result};
+use crate::one::property::references::References;
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 use crate::onestore::types::compact_id::CompactId;
-use crate::onestore::types::property::{PropertyId, PropertyValue};
+use crate::onestore::types::property::PropertyValue;
 use crate::types::exguid::ExGuid;
 
 pub(crate) struct ObjectReference;
 
 impl ObjectReference {
     pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Result<Option<ExGuid>> {
-        let reference = object
-            .props()
-            .get(prop_type)
-            .map(|value| {
-                value.to_object_id().ok_or_else(|| {
-                    ErrorKind::MalformedOneNoteFileData(
-                        "object reference is not a object id".into(),
-                    )
-                })
-            })
-            .transpose()?
-            .map(|_| {
-                object
-                    .props()
-                    .object_ids()
-                    .iter()
-                    .nth(Self::get_offset(prop_type, object))
-                    .expect("object id index corrupt")
-            })
-            .and_then(|id| Self::resolve_id(id, object));
+        // Validate the value of the property
+        let property = unwrap_or_return!(object.props().get(prop_type));
+        property.to_object_id().ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("object reference is not a object id".into())
+        })?;
 
-        Ok(reference)
+        // Find the correct object reference
+        let id = object
+            .props()
+            .object_ids()
+            .iter()
+            .nth(Self::get_offset(prop_type, object)?)
+            .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("object id index corrupt".into()))?;
+
+        Ok(Self::resolve_id(id, object))
     }
 
     pub(crate) fn parse_vec(
         prop_type: PropertyType,
         object: &Object,
     ) -> Result<Option<Vec<ExGuid>>> {
-        let references = object
-            .props()
-            .get(prop_type)
-            .map(|value| {
-                value.to_object_ids().ok_or_else(|| {
-                    ErrorKind::MalformedOneNoteFileData(
-                        "object reference array is not a object id array".into(),
-                    )
-                })
-            })
-            .transpose()?
-            .map(|count| {
-                object
-                    .props()
-                    .object_ids()
-                    .iter()
-                    .skip(Self::get_offset(prop_type, object))
-                    .take(count as usize)
-                    .flat_map(|id| Self::resolve_id(id, object))
-                    .collect()
-            });
+        let prop = unwrap_or_return!(object.props().get(prop_type));
+        let count = prop.to_object_ids().ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData(
+                "object reference array is not a object id array".into(),
+            )
+        })?;
+        let object_refs = object.props().object_ids();
+        let object_ids = object_refs
+            .iter()
+            .skip(Self::get_offset(prop_type, object)?)
+            .take(count as usize)
+            .flat_map(|id| Self::resolve_id(id, object))
+            .collect();
 
-        Ok(references)
+        Ok(Some(object_ids))
     }
 
-    pub(crate) fn get_offset(prop_type: PropertyType, object: &Object) -> usize {
-        let prop_index = object
-            .props()
-            .properties()
-            .index(PropertyId::new(prop_type as u32))
-            .unwrap();
+    pub(crate) fn get_offset(prop_type: PropertyType, object: &Object) -> Result<usize> {
+        let predecessors = References::get_predecessors(prop_type, object)?;
+        let offset = Self::count_references(predecessors);
 
-        Self::count_references(
-            object
-                .props()
-                .properties()
-                .values_with_index()
-                .filter(|(idx, _)| *idx < prop_index)
-                .map(|(_, value)| value),
-        )
+        Ok(offset)
     }
 
     pub(crate) fn count_references<'a>(props: impl Iterator<Item = &'a PropertyValue>) -> usize {

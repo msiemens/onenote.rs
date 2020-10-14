@@ -10,6 +10,7 @@ pub(crate) mod object_reference;
 pub(crate) mod object_space_reference;
 pub(crate) mod page_size;
 pub(crate) mod paragraph_alignment;
+mod references;
 pub(crate) mod simple;
 pub(crate) mod time;
 

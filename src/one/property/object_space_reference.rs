@@ -1,8 +1,9 @@
 use crate::errors::{ErrorKind, Result};
+use crate::one::property::references::References;
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 use crate::onestore::types::compact_id::CompactId;
-use crate::onestore::types::property::{PropertyId, PropertyValue};
+use crate::onestore::types::property::PropertyValue;
 use crate::types::cell_id::CellId;
 
 pub(crate) struct ObjectSpaceReference;
@@ -12,45 +13,28 @@ impl ObjectSpaceReference {
         prop_type: PropertyType,
         object: &Object,
     ) -> Result<Option<Vec<CellId>>> {
-        object
-            .props()
-            .get(prop_type)
-            .map(|value| {
-                value.to_object_space_ids().ok_or_else(|| {
-                    ErrorKind::MalformedOneNoteFileData(
-                        "object space reference array is not a object space id array".into(),
-                    )
-                })
-            })
-            .transpose()?
-            .map(|count| {
-                object
-                    .props()
-                    .object_space_ids()
-                    .iter()
-                    .skip(Self::get_offset(prop_type, object))
-                    .take(count as usize)
-                    .map(|id| Self::resolve_id(id, object))
-                    .collect::<Result<_>>()
-            })
-            .transpose()
+        let prop = unwrap_or_return!(object.props().get(prop_type));
+        let count = prop.to_object_space_ids().ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData(
+                "object space reference array is not a object id array".into(),
+            )
+        })?;
+        let object_refs = object.props().object_space_ids();
+        let object_space_ids = object_refs
+            .iter()
+            .skip(Self::get_offset(prop_type, object)?)
+            .take(count as usize)
+            .flat_map(|id| Self::resolve_id(id, object))
+            .collect();
+
+        Ok(Some(object_space_ids))
     }
 
-    pub(crate) fn get_offset(prop_type: PropertyType, object: &Object) -> usize {
-        let prop_index = object
-            .props()
-            .properties()
-            .index(PropertyId::new(prop_type as u32))
-            .unwrap();
+    pub(crate) fn get_offset(prop_type: PropertyType, object: &Object) -> Result<usize> {
+        let predecessors = References::get_predecessors(prop_type, object)?;
+        let offset = Self::count_references(predecessors);
 
-        Self::count_references(
-            object
-                .props()
-                .properties()
-                .values_with_index()
-                .filter(|(idx, _)| *idx < prop_index)
-                .map(|(_, value)| value),
-        )
+        Ok(offset)
     }
 
     pub(crate) fn count_references<'a>(props: impl Iterator<Item = &'a PropertyValue>) -> usize {

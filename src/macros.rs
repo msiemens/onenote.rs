@@ -1,3 +1,13 @@
+macro_rules! unwrap_or_return {
+    ($e:expr) => {
+        if let Some(value) = $e {
+            value
+        } else {
+            return Ok(None);
+        }
+    };
+}
+
 macro_rules! guid {
     ({ $p0:tt - $p1:tt - $p2:tt - $p3:tt - $p4:tt }) => {
         crate::types::guid::Guid::from_str(concat!(
