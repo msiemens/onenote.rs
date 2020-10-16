@@ -58,18 +58,20 @@ pub(crate) fn parse_u32(prop_type: PropertyType, object: &Object) -> Result<Opti
         .map_err(|e| e.into())
 }
 
-pub(crate) fn parse_u64(prop_type: PropertyType, object: &Object) -> Result<Option<u64>> {
-    object
-        .props()
-        .get(prop_type)
-        .map(|value| {
-            value
-                .to_u64()
-                .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("u64 value is not a u64".into()))
-        })
-        .transpose()
-        .map_err(|e| e.into())
-}
+// Not used at the moment
+//
+// pub(crate) fn parse_u64(prop_type: PropertyType, object: &Object) -> Result<Option<u64>> {
+//     object
+//         .props()
+//         .get(prop_type)
+//         .map(|value| {
+//             value
+//                 .to_u64()
+//                 .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("u64 value is not a u64".into()))
+//         })
+//         .transpose()
+//         .map_err(|e| e.into())
+// }
 
 pub(crate) fn parse_f32(prop_type: PropertyType, object: &Object) -> Result<Option<f32>> {
     let value = object

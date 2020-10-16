@@ -80,8 +80,4 @@ impl<'a> Reader<'a> {
     pub(crate) fn get_f32(&mut self) -> Result<f32> {
         try_get!(self, f32::le)
     }
-
-    pub(crate) fn get_f64(&mut self) -> Result<f64> {
-        try_get!(self, f64::le)
-    }
 }

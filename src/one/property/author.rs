@@ -10,10 +10,6 @@ impl Author {
         self.0
     }
 
-    pub(crate) fn name(&self) -> &str {
-        &self.0
-    }
-
     pub(crate) fn parse(object: &Object) -> Result<Option<Author>> {
         Ok(simple::parse_string(PropertyType::Author, object)?.map(Author))
     }

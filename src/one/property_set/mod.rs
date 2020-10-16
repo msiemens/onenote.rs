@@ -2,7 +2,6 @@ use crate::onestore::types::jcid::JcId;
 use enum_primitive_derive::Primitive;
 use num_traits::FromPrimitive;
 
-pub(crate) mod author_container;
 pub(crate) mod embedded_file_container;
 pub(crate) mod embedded_file_node;
 pub(crate) mod image_node;
@@ -18,7 +17,6 @@ pub(crate) mod page_node;
 pub(crate) mod page_series_node;
 pub(crate) mod paragraph_style_object;
 pub(crate) mod picture_container;
-pub(crate) mod revision_metadata;
 pub(crate) mod rich_text_node;
 pub(crate) mod section_metadata_node;
 pub(crate) mod section_node;

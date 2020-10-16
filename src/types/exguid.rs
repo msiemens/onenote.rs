@@ -87,13 +87,6 @@ impl ExGuid {
 
         Ok(values)
     }
-
-    pub(crate) fn parse_str(guid: &str, n: u32) -> Result<ExGuid> {
-        Ok(ExGuid {
-            guid: Guid::from_str(guid)?,
-            value: n,
-        })
-    }
 }
 
 impl fmt::Debug for ExGuid {

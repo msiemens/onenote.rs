@@ -23,10 +23,6 @@ impl<'a> ObjectSpace<'a> {
         self.objects.get(&id)
     }
 
-    pub(crate) fn context(&self) -> ExGuid {
-        self.context
-    }
-
     pub(crate) fn content_root(&self) -> Option<ExGuid> {
         self.roots.get(&RevisionRole::DefaultContent).copied()
     }
