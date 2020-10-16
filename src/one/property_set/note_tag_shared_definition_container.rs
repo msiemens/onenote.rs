@@ -438,41 +438,41 @@ impl NoteTagShape {
         }
     }
 
-    pub(crate) fn is_checkable(&self) -> bool {
-        match self {
+    pub fn is_checkable(&self) -> bool {
+        matches!(
+            self,
             NoteTagShape::GreenCheckBox
-            | NoteTagShape::YellowCheckBox
-            | NoteTagShape::BlueCheckBox
-            | NoteTagShape::GreenStarCheckBox
-            | NoteTagShape::YellowStarCheckBox
-            | NoteTagShape::BlueStarCheckBox
-            | NoteTagShape::GreenExclamationCheckBox
-            | NoteTagShape::YellowExclamationCheckBox
-            | NoteTagShape::BlueExclamationCheckBox
-            | NoteTagShape::GreenRightArrowCheckBox
-            | NoteTagShape::YellowRightArrowCheckBox
-            | NoteTagShape::BlueRightArrowCheckBox
-            | NoteTagShape::BlueCheckBox1
-            | NoteTagShape::BlueCheckBox2
-            | NoteTagShape::BlueCheckBox3
-            | NoteTagShape::GreenCheckBox1
-            | NoteTagShape::GreenCheckBox2
-            | NoteTagShape::GreenCheckBox3
-            | NoteTagShape::YellowCheckBox1
-            | NoteTagShape::YellowCheckBox2
-            | NoteTagShape::YellowCheckBox3
-            | NoteTagShape::FollowUpTodayFlag
-            | NoteTagShape::FollowUpTomorrowFlag
-            | NoteTagShape::FollowUpThisWeekFlag
-            | NoteTagShape::FollowUpNextWeekFlag
-            | NoteTagShape::NoFollowUpDateFlag
-            | NoteTagShape::BluePersonCheckBox
-            | NoteTagShape::YellowPersonCheckBox
-            | NoteTagShape::GreenPersonCheckBox
-            | NoteTagShape::BlueFlagCheckBox
-            | NoteTagShape::RedFlagCheckBox
-            | NoteTagShape::GreenFlagCheckBox => true,
-            _ => false,
-        }
+                | NoteTagShape::YellowCheckBox
+                | NoteTagShape::BlueCheckBox
+                | NoteTagShape::GreenStarCheckBox
+                | NoteTagShape::YellowStarCheckBox
+                | NoteTagShape::BlueStarCheckBox
+                | NoteTagShape::GreenExclamationCheckBox
+                | NoteTagShape::YellowExclamationCheckBox
+                | NoteTagShape::BlueExclamationCheckBox
+                | NoteTagShape::GreenRightArrowCheckBox
+                | NoteTagShape::YellowRightArrowCheckBox
+                | NoteTagShape::BlueRightArrowCheckBox
+                | NoteTagShape::BlueCheckBox1
+                | NoteTagShape::BlueCheckBox2
+                | NoteTagShape::BlueCheckBox3
+                | NoteTagShape::GreenCheckBox1
+                | NoteTagShape::GreenCheckBox2
+                | NoteTagShape::GreenCheckBox3
+                | NoteTagShape::YellowCheckBox1
+                | NoteTagShape::YellowCheckBox2
+                | NoteTagShape::YellowCheckBox3
+                | NoteTagShape::FollowUpTodayFlag
+                | NoteTagShape::FollowUpTomorrowFlag
+                | NoteTagShape::FollowUpThisWeekFlag
+                | NoteTagShape::FollowUpNextWeekFlag
+                | NoteTagShape::NoFollowUpDateFlag
+                | NoteTagShape::BluePersonCheckBox
+                | NoteTagShape::YellowPersonCheckBox
+                | NoteTagShape::GreenPersonCheckBox
+                | NoteTagShape::BlueFlagCheckBox
+                | NoteTagShape::RedFlagCheckBox
+                | NoteTagShape::GreenFlagCheckBox
+        )
     }
 }
