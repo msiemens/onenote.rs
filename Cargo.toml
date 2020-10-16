@@ -1,11 +1,14 @@
 [package]
-name = "onenote"
+name = "onenote_parser"
 version = "0.1.0"
 authors = ["Markus Siemens <markus@m-siemens.de>"]
 edition = "2018"
-
-[profile.release]
-debug = true
+license = "MPL-2.0"
+readme = "README.md"
+repository = "https://github.com/msiemens/onenote.rs"
+description = "A parser for Microsoft OneNote® files"
+keywords = ["onenote", "parser"]
+categories = ["parser-implementations"]
 
 [features]
 backtrace = []
