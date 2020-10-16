@@ -88,6 +88,7 @@ impl<'a, 'b> ObjectSpace<'a> {
         Ok((cell_id, space))
     }
 
+    #[allow(clippy::too_many_arguments)]
     fn parse_revision(
         revision_manifest_id: ExGuid,
         context_id: ExGuid,
