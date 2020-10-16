@@ -5,7 +5,7 @@ use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 use itertools::Itertools;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Notebook {
     pub(crate) sections: Vec<Section>,
 }

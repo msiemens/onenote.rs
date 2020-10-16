@@ -31,7 +31,7 @@ pub(crate) struct Data {
     pub(crate) recording_duration: Option<u32>,
 }
 
-#[derive(Debug)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum FileType {
     Unknown,
     Audio,

@@ -10,7 +10,7 @@ use crate::one::property_set::note_tag_shared_definition_container::{
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 
-#[derive(Debug)]
+#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct NoteTag {
     completed_at: Option<Time>,
     item_status: ActionItemStatus,
@@ -31,7 +31,7 @@ impl NoteTag {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct NoteTagDefinition {
     label: String,
     status: NoteTagPropertyStatus,

@@ -6,7 +6,7 @@ use crate::onenote::parser::page_content::{parse_page_content, PageContent};
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Page {
     title: Option<Title>,
     level: i32,
@@ -61,7 +61,7 @@ impl Page {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Title {
     pub(crate) contents: Vec<Outline>,
     pub(crate) offset_horizontal: f32,

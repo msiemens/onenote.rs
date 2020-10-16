@@ -52,7 +52,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
     Ok(data)
 }
 
-#[derive(Debug, Clone)]
+#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct NoteTagPropertyStatus {
     has_label: bool,
     has_font_color: bool,
@@ -138,7 +138,7 @@ impl NoteTagPropertyStatus {
     }
 }
 
-#[derive(Debug, Copy, Clone, PartialEq)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 #[allow(dead_code)]
 pub enum NoteTagShape {
     NoIcon,

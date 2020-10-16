@@ -8,7 +8,7 @@ use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 use crate::Color;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Table {
     pub(crate) rows: u32,
     pub(crate) cols: u32,
@@ -63,7 +63,7 @@ impl Table {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct TableRow {
     pub(crate) contents: Vec<TableCell>,
 }
@@ -74,7 +74,7 @@ impl TableRow {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct TableCell {
     pub(crate) contents: Vec<OutlineElement>,
 

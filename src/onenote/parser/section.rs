@@ -5,7 +5,7 @@ use crate::onestore::object_space::ObjectSpace;
 use crate::onestore::OneStore;
 use crate::Color;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Section {
     display_name: String,
     page_series: Vec<PageSeries>,

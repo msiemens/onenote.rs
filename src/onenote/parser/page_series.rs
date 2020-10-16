@@ -4,7 +4,7 @@ use crate::onenote::parser::page::{parse_page, Page};
 use crate::onestore::OneStore;
 use crate::types::exguid::ExGuid;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct PageSeries {
     pages: Vec<Page>,
 }

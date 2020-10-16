@@ -5,7 +5,7 @@ use crate::onenote::parser::note_tag::{parse_note_tags, NoteTag};
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 
-#[derive(Debug)]
+#[derive(Clone, PartialEq, PartialOrd, Debug)]
 pub struct EmbeddedFile {
     pub(crate) filename: String,
     pub(crate) file_type: FileType,

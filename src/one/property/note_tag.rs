@@ -2,7 +2,7 @@ use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct ActionItemStatus {
     completed: bool,
     disabled: bool,
@@ -44,7 +44,7 @@ impl ActionItemStatus {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 #[allow(dead_code)]
 pub enum ActionItemType {
     Numeric(u16),

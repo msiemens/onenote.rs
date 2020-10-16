@@ -2,7 +2,7 @@ use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct LayoutAlignment {
     alignment_horizontal: HorizontalAlignment,
     alignment_margin_horizontal: HorizontalAlignmentMargin,
@@ -68,7 +68,7 @@ impl LayoutAlignment {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum HorizontalAlignment {
     Unknown,
     Left,
@@ -95,7 +95,7 @@ impl HorizontalAlignment {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum HorizontalAlignmentMargin {
     Right,
     Left,
@@ -114,7 +114,7 @@ impl HorizontalAlignmentMargin {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum VerticalAlignment {
     Bottom,
     Top,
@@ -133,7 +133,7 @@ impl VerticalAlignment {
     }
 }
 
-#[derive(Debug, Copy, Clone)]
+#[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum VerticalAlignmentMargin {
     Bottom,
     Top,

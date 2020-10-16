@@ -6,7 +6,7 @@ use crate::onenote::parser::outline::{parse_outline, Outline};
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum PageContent {
     Outline(Outline),
     Image(Image),

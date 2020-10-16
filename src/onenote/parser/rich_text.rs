@@ -8,7 +8,7 @@ use crate::onenote::parser::note_tag::{parse_note_tags, NoteTag};
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct RichText {
     pub(crate) text: String,
 
@@ -73,7 +73,7 @@ impl RichText {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct ParagraphStyling {
     pub(crate) charset: Option<Charset>,
     pub(crate) bold: bool,

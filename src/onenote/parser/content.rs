@@ -7,7 +7,7 @@ use crate::onenote::parser::table::{parse_table, Table};
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum Content {
     RichText(RichText),
     Table(Table),

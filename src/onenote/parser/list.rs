@@ -4,7 +4,7 @@ use crate::one::property_set::number_list_node;
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 
-#[derive(Debug)]
+#[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct List {
     pub(crate) list_font: Option<String>,
     pub(crate) list_restart: Option<i32>,

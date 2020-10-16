@@ -6,7 +6,7 @@ use crate::onenote::parser::list::{parse_list, List};
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct Outline {
     pub(crate) items_level: u8,
     pub(crate) list_spacing: Option<f32>,
@@ -80,7 +80,7 @@ impl Outline {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub enum OutlineItem {
     Group(OutlineGroup),
     Element(OutlineElement),
@@ -96,7 +96,7 @@ impl OutlineItem {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct OutlineGroup {
     pub(crate) child_level: u8,
     pub(crate) outlines: Vec<OutlineItem>,
@@ -112,7 +112,7 @@ impl OutlineGroup {
     }
 }
 
-#[derive(Debug)]
+#[derive(Clone, Debug)]
 pub struct OutlineElement {
     pub(crate) contents: Vec<Content>,
 
