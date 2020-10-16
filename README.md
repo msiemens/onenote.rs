@@ -7,8 +7,7 @@ A parser for Microsoft OneNote® files implemented in Rust.
 Work in progress. Right now it can parse most of OneNote file contents but only
 if the files are in the FSSHTTP packaging format [[MS-ONESTORE 2.8]]. OneNote files
 as created and stored by the OneNote 2016 desktop application are not yet
-supported. Also for some files there are data or parsing errors that have to be
-resolved.
+supported.
 
 ## Goals
 
