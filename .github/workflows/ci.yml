@@ -2,6 +2,9 @@ on: push
 
 name: Continuous integration
 
+env:
+  CARGO_TERM_COLOR: always
+
 jobs:
   ci:
     runs-on: ubuntu-latest
@@ -11,7 +14,6 @@ jobs:
           - stable
           - beta
           - nightly
-          - 1.31.0  # MSRV
 
     steps:
       - uses: actions/checkout@v2
