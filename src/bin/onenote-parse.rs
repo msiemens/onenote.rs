@@ -1,5 +1,4 @@
-use onenote::Parser;
-use onenote::Result;
+use onenote_parser::{Parser, Result};
 use std::env;
 use std::ffi::OsString;
 use std::path::PathBuf;
