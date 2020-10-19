@@ -43,4 +43,4 @@ jobs:
           command: clippy
           args: -- -D warnings
 
-      - uses: EmbarkStudios/cargo-deny-action@v0
+      - uses: EmbarkStudios/cargo-deny-action@v1
