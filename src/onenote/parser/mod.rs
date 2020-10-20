@@ -1,9 +1,10 @@
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::packaging::Packaging;
 use crate::onenote::parser::notebook::Notebook;
-use crate::onenote::parser::section::Section;
+use crate::onenote::parser::section::{Section, SectionEntry, SectionGroup};
 use crate::onestore::parse_store;
 use crate::reader::Reader;
+use std::ffi::OsStr;
 use std::fs::File;
 use std::io::{BufReader, Read};
 use std::path::Path;
@@ -51,14 +52,19 @@ impl Parser {
 
                 file
             })
-            // .inspect(|path| {
-            //     dbg!(path.display());
-            // })
-            .filter(|p| p.is_file())
-            .map(|path| self.parse_section(&path))
+            .filter(|p| p.exists())
+            .filter(|p| !p.ends_with("OneNote_RecycleBin"))
+            .map(|path| {
+                if path.is_file() {
+                    self.parse_section(&path).map(SectionEntry::Section)
+                } else {
+                    self.parse_section_group(&path)
+                        .map(SectionEntry::SectionGroup)
+                }
+            })
             .collect::<Result<_>>()?;
 
-        Ok(Notebook { sections })
+        Ok(Notebook { entries: sections })
     }
 
     pub fn parse_section(&mut self, path: &Path) -> Result<Section> {
@@ -81,6 +87,37 @@ impl Parser {
                 .to_string_lossy()
                 .to_string(),
         )
+    }
+
+    pub fn parse_section_group(&mut self, path: &Path) -> Result<SectionGroup> {
+        let display_name = path
+            .file_name()
+            .expect("file without file name")
+            .to_string_lossy()
+            .to_string();
+
+        for entry in path.read_dir()? {
+            let entry = entry?;
+            let is_toc = entry
+                .path()
+                .extension()
+                .map(|ext| ext == OsStr::new("onetoc2"))
+                .unwrap_or_default();
+
+            if is_toc {
+                return self
+                    .parse_notebook(&dbg!(entry.path()))
+                    .map(|group| SectionGroup {
+                        display_name,
+                        entries: group.entries,
+                    });
+            }
+        }
+
+        Err(ErrorKind::TocFileMissing {
+            dir: path.as_os_str().to_string_lossy().into_owned(),
+        }
+        .into())
     }
 
     fn read(file: File) -> Result<Vec<u8>> {

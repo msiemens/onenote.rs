@@ -1,18 +1,18 @@
 use crate::errors::{ErrorKind, Result};
 use crate::one::property_set::toc_container;
-use crate::onenote::parser::section::Section;
+use crate::onenote::parser::section::SectionEntry;
 use crate::onestore::object_space::ObjectSpace;
 use crate::types::exguid::ExGuid;
 use itertools::Itertools;
 
 #[derive(Clone, Debug)]
 pub struct Notebook {
-    pub(crate) sections: Vec<Section>,
+    pub(crate) entries: Vec<SectionEntry>,
 }
 
 impl Notebook {
-    pub fn sections(&self) -> &[Section] {
-        &self.sections
+    pub fn entries(&self) -> &[SectionEntry] {
+        &self.entries
     }
 }
 

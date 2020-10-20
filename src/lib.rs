@@ -26,7 +26,7 @@ pub use crate::onenote::parser::page::{Page, Title};
 pub use crate::onenote::parser::page_content::PageContent;
 pub use crate::onenote::parser::page_series::PageSeries;
 pub use crate::onenote::parser::rich_text::{ParagraphStyling, RichText};
-pub use crate::onenote::parser::section::Section;
+pub use crate::onenote::parser::section::{Section, SectionEntry, SectionGroup};
 pub use crate::onenote::parser::table::{Table, TableCell, TableRow};
 pub use crate::onenote::parser::Parser;
 

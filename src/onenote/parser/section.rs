@@ -6,6 +6,12 @@ use crate::onestore::OneStore;
 use crate::Color;
 
 #[derive(Clone, Debug)]
+pub enum SectionEntry {
+    Section(Section),
+    SectionGroup(SectionGroup),
+}
+
+#[derive(Clone, Debug)]
 pub struct Section {
     display_name: String,
     page_series: Vec<PageSeries>,
@@ -23,6 +29,22 @@ impl Section {
 
     pub fn color(&self) -> Option<Color> {
         self.color
+    }
+}
+
+#[derive(Clone, Debug)]
+pub struct SectionGroup {
+    pub(crate) display_name: String,
+    pub(crate) entries: Vec<SectionEntry>,
+}
+
+impl SectionGroup {
+    pub fn display_name(&self) -> &str {
+        &self.display_name
+    }
+
+    pub fn entries(&self) -> &[SectionEntry] {
+        &self.entries
     }
 }
 

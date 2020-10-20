@@ -65,6 +65,9 @@ pub enum ErrorKind {
     #[error("Not a section file: {file}")]
     NotASectionFile { file: String },
 
+    #[error("Table of contents file is missing in dir {dir}")]
+    TocFileMissing { dir: String },
+
     #[error("Malformed data: {0}")]
     MalformedData(Cow<'static, str>),
 
