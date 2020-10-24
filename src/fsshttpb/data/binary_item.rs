@@ -1,5 +1,5 @@
 use crate::errors::Result;
-use crate::types::compact_u64::CompactU64;
+use crate::fsshttpb::data::compact_u64::CompactU64;
 use crate::Reader;
 
 pub(crate) struct BinaryItem(Vec<u8>);

@@ -10,7 +10,7 @@ macro_rules! unwrap_or_return {
 
 macro_rules! guid {
     ({ $p0:tt - $p1:tt - $p2:tt - $p3:tt - $p4:tt }) => {
-        crate::types::guid::Guid::from_str(concat!(
+        crate::shared::guid::Guid::from_str(concat!(
             stringify!($p0),
             '-',
             stringify!($p1),
@@ -27,14 +27,14 @@ macro_rules! guid {
 
 macro_rules! exguid {
     ({$guid:tt , $n:literal}) => {
-        crate::types::exguid::ExGuid::from_guid(guid!($guid), $n)
+        crate::fsshttpb::data::exguid::ExGuid::from_guid(guid!($guid), $n)
     };
 }
 
 #[cfg(test)]
 mod test {
-    use crate::types::exguid::ExGuid;
-    use crate::types::guid::Guid;
+    use crate::fsshttpb::data::exguid::ExGuid;
+    use crate::shared::guid::Guid;
 
     #[test]
     fn parse_guid() {

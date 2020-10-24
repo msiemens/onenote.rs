@@ -1,10 +1,10 @@
 use crate::errors::{ErrorKind, Result};
+use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::references::References;
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 use crate::onestore::types::compact_id::CompactId;
 use crate::onestore::types::property::PropertyValue;
-use crate::types::exguid::ExGuid;
 
 pub(crate) struct ObjectReference;
 

@@ -1,6 +1,6 @@
 use crate::errors::Result;
-use crate::types::compact_u64::CompactU64;
-use crate::types::exguid::ExGuid;
+use crate::fsshttpb::data::compact_u64::CompactU64;
+use crate::fsshttpb::data::exguid::ExGuid;
 use crate::Reader;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]

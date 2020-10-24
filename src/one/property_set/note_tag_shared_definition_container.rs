@@ -52,6 +52,11 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
     Ok(data)
 }
 
+/// The status of a note tag.
+///
+/// See [\[MS-ONE 2.3.87\]].
+///
+/// [\[MS-ONE 2.3.87\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/24274836-ec41-4fee-913f-225d65ac457c
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct NoteTagPropertyStatus {
     has_label: bool,
@@ -67,42 +72,52 @@ pub struct NoteTagPropertyStatus {
 }
 
 impl NoteTagPropertyStatus {
+    /// Whether the note tag has a labe.
     pub fn has_label(&self) -> bool {
         self.has_label
     }
 
+    /// Whether the note tag has a font color.
     pub fn has_font_color(&self) -> bool {
         self.has_font_color
     }
 
+    /// Whether the note tag has a text highlight color.
     pub fn has_highlight_color(&self) -> bool {
         self.has_highlight_color
     }
 
+    /// Whether the note tag has an icon.
     pub fn has_icon(&self) -> bool {
         self.has_icon
     }
 
+    /// Whether the note tag has is due today.
     pub fn due_today(&self) -> bool {
         self.due_today
     }
 
+    /// Whether the note tag has is due tomorrow.
     pub fn due_tomorrow(&self) -> bool {
         self.due_tomorrow
     }
 
+    /// Whether the note tag has is due this week.
     pub fn due_this_week(&self) -> bool {
         self.due_this_week
     }
 
+    /// Whether the note tag has is due next week.
     pub fn due_next_week(&self) -> bool {
         self.due_next_week
     }
 
+    /// Whether the note tag has is due later.
     pub fn due_later(&self) -> bool {
         self.due_later
     }
 
+    /// Whether the note tag has is due at a custom date.
     pub fn due_custom(&self) -> bool {
         self.due_custom
     }
@@ -138,8 +153,13 @@ impl NoteTagPropertyStatus {
     }
 }
 
+/// The shape of a note tag icon.
+///
+/// See [\[MS-ONE 2.3.86\]].
+///
+/// [\[MS-ONE 2.3.86\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/aa5c7aba-d5e4-4bf8-b265-9100eeb9a7a7
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
-#[allow(dead_code)]
+#[allow(missing_docs)]
 pub enum NoteTagShape {
     NoIcon,
     GreenCheckBox,
@@ -438,6 +458,7 @@ impl NoteTagShape {
         }
     }
 
+    /// Whether the note tag icon is checkable.
     pub fn is_checkable(&self) -> bool {
         matches!(
             self,

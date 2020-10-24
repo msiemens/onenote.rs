@@ -1,16 +1,24 @@
 use crate::errors::{ErrorKind, Result};
+use crate::one::property::color::Color;
 use crate::one::property_set::{section_metadata_node, section_node};
 use crate::onenote::parser::page_series::{parse_page_series, PageSeries};
 use crate::onestore::object_space::ObjectSpace;
 use crate::onestore::OneStore;
-use crate::Color;
 
+/// An entry in a section list.
+#[allow(missing_docs)]
 #[derive(Clone, Debug)]
 pub enum SectionEntry {
     Section(Section),
     SectionGroup(SectionGroup),
 }
 
+/// A OneNote section.
+///
+/// See [\[MS-ONE 1.3.1\]] and [\[MS-ONE 2.2.17\]].
+///
+/// [\[MS-ONE 1.3.1\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/1603b29c-1c9f-4e85-b9b9-59684122374a
+/// [\[MS-ONE 2.2.17\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/6913913f-b7d1-4b29-ab09-231ea3835ac2
 #[derive(Clone, Debug)]
 pub struct Section {
     display_name: String,
@@ -19,19 +27,23 @@ pub struct Section {
 }
 
 impl Section {
+    /// The section name.
     pub fn display_name(&self) -> &str {
         &self.display_name
     }
 
+    /// The page series contained within the section.
     pub fn page_series(&self) -> &[PageSeries] {
         &self.page_series
     }
 
+    /// The color of the section.
     pub fn color(&self) -> Option<Color> {
         self.color
     }
 }
 
+/// A group of sections.
 #[derive(Clone, Debug)]
 pub struct SectionGroup {
     pub(crate) display_name: String,
@@ -39,10 +51,12 @@ pub struct SectionGroup {
 }
 
 impl SectionGroup {
+    /// The group name.
     pub fn display_name(&self) -> &str {
         &self.display_name
     }
 
+    /// The sections contained within the group.
     pub fn entries(&self) -> &[SectionEntry] {
         &self.entries
     }

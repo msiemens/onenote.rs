@@ -1,10 +1,10 @@
 use crate::errors::Result;
+use crate::fsshttpb::data::cell_id::CellId;
+use crate::fsshttpb::data::exguid::ExGuid;
+use crate::fsshttpb::data::object_types::ObjectType;
+use crate::fsshttpb::data::stream_object::ObjectHeader;
 use crate::fsshttpb::data_element::DataElement;
-use crate::types::cell_id::CellId;
-use crate::types::exguid::ExGuid;
-use crate::types::guid::Guid;
-use crate::types::object_types::ObjectType;
-use crate::types::stream_object::ObjectHeader;
+use crate::shared::guid::Guid;
 use crate::Reader;
 use std::collections::HashMap;
 

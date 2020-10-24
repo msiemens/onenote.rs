@@ -2,10 +2,21 @@ use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
+/// An RGB color value.
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum ColorRef {
+    /// Determined by the application.
     Auto,
-    Manual { b: u8, g: u8, r: u8 },
+
+    /// A manually specified color
+    Manual {
+        /// The color's red value.
+        r: u8,
+        /// The color's green value.
+        g: u8,
+        /// The color's blue value
+        b: u8,
+    },
 }
 
 impl ColorRef {

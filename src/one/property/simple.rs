@@ -2,7 +2,7 @@ use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 use crate::reader::Reader;
-use crate::types::guid::Guid;
+use crate::shared::guid::Guid;
 use crate::utils::Utf16ToString;
 use encoding_rs::mem::decode_latin1;
 

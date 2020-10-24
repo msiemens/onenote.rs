@@ -1,8 +1,8 @@
 use crate::errors::{ErrorKind, Result};
+use crate::fsshttpb::data::exguid::ExGuid;
+use crate::fsshttpb::data::object_types::ObjectType;
+use crate::fsshttpb::data::stream_object::ObjectHeader;
 use crate::fsshttpb::data_element::DataElement;
-use crate::types::exguid::ExGuid;
-use crate::types::object_types::ObjectType;
-use crate::types::stream_object::ObjectHeader;
 use crate::Reader;
 
 #[derive(Debug)]

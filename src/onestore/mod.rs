@@ -1,11 +1,11 @@
 use crate::errors::{ErrorKind, Result};
+use crate::fsshttpb::data::cell_id::CellId;
 use crate::fsshttpb::data_element::storage_index::StorageIndex;
 use crate::fsshttpb::data_element::storage_manifest::StorageManifest;
 use crate::fsshttpb::packaging::Packaging;
 use crate::onestore::header::StoreHeader;
 use crate::onestore::object_space::{ObjectSpace, Revision};
-use crate::types::cell_id::CellId;
-use crate::types::guid::Guid;
+use crate::shared::guid::Guid;
 use std::collections::{HashMap, HashSet};
 
 pub(crate) mod header;

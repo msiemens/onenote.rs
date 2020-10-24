@@ -2,6 +2,11 @@ use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
+/// The action status of a note tag.
+///
+/// See [\[MS-ONE 2.3.91\]].
+///
+/// [\[MS-ONE 2.3.91\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/6b516f12-8f47-40b3-9dd4-44c00aac206b
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct ActionItemStatus {
     completed: bool,
@@ -10,14 +15,17 @@ pub struct ActionItemStatus {
 }
 
 impl ActionItemStatus {
+    /// Whether the checkable note tag is completed.
     pub fn completed(&self) -> bool {
         self.completed
     }
 
+    /// Whether the note tag is disabled.
     pub fn disabled(&self) -> bool {
         self.disabled
     }
 
+    /// Whether the note tag is a task tag.
     pub fn task_tag(&self) -> bool {
         self.task_tag
     }
@@ -44,8 +52,13 @@ impl ActionItemStatus {
     }
 }
 
+/// The identifier and item type of a note tag.
+///
+/// See [\[MS-ONE 2.3.85\]].
+///
+/// [\[MS-ONE 2.3.85\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b39a1d88-b8e1-48c6-bbfe-99ac3effe91b
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
-#[allow(dead_code)]
+#[allow(missing_docs)]
 pub enum ActionItemType {
     Numeric(u16),
     DueToday,

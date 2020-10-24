@@ -2,6 +2,7 @@ use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
+/// A RGBA color value.
 #[derive(Debug, Copy, Clone)]
 pub struct Color {
     alpha: u8,
@@ -11,18 +12,22 @@ pub struct Color {
 }
 
 impl Color {
+    /// The color's transparency value.
     pub fn alpha(&self) -> u8 {
         self.alpha
     }
 
+    /// The color's red value.
     pub fn r(&self) -> u8 {
         self.r
     }
 
+    /// The color's green value.
     pub fn g(&self) -> u8 {
         self.g
     }
 
+    /// The color's blue value.
     pub fn b(&self) -> u8 {
         self.b
     }

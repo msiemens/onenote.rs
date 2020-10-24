@@ -1,9 +1,9 @@
 use crate::errors::{ErrorKind, Result};
+use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::PropertyType;
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {

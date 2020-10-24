@@ -1,11 +1,17 @@
 use crate::errors::{ErrorKind, Result};
+use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::{outline_element_node, outline_group, outline_node, PropertySetId};
 use crate::onenote::parser::content::{parse_content, Content};
 use crate::onenote::parser::list::{parse_list, List};
 use crate::onestore::object_space::ObjectSpace;
-use crate::types::exguid::ExGuid;
 
+/// A content outline.
+///
+/// See [\[MS-ONE 1.3.2.1\]] and [\[MS-ONE 2.2.20\]].
+///
+/// [\[MS-ONE 1.3.2.1\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/22e65fbe-01db-4c3f-8b00-101a6cd6f9c4
+/// [\[MS-ONE 2.2.20\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b25fa331-e07e-474e-99c9-b3603b7bf937
 #[derive(Clone, Debug)]
 pub struct Outline {
     pub(crate) items_level: u8,
@@ -27,59 +33,123 @@ pub struct Outline {
 }
 
 impl Outline {
+    /// Contents of this outline.
     pub fn items(&self) -> &[OutlineItem] {
         &self.items
     }
 
+    /// The nesting level of this outline's contents.
+    ///
+    /// See [\[MS-ONE 2.3.8\]].
+    ///
+    /// [\[MS-ONE 2.3.8\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b631036a-9152-4385-8165-60fc324e5efd
     pub fn items_level(&self) -> u8 {
         self.items_level
     }
 
+    /// The horizontal distance between a list index number or bullet and the outline content.
+    ///
+    /// See [\[MS-ONE 2.3.45\]].
+    ///
+    /// [\[MS-ONE 2.3.45\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/3139a52f-fc22-48a3-9765-cebc6774d109
     pub fn list_spacing(&self) -> Option<f32> {
         self.list_spacing
     }
 
+    /// The indentation of each level in the outline.
+    ///
+    /// The contents are specified in [\[MS-ONE 2.2.2\]] but the semantics described there
+    /// don't really match what the OneNote desktop and web applications seem to be doing.
+    ///
+    /// [\[MS-ONE 2.2.2\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/269a3e7b-d85a-4ba8-8e1d-d85e1c840772
     pub fn indents(&self) -> &[f32] {
         &self.indents
     }
 
+    /// The outline's alignment relative to the parent element (if present).
+    ///
+    /// See [\[MS-ONE 2.3.27\]].
+    ///
+    /// [\[MS-ONE 2.3.27\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/61fa50be-c355-4b8d-ac01-761a2f7f66c0
     pub fn alignment_in_parent(&self) -> Option<LayoutAlignment> {
         self.alignment_in_parent
     }
 
+    /// The outline's alignment.
+    ///
+    /// See [\[MS-ONE 2.3.33\]].
+    ///
+    /// [\[MS-ONE 2.3.33\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4e7fe9db-2fdb-4239-b291-dc4b909c94ad
     pub fn alignment_self(&self) -> Option<LayoutAlignment> {
         self.alignment_self
     }
 
+    /// The outline's max height in half-inch increments.
+    ///
+    /// See [\[MS-ONE 2.3.24\]].
+    ///
+    /// [\[MS-ONE 2.3.24\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/76ab7015-2c74-4783-8435-c68b17dd6882
     pub fn layout_max_height(&self) -> Option<f32> {
         self.layout_max_height
     }
 
+    /// The outline's max width in half-inch increments.
+    ///
+    /// See [\[MS-ONE 2.3.22\]].
+    ///
+    /// [\[MS-ONE 2.3.22\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/a770ac4b-2225-4aa6-ba92-d3a51f97c405
     pub fn layout_max_width(&self) -> Option<f32> {
         self.layout_max_width
     }
 
+    /// The outline's minimum width before the text wraps in half-inch increments.
+    ///
+    /// See [\[MS-ONE 2.3.46\]].
+    ///
+    /// [\[MS-ONE 2.3.46\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/e65a3ebc-da8b-4909-a423-b309e2457b36
     pub fn layout_reserved_width(&self) -> Option<f32> {
         self.layout_reserved_width
     }
 
+    /// The outline's minimum width in half-inch increments.
+    ///
+    /// See [\[MS-ONE 2.3.49\]].
+    ///
+    /// [\[MS-ONE 2.3.49\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/ebeff222-f4e5-4c58-861c-e28b816d01ce
     pub fn layout_minimum_outline_width(&self) -> Option<f32> {
         self.layout_minimum_outline_width
     }
 
+    /// Whether the [`layout_max_width()`](Self::layout_max_width()) value is set by the user.
+    ///
+    /// See [\[MS-ONE 2.3.44\]].
+    ///
+    /// [\[MS-ONE 2.3.44\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/19227b81-43ab-484c-aaae-d33cf13e2602
     pub fn is_layout_size_set_by_user(&self) -> bool {
         self.is_layout_size_set_by_user
     }
 
+    /// The horizontal offset from the page origin in half-inch increments.
+    ///
+    /// See [\[MS-ONE 2.3.18\]].
+    ///
+    /// [\[MS-ONE 2.3.18\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5fb9e84a-c9e9-4537-ab14-e5512f24669a
     pub fn offset_horizontal(&self) -> Option<f32> {
         self.offset_horizontal
     }
 
+    /// The vertical offset from the page origin in half-inch increments.
+    ///
+    /// See [\[MS-ONE 2.3.19\]].
+    ///
+    /// [\[MS-ONE 2.3.19\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5c4992ba-1db5-43e9-83dd-7299c562104d
     pub fn offset_vertical(&self) -> Option<f32> {
         self.offset_vertical
     }
 }
 
+/// An entry in an outline list.
+#[allow(missing_docs)]
 #[derive(Clone, Debug)]
 pub enum OutlineItem {
     Group(OutlineGroup),
@@ -87,6 +157,7 @@ pub enum OutlineItem {
 }
 
 impl OutlineItem {
+    /// Return the outline element if the item is an element.
     pub fn element(&self) -> Option<&OutlineElement> {
         if let OutlineItem::Element(element) = self {
             Some(element)
@@ -96,6 +167,14 @@ impl OutlineItem {
     }
 }
 
+/// An outline group with a custom indentation level.
+///
+/// This is used to represent the case where the first [`OutlineElement`]
+/// has a greater indentation level than the following outline elements.
+///
+/// See [\[MS-ONE 2.2.22\]].
+///
+/// [\[MS-ONE 2.2.22\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/7dcc1618-46ee-4912-b918-ab4df1b52315
 #[derive(Clone, Debug)]
 pub struct OutlineGroup {
     pub(crate) child_level: u8,
@@ -103,15 +182,27 @@ pub struct OutlineGroup {
 }
 
 impl OutlineGroup {
+    /// The nesting level of this outline group's contents.
+    ///
+    /// See [\[MS-ONE 2.3.8\]].
+    ///
+    /// [\[MS-ONE 2.3.8\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b631036a-9152-4385-8165-60fc324e5efd
     pub fn child_level(&self) -> u8 {
         self.child_level
     }
 
+    /// The contents of this outline group.
     pub fn outlines(&self) -> &[OutlineItem] {
         &self.outlines
     }
 }
 
+/// A container for a outline's content element.
+///
+/// See [\[MS-ONE 1.3.2.2\]] and [\[MS-ONE 2.2.21\]].
+///
+/// [\[MS-ONE 1.3.2.2\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/97bfd6bb-6ee4-43fd-aa1c-55646c0f6387
+/// [\[MS-ONE 2.2.21\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/d47760a6-6f1f-4fd5-b2ad-a51fe5a72c21
 #[derive(Clone, Debug)]
 pub struct OutlineElement {
     pub(crate) contents: Vec<Content>,
@@ -124,22 +215,42 @@ pub struct OutlineElement {
 }
 
 impl OutlineElement {
+    /// The outline element's contents.
     pub fn contents(&self) -> &[Content] {
         &self.contents
     }
 
+    /// The list specification.
+    ///
+    /// From MS-ONE it's not really clear whether an outline element can have multiple
+    /// list specifications so we're able to return multiple specifications just in case.
+    ///
+    /// See [\[MS-ONE 2.2.57\]].
+    ///
+    /// [\[MS-ONE 2.2.57\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4c32f819-5885-4a53-bd2d-d020484c92ed
     pub fn list_contents(&self) -> &[List] {
         &self.list_contents
     }
 
+    /// The horizontal distance between a list index number or bullet and the outline content.
+    ///
+    /// See [\[MS-ONE 2.3.45\]].
+    ///
+    /// [\[MS-ONE 2.3.45\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/3139a52f-fc22-48a3-9765-cebc6774d109
     pub fn list_spacing(&self) -> Option<f32> {
         self.list_spacing
     }
 
+    /// The nesting level of this outline element's contents.
+    ///
+    /// See [\[MS-ONE 2.3.8\]].
+    ///
+    /// [\[MS-ONE 2.3.8\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b631036a-9152-4385-8165-60fc324e5efd
     pub fn child_level(&self) -> u8 {
         self.child_level
     }
 
+    /// Outline contents that are nested below this outline's contents.
     pub fn children(&self) -> &[OutlineItem] {
         &self.children
     }

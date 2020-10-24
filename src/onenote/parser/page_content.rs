@@ -1,11 +1,13 @@
 use crate::errors::{ErrorKind, Result};
+use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property_set::PropertySetId;
 use crate::onenote::parser::embedded_file::{parse_embedded_file, EmbeddedFile};
 use crate::onenote::parser::image::{parse_image, Image};
 use crate::onenote::parser::outline::{parse_outline, Outline};
 use crate::onestore::object_space::ObjectSpace;
-use crate::types::exguid::ExGuid;
 
+/// The contents of a page.
+#[allow(missing_docs)]
 #[derive(Clone, Debug)]
 pub enum PageContent {
     Outline(Outline),
@@ -15,6 +17,7 @@ pub enum PageContent {
 }
 
 impl PageContent {
+    /// Return the outline data if it's an outline content.
     pub fn outline(&self) -> Option<&Outline> {
         if let PageContent::Outline(outline) = self {
             Some(outline)
@@ -23,6 +26,7 @@ impl PageContent {
         }
     }
 
+    /// Return the image data if it's an image content.
     pub fn image(&self) -> Option<&Image> {
         if let PageContent::Image(image) = self {
             Some(image)
@@ -31,6 +35,7 @@ impl PageContent {
         }
     }
 
+    /// Return the embedded file data if it's an embedded file content.
     pub fn embedded_file(&self) -> Option<&EmbeddedFile> {
         if let PageContent::EmbeddedFile(embedded_file) = self {
             Some(embedded_file)

@@ -4,7 +4,7 @@ use crate::one::property::PropertyType;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
 use crate::onestore::types::property::PropertyValue;
 use crate::reader::Reader;
-use crate::types::guid::Guid;
+use crate::shared::guid::Guid;
 
 #[derive(Debug)]
 pub(crate) struct StoreHeader {

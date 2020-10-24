@@ -1,10 +1,10 @@
-use crate::errors::Result;
+use crate::errors::{ErrorKind, Result};
+use crate::fsshttpb::data::exguid::ExGuid;
+use crate::fsshttpb::data::object_types::ObjectType;
+use crate::fsshttpb::data::stream_object::ObjectHeader;
 use crate::fsshttpb::data_element::DataElementPackage;
-use crate::types::exguid::ExGuid;
-use crate::types::guid::Guid;
-use crate::types::object_types::ObjectType;
-use crate::types::stream_object::ObjectHeader;
-use crate::{ErrorKind, Reader};
+use crate::shared::guid::Guid;
+use crate::Reader;
 
 #[derive(Debug)]
 pub(crate) struct Packaging {

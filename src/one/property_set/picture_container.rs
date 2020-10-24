@@ -1,8 +1,7 @@
-use crate::errors::Result;
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-use crate::ErrorKind;
 
 #[derive(Debug)]
 pub(crate) struct Data {

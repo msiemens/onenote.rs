@@ -1,8 +1,8 @@
 use crate::errors::Result;
+use crate::fsshttpb::data::binary_item::BinaryItem;
+use crate::fsshttpb::data::object_types::ObjectType;
+use crate::fsshttpb::data::stream_object::ObjectHeader;
 use crate::fsshttpb::data_element::DataElement;
-use crate::types::binary_item::BinaryItem;
-use crate::types::object_types::ObjectType;
-use crate::types::stream_object::ObjectHeader;
 use crate::Reader;
 use std::fmt;
 

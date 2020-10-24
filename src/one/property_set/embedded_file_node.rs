@@ -1,4 +1,5 @@
 use crate::errors::{ErrorKind, Result};
+use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
@@ -6,7 +7,6 @@ use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::note_tag_container::Data as NoteTagData;
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {
@@ -31,10 +31,20 @@ pub(crate) struct Data {
     pub(crate) recording_duration: Option<u32>,
 }
 
+/// An embedded file's file type.
+///
+/// See [\[MS-ONE 2.3.62\]].
+///
+/// [\[MS-ONE 2.3.62\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/112836a0-ed3b-4be1-bc4b-49f0f7b02295
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum FileType {
+    /// Unknown
     Unknown,
+
+    /// An audio file.
     Audio,
+
+    /// A video file.
     Video,
 }
 

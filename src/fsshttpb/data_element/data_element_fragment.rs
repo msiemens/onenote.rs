@@ -1,9 +1,9 @@
 use crate::errors::Result;
+use crate::fsshttpb::data::compact_u64::CompactU64;
+use crate::fsshttpb::data::exguid::ExGuid;
+use crate::fsshttpb::data::object_types::ObjectType;
+use crate::fsshttpb::data::stream_object::ObjectHeader;
 use crate::fsshttpb::data_element::DataElement;
-use crate::types::compact_u64::CompactU64;
-use crate::types::exguid::ExGuid;
-use crate::types::object_types::ObjectType;
-use crate::types::stream_object::ObjectHeader;
 use crate::Reader;
 
 #[derive(Debug)]

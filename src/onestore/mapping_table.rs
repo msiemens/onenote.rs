@@ -1,6 +1,6 @@
+use crate::fsshttpb::data::cell_id::CellId;
+use crate::fsshttpb::data::exguid::ExGuid;
 use crate::onestore::types::compact_id::CompactId;
-use crate::types::cell_id::CellId;
-use crate::types::exguid::ExGuid;
 use std::collections::HashMap;
 
 #[derive(Debug, Clone)]

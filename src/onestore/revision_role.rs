@@ -1,5 +1,5 @@
 use crate::errors::{ErrorKind, Result};
-use crate::types::exguid::ExGuid;
+use crate::fsshttpb::data::exguid::ExGuid;
 
 #[derive(Debug, PartialEq, Hash, Eq, Copy, Clone)]
 pub(crate) enum RevisionRole {

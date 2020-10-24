@@ -1,11 +1,10 @@
-use crate::errors::Result;
+use crate::errors::{ErrorKind, Result};
 use crate::one::property::charset::Charset;
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property::paragraph_alignment::ParagraphAlignment;
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-use crate::ErrorKind;
 
 #[derive(Debug)]
 pub(crate) struct Data {

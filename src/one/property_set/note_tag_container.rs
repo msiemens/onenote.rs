@@ -1,4 +1,5 @@
 use crate::errors::{ErrorKind, Result};
+use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::note_tag::ActionItemStatus;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::object_space_reference::ObjectSpaceReference;
@@ -9,7 +10,6 @@ use crate::onestore::types::compact_id::CompactId;
 use crate::onestore::types::jcid::JcId;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
 use crate::onestore::types::prop_set::PropertySet;
-use crate::types::exguid::ExGuid;
 
 #[derive(Debug)]
 pub(crate) struct Data {

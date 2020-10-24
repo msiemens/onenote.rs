@@ -2,6 +2,12 @@ use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
+/// A charset representation.
+///
+/// See [\[MS-ONE 2.3.55\]].
+///
+/// [\[MS-ONE 2.3.55\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/64e2db6e-6eeb-443c-9ccf-0f72b37ba411
+#[allow(missing_docs)]
 #[derive(Debug, Copy, Clone)]
 pub enum Charset {
     Ansi,

@@ -1,6 +1,6 @@
 use crate::errors::{ErrorKind, Result};
-use crate::types::compact_u64::CompactU64;
-use crate::types::guid::Guid;
+use crate::fsshttpb::data::compact_u64::CompactU64;
+use crate::shared::guid::Guid;
 use crate::Reader;
 use std::fmt;
 

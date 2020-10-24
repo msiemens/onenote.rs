@@ -1,5 +1,5 @@
 use crate::errors::Result;
-use crate::types::guid::Guid;
+use crate::shared::guid::Guid;
 use crate::Reader;
 
 #[derive(Debug)]

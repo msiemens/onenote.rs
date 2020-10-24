@@ -23,13 +23,20 @@ pub(crate) mod rich_text;
 pub(crate) mod section;
 pub(crate) mod table;
 
-pub struct Parser {}
+/// The OneNote file parser.
+pub struct Parser;
 
 impl Parser {
+    /// Create a new OneNote file parser.
     pub fn new() -> Parser {
         Parser {}
     }
 
+    /// Parse a OneNote notebook.
+    ///
+    /// The `path` argument must point to a `.onetoc2` file. This will parse the
+    /// table of contents of the notebook as well as all contained
+    /// sections from the folder that the table of contents file is in.
     pub fn parse_notebook(&mut self, path: &Path) -> Result<Notebook> {
         let file = File::open(path)?;
         let data = Parser::read(file)?;
@@ -67,6 +74,10 @@ impl Parser {
         Ok(Notebook { entries: sections })
     }
 
+    /// Parse a OneNote section file.
+    ///
+    /// The `path` argument must point to a `.one` file that contains a
+    /// OneNote section.
     pub fn parse_section(&mut self, path: &Path) -> Result<Section> {
         let file = File::open(path)?;
         let data = Parser::read(file)?;
@@ -89,7 +100,7 @@ impl Parser {
         )
     }
 
-    pub fn parse_section_group(&mut self, path: &Path) -> Result<SectionGroup> {
+    fn parse_section_group(&mut self, path: &Path) -> Result<SectionGroup> {
         let display_name = path
             .file_name()
             .expect("file without file name")

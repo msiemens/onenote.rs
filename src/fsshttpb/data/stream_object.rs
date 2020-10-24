@@ -1,6 +1,6 @@
 use crate::errors::{ErrorKind, Result};
-use crate::types::compact_u64::CompactU64;
-use crate::types::object_types::ObjectType;
+use crate::fsshttpb::data::compact_u64::CompactU64;
+use crate::fsshttpb::data::object_types::ObjectType;
 use crate::Reader;
 use num_traits::{FromPrimitive, ToPrimitive};
 
