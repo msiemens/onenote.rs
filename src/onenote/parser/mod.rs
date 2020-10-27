@@ -117,7 +117,7 @@ impl Parser {
 
             if is_toc {
                 return self
-                    .parse_notebook(&dbg!(entry.path()))
+                    .parse_notebook(&entry.path())
                     .map(|group| SectionGroup {
                         display_name,
                         entries: group.entries,
