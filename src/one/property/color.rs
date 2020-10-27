@@ -3,7 +3,7 @@ use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
 /// A RGBA color value.
-#[derive(Debug, Copy, Clone)]
+#[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Color {
     alpha: u8,
     r: u8,
