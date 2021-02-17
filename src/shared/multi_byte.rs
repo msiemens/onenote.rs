@@ -27,10 +27,11 @@ pub(crate) fn decode_signed(input: &[u8]) -> Vec<i64> {
     decode(input)
         .into_iter()
         .map(|value| {
+            let shifted = (value >> 1) as i64;
             if value & 0x1 == 0x1 {
-                (value >> 1) as i64 * -1
+                -shifted
             } else {
-                (value >> 1) as i64
+                shifted
             }
         })
         .collect()

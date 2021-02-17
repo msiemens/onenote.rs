@@ -6,7 +6,7 @@ use std::mem;
 macro_rules! try_get {
     ($this:ident, $typ:tt) => {{
         if $this.0.remaining() < mem::size_of::<$typ>() {
-            Err(ErrorKind::UnexpectedEOF.into())
+            Err(ErrorKind::UnexpectedEof.into())
         } else {
             Ok(paste! {$this.0. [< get_ $typ >]()})
         }
@@ -14,7 +14,7 @@ macro_rules! try_get {
 
     ($this:ident, $typ:tt::$endian:tt) => {{
         if $this.0.remaining() < mem::size_of::<$typ>() {
-            Err(ErrorKind::UnexpectedEOF.into())
+            Err(ErrorKind::UnexpectedEof.into())
         } else {
             Ok(paste! {$this.0. [< get_ $typ _ $endian >]()})
         }
@@ -30,7 +30,7 @@ impl<'a> Reader<'a> {
 
     pub(crate) fn read(&mut self, cnt: usize) -> Result<&[u8]> {
         if self.remaining() < cnt {
-            return Err(ErrorKind::UnexpectedEOF.into());
+            return Err(ErrorKind::UnexpectedEof.into());
         }
 
         let data = &self.0[0..cnt];
@@ -49,7 +49,7 @@ impl<'a> Reader<'a> {
 
     pub(crate) fn advance(&mut self, cnt: usize) -> Result<()> {
         if self.remaining() < cnt {
-            return Err(ErrorKind::UnexpectedEOF.into());
+            return Err(ErrorKind::UnexpectedEof.into());
         }
 
         self.0.advance(cnt);

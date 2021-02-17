@@ -56,7 +56,7 @@ impl StoreHeader {
             .transpose()?;
 
         let file_name_crc = prop_set
-            .get(PropertyType::FileNameCRC)
+            .get(PropertyType::FileNameCrc)
             .map(|value| StoreHeader::parse_u32(value))
             .transpose()?
             .ok_or_else(|| ErrorKind::MalformedOneStoreData("FileNameCRC prop missing".into()))?;

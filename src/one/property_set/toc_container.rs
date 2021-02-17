@@ -26,7 +26,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
     let filename = simple::parse_string(PropertyType::FolderChildFilename, object)?
         .map(|s| s.replace("^M", "+"))
         .map(|s| s.replace("^J", ","));
-    let ordering_id = simple::parse_u32(PropertyType::NotebookElementOrderingID, object)?;
+    let ordering_id = simple::parse_u32(PropertyType::NotebookElementOrderingId, object)?;
 
     Ok(Data {
         children,

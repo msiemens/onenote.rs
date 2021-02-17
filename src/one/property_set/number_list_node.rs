@@ -41,7 +41,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
         })?;
     let bold = simple::parse_bool(PropertyType::Bold, object)?.unwrap_or_default();
     let italic = simple::parse_bool(PropertyType::Italic, object)?.unwrap_or_default();
-    let language_code = simple::parse_u32(PropertyType::LanguageID, object)?;
+    let language_code = simple::parse_u32(PropertyType::LanguageId, object)?;
     let font = simple::parse_string(PropertyType::Font, object)?;
     let font_size = simple::parse_u16(PropertyType::FontSize, object)?;
     let font_color = ColorRef::parse(PropertyType::FontColor, object)?;

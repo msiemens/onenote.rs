@@ -48,7 +48,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
     let layout_max_height = simple::parse_f32(PropertyType::LayoutMaxHeight, object)?;
     let is_layout_size_set_by_user =
         simple::parse_bool(PropertyType::IsLayoutSizeSetByUser, object)?.unwrap_or_default();
-    let language_code = simple::parse_u32(PropertyType::LanguageID, object)?;
+    let language_code = simple::parse_u32(PropertyType::LanguageId, object)?;
     let alt_text = simple::parse_string(PropertyType::ImageAltText, object)?;
     let layout_alignment_in_parent =
         LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object)?;
@@ -57,7 +57,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
     let displayed_page_number = simple::parse_u32(PropertyType::DisplayedPageNumber, object)?;
     let text = simple::parse_string(PropertyType::RichEditTextUnicode, object)?;
     let text_language_code =
-        simple::parse_u16(PropertyType::RichEditTextLangID, object)?.map(|value| value as u32);
+        simple::parse_u16(PropertyType::RichEditTextLangId, object)?.map(|value| value as u32);
     let picture_width = simple::parse_f32(PropertyType::PictureWidth, object)?;
     let picture_height = simple::parse_f32(PropertyType::PictureHeight, object)?;
     let hyperlink_url = simple::parse_string(PropertyType::WzHyperlinkUrl, object)?;

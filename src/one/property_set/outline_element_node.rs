@@ -56,7 +56,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
         .ok_or_else(|| {
             ErrorKind::MalformedOneNoteFileData("outline element has no most recent author".into())
         })?;
-    let rtl = simple::parse_bool(PropertyType::OutlineElementRTL, object)?.unwrap_or_default();
+    let rtl = simple::parse_bool(PropertyType::OutlineElementRtl, object)?.unwrap_or_default();
     let is_deletable = simple::parse_bool(PropertyType::Deletable, object)?.unwrap_or_default();
     let is_selectable = simple::parse_bool(PropertyType::CannotBeSelected, object)?
         .map(|value| !value)

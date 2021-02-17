@@ -28,7 +28,7 @@ pub enum Charset {
     Russian,
     Thai,
     EastEurope,
-    OEM,
+    Oem,
 }
 
 impl Charset {
@@ -61,7 +61,7 @@ impl Charset {
                 204 => Ok(Charset::Russian),
                 222 => Ok(Charset::Thai),
                 238 => Ok(Charset::EastEurope),
-                255 => Ok(Charset::OEM),
+                255 => Ok(Charset::Oem),
                 _ => Err(ErrorKind::MalformedOneNoteFileData(
                     format!("invalid charset: {}", value).into(),
                 )

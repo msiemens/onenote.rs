@@ -80,8 +80,8 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
     let is_title_date = simple::parse_bool(PropertyType::IsTitleDate, object)?.unwrap_or_default();
     let is_title_text = simple::parse_bool(PropertyType::IsTitleText, object)?.unwrap_or_default();
     let language_code =
-        simple::parse_u16(PropertyType::RichEditTextLangID, object)?.map(|value| value as u32);
-    let rtl = simple::parse_bool(PropertyType::ReadingOrderRTL, object)?.unwrap_or_default();
+        simple::parse_u16(PropertyType::RichEditTextLangId, object)?.map(|value| value as u32);
+    let rtl = simple::parse_bool(PropertyType::ReadingOrderRtl, object)?.unwrap_or_default();
 
     let note_tags = NoteTagData::parse(object)?.unwrap_or_default();
 

@@ -33,8 +33,7 @@ impl Data {
             })
             .transpose()?
             .map(|(id, sets)| {
-                Ok(sets
-                    .iter()
+                sets.iter()
                     .map(|props| {
                         Ok(Object {
                             context_id: object.context_id,
@@ -77,7 +76,7 @@ impl Data {
                             item_status,
                         })
                     })
-                    .collect::<Result<Vec<_>>>()?)
+                    .collect::<Result<Vec<_>>>()
             })
             .transpose()
     }

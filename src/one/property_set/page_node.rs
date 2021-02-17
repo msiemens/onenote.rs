@@ -56,7 +56,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
     let page_margin_top = simple::parse_f32(PropertyType::PageMarginTop, object)?;
     let page_margin_bottom = simple::parse_f32(PropertyType::PageMarginBottom, object)?;
     let page_size = PageSize::parse(PropertyType::PageSize, object)?.unwrap_or_default();
-    let rtl = simple::parse_bool(PropertyType::EditRootRTL, object)?.unwrap_or_default();
+    let rtl = simple::parse_bool(PropertyType::EditRootRtl, object)?.unwrap_or_default();
 
     let data = Data {
         last_modified,

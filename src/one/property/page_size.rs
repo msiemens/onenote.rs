@@ -5,10 +5,10 @@ use crate::onestore::object::Object;
 #[derive(Debug)]
 pub(crate) enum PageSize {
     Auto,
-    US,
+    Us,
     AnsiLetter,
     AnsiTabloid,
-    USLegal,
+    UsLegal,
     IsoA3,
     IsoA4,
     IsoA5,
@@ -35,10 +35,10 @@ impl PageSize {
                     })
                     .and_then(|value| match value {
                         0 => Ok(PageSize::Auto),
-                        1 => Ok(PageSize::US),
+                        1 => Ok(PageSize::Us),
                         2 => Ok(PageSize::AnsiLetter),
                         3 => Ok(PageSize::AnsiTabloid),
-                        4 => Ok(PageSize::USLegal),
+                        4 => Ok(PageSize::UsLegal),
                         5 => Ok(PageSize::IsoA3),
                         6 => Ok(PageSize::IsoA4),
                         7 => Ok(PageSize::IsoA5),

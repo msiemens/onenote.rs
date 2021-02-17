@@ -61,7 +61,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
     let paragraph_space_after = simple::parse_f32(PropertyType::ParagraphSpaceAfter, object)?;
     let paragraph_line_spacing_exact =
         simple::parse_f32(PropertyType::ParagraphLineSpacingExact, object)?;
-    let language_code = simple::parse_u32(PropertyType::LanguageID, object)?;
+    let language_code = simple::parse_u32(PropertyType::LanguageId, object)?;
     let math_formatting =
         simple::parse_bool(PropertyType::MathFormatting, object)?.unwrap_or_default();
     let hyperlink = simple::parse_bool(PropertyType::Hyperlink, object)?.unwrap_or_default();

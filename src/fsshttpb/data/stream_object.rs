@@ -17,7 +17,7 @@ impl ObjectHeader {
     }
 
     pub(crate) fn parse(reader: Reader) -> Result<ObjectHeader> {
-        let header_type = reader.bytes().first().ok_or(ErrorKind::UnexpectedEOF)?;
+        let header_type = reader.bytes().first().ok_or(ErrorKind::UnexpectedEof)?;
 
         match header_type & 0b11 {
             0x0 => Self::parse_16(reader),
@@ -158,7 +158,7 @@ impl ObjectHeader {
     }
 
     pub(crate) fn has_end_8(reader: Reader, object_type: ObjectType) -> Result<bool> {
-        let data = reader.bytes().first().ok_or(ErrorKind::UnexpectedEOF)?;
+        let data = reader.bytes().first().ok_or(ErrorKind::UnexpectedEof)?;
 
         Ok(data & 0b11 == 0x1 && data >> 2 == object_type.to_u8().unwrap())
     }

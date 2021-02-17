@@ -69,7 +69,7 @@ impl From<uuid::Error> for Error {
 pub enum ErrorKind {
     /// Hit the end of the OneNote file before it was expected.
     #[error("Unexpected end of file")]
-    UnexpectedEOF,
+    UnexpectedEof,
 
     /// The parser was asked to process a table-of-contents file that turned out not to be one.
     #[error("Not a table of contents file: {file}")]
@@ -112,6 +112,7 @@ pub enum ErrorKind {
 
     /// An I/O failure was encountered during parsing.
     #[error("I/O failure: {err}")]
+    #[allow(clippy::upper_case_acronyms)]
     IO {
         #[from]
         err: io::Error,

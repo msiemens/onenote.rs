@@ -1,10 +1,9 @@
-use onenote_parser::errors::Result;
 use onenote_parser::Parser;
 use std::env;
 use std::ffi::OsString;
 use std::path::PathBuf;
 
-fn main() -> Result<()> {
+fn main() {
     let path = env::args().nth(1).expect("usage: parse <file>");
     let path = PathBuf::from(path);
 
@@ -16,6 +15,4 @@ fn main() -> Result<()> {
         let section = parser.parse_section(&path).unwrap();
         println!("{:#?}", section);
     }
-
-    Ok(())
 }

@@ -46,7 +46,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
         .ok_or_else(|| {
             ErrorKind::MalformedOneNoteFileData("ink stroke node has no ink bias".into())
         })?;
-    let language_code = simple::parse_u32(PropertyType::LanguageID, object)?;
+    let language_code = simple::parse_u32(PropertyType::LanguageId, object)?;
     let properties = ObjectReference::parse(PropertyType::InkStrokeProperties, object)?
         .ok_or_else(|| {
             ErrorKind::MalformedOneNoteFileData(

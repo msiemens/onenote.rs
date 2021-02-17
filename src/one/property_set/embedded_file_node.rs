@@ -91,7 +91,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
         simple::parse_bool(PropertyType::IsLayoutSizeSetByUser, object)?.unwrap_or_default();
     let text = simple::parse_string(PropertyType::RichEditTextUnicode, object)?;
     let text_language_code =
-        simple::parse_u16(PropertyType::RichEditTextLangID, object)?.map(|value| value as u32);
+        simple::parse_u16(PropertyType::RichEditTextLangId, object)?.map(|value| value as u32);
     let layout_alignment_in_parent =
         LayoutAlignment::parse(PropertyType::LayoutAlignmentInParent, object)?;
     let layout_alignment_self = LayoutAlignment::parse(PropertyType::LayoutAlignmentSelf, object)?;
