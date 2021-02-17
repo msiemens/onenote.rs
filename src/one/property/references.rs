@@ -15,7 +15,9 @@ impl References {
             .properties()
             .index(PropertyId::new(prop_type as u32))
             .ok_or_else(|| {
-                ErrorKind::MalformedOneNoteFileData("object offset does not exist".into())
+                ErrorKind::MalformedOneNoteFileData(
+                    format!("no object offset for property {:?}", prop_type).into(),
+                )
             })?;
 
         let predecessors = object

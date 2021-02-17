@@ -4,7 +4,11 @@ use num_traits::FromPrimitive;
 
 pub(crate) mod embedded_file_container;
 pub(crate) mod embedded_file_node;
+pub(crate) mod embedded_ink_container;
 pub(crate) mod image_node;
+pub(crate) mod ink_container;
+pub(crate) mod ink_data_node;
+pub(crate) mod ink_stroke_node;
 pub(crate) mod note_tag_container;
 pub(crate) mod note_tag_shared_definition_container;
 pub(crate) mod number_list_node;
@@ -20,6 +24,7 @@ pub(crate) mod picture_container;
 pub(crate) mod rich_text_node;
 pub(crate) mod section_metadata_node;
 pub(crate) mod section_node;
+pub(crate) mod stroke_properties_node;
 pub(crate) mod table_cell_node;
 pub(crate) mod table_node;
 pub(crate) mod table_row_node;
@@ -35,7 +40,6 @@ pub(crate) enum PropertySetId {
     EmbeddedFileContainer = 0x00080036,
     EmbeddedFileNode = 0x00060035,
     ImageNode = 0x00060011,
-    InkNode = 0x00060014,
     NoteTagSharedDefinitionContainer = 0x00120043,
     NumberListNode = 0x00060012,
     OutlineElementNode = 0x0006000D,
@@ -59,6 +63,10 @@ pub(crate) enum PropertySetId {
 
     // Undocumented:
     XpsContainer = 0x0008003A,
+    InkContainer = 0x00060014,
+    InkDataNode = 0x0002003B,
+    InkStrokeNode = 0x00020047,
+    StrokePropertiesNode = 0x00120048,
 }
 
 impl PropertySetId {

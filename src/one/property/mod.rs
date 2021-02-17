@@ -4,6 +4,7 @@ pub(crate) mod author;
 pub(crate) mod charset;
 pub(crate) mod color;
 pub(crate) mod color_ref;
+pub(crate) mod ink_dimensions;
 pub(crate) mod layout_alignment;
 pub(crate) mod note_tag;
 pub(crate) mod object_reference;
@@ -16,6 +17,7 @@ pub(crate) mod time;
 
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[allow(dead_code)]
+#[allow(clippy::enum_clike_unportable_variant)]
 pub(crate) enum PropertyType {
     ActionItemSchemaVersion = 0x0C003473,
     ActionItemStatus = 0x10003470,
@@ -164,6 +166,33 @@ pub(crate) enum PropertyType {
     PictureFileExtension = 0x24003424,
     NoteTags = 0x40003489,
     NoteTag = 0x44000811,
-    SectionColor = 0x14001cbe,
+    SectionColor = 0x14001CBE,
     CellBackgroundColor = 0x14001E26,
+    InkBias = 0x0C00341C,
+    InkData = 0x20003415,
+    InkDimensions = 0x1C00340A,
+    InkPath = 0x1C00340B,
+    InkStrokeProperties = 0x20003409,
+    InkStrokes = 0x24003416,
+    InkAntialised = 0x8000340E,
+    InkFitToCurve = 0x80003410,
+    InkIgnorePressure = 0x08003411,
+    InkPenTip = 0x0C003412,
+    InkRasterOperation = 0x0C003413,
+    InkTransparency = 0x0C003414,
+    InkHeight = 0x1400340C,
+    InkWidth = 0x1400340D,
+    InkColor = 0x1400340F,
+    InkScalingX = 0x14001C46,
+    InkScalingY = 0x14001C47,
+    InkBoundingBox = 0x1C003418,
+    EmbeddedObjectType = 0x14003457,
+    EmbeddedInkStartX = 0x1400349E,
+    EmbeddedInkStartY = 0x1400349F,
+    EmbeddedInkWidth = 0x140034A0,
+    EmbeddedInkHeight = 0x140034A1,
+    EmbeddedInkOffsetHoriz = 0x140034A2,
+    EmbeddedInkOffsetVert = 0x140034A3,
+    EmbeddedInkSpaceWidth = 0x14001C27,
+    EmbeddedInkSpaceHeight = 0x14001C28,
 }

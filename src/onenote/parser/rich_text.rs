@@ -4,9 +4,11 @@ use crate::one::property::charset::Charset;
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::paragraph_alignment::ParagraphAlignment;
-use crate::one::property_set::{paragraph_style_object, rich_text_node};
+use crate::one::property_set::{embedded_ink_container, paragraph_style_object, rich_text_node};
+use crate::onenote::parser::ink::{parse_ink_data, Ink, InkBoundingBox};
 use crate::onenote::parser::note_tag::{parse_note_tags, NoteTag};
 use crate::onestore::object_space::ObjectSpace;
+use itertools::Itertools;
 
 /// A rich text paragraph.
 ///
@@ -40,6 +42,7 @@ pub struct RichText {
     pub(crate) layout_alignment_self: Option<LayoutAlignment>,
 
     pub(crate) note_tags: Vec<NoteTag>,
+    pub(crate) embedded_objects: Vec<EmbeddedObject>,
 }
 
 impl RichText {
@@ -128,6 +131,62 @@ impl RichText {
     /// Note tags for this paragraph.
     pub fn note_tags(&self) -> &[NoteTag] {
         &self.note_tags
+    }
+
+    /// Objects embedded in this paragraph.
+    pub fn embedded_objects(&self) -> &[EmbeddedObject] {
+        &self.embedded_objects
+    }
+}
+
+/// An object embedded in a rich text paragraph.
+#[derive(Clone, Debug)]
+pub enum EmbeddedObject {
+    /// An ink handwriting object container.
+    Ink(EmbeddedInkContainer),
+
+    /// A space in the ink handwriting.
+    InkSpace(EmbeddedInkSpace),
+
+    /// A line break in the ink handwriting.
+    InkLineBreak,
+}
+
+/// An ink handwriting object container.
+#[derive(Clone, Debug)]
+pub struct EmbeddedInkContainer {
+    pub(crate) ink: Ink,
+    pub(crate) bounding_box: Option<InkBoundingBox>,
+}
+
+impl EmbeddedInkContainer {
+    /// The ink data embedded in a paragraph.
+    pub fn ink(&self) -> &Ink {
+        &self.ink
+    }
+
+    /// The ink object's bounding box.
+    pub fn bounding_box(&self) -> Option<&InkBoundingBox> {
+        self.bounding_box.as_ref()
+    }
+}
+
+/// A space in an embedded ink handwriting object.
+#[derive(Clone, Debug)]
+pub struct EmbeddedInkSpace {
+    height: f32,
+    width: f32,
+}
+
+impl EmbeddedInkSpace {
+    /// The space's height.
+    pub fn height(&self) -> f32 {
+        self.height
+    }
+
+    /// The space's width.
+    pub fn width(&self) -> f32 {
+        self.width
     }
 }
 
@@ -299,28 +358,102 @@ impl ParagraphStyling {
     }
 }
 
+// Embedded object types
+const INK_SPACE_BLOB: u32 = 0x00020026;
+const INK_END_OF_LINE_BLOB: u32 = 0x00020027;
+
 pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result<RichText> {
     let object = space
         .get_object(content_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("rich text content is missing".into()))?;
     let data = rich_text_node::parse(object)?;
 
-    let style = parse_style(data.paragraph_style, space)?;
+    // Parse the base paragraph style
+    let paragraph_style_object = space
+        .get_object(data.paragraph_style)
+        .ok_or_else(|| ErrorKind::MalformedOneNoteData("paragraph styling is missing".into()))?;
+    let paragraph_style_data = paragraph_style_object::parse(paragraph_style_object)?;
+    let paragraph_style = parse_style(paragraph_style_data);
 
-    let styles = data
+    // Parse the styles text runs (part 1)
+    let text_run_data = embedded_ink_container::Data::parse(object)?.unwrap_or_default();
+    let styles_data: Vec<paragraph_style_object::Data> = data
         .text_run_formatting
+        .iter()
+        .map(|style_id| {
+            space
+                .get_object(*style_id)
+                .ok_or_else(|| ErrorKind::MalformedOneNoteData("styling is missing".into()).into())
+        })
+        .map(|style_object| style_object.and_then(|object| paragraph_style_object::parse(object)))
+        .collect::<Result<Vec<_>>>()?;
+
+    // Parse the embedded objects
+    let objects = text_run_data
         .into_iter()
-        .map(|style_id| parse_style(style_id, space))
-        .collect::<Result<_>>()?;
+        .zip(&styles_data)
+        .flat_map(|(object_data, style_data)| {
+            style_data
+                .text_run_is_embedded_object
+                .then(|| (style_data.text_run_object_type, object_data))
+        })
+        .collect_vec();
+
+    let mut objects_without_ref = 0;
+
+    let embedded_objects: Vec<_> = objects
+        .into_iter()
+        .enumerate()
+        .map(|(i, (object_type, embedded_data))| match object_type {
+            Some(INK_END_OF_LINE_BLOB) => {
+                objects_without_ref += 1;
+                Ok(Some(EmbeddedObject::InkLineBreak))
+            }
+            Some(INK_SPACE_BLOB) => {
+                objects_without_ref += 1;
+                parse_embedded_ink_space(embedded_data)
+                    .map(|space| Some(EmbeddedObject::InkSpace(space)))
+            }
+            None => {
+                if !data.text_run_data_object.is_empty() {
+                    return parse_embedded_ink_data(
+                        data.text_run_data_object[i - objects_without_ref],
+                        space,
+                        embedded_data,
+                    )
+                    .map(|container| Some(EmbeddedObject::Ink(container)));
+                }
+
+                Ok(None)
+            }
+            Some(v) => Err(ErrorKind::MalformedOneNoteFileData(
+                format!("unknown embedded object type: {:x}", v).into(),
+            )
+            .into()),
+        })
+        .collect::<Result<Vec<_>>>()?
+        .into_iter()
+        .flatten()
+        .collect_vec();
+
+    // Parse the styles text runs (part 2)
+    let styles = styles_data.into_iter().map(parse_style).collect_vec();
 
     // TODO: Parse lang code into iso code
     // dia-i18n = "0.8.0"
 
+    let text = if !embedded_objects.is_empty() {
+        "".to_string()
+    } else {
+        data.text.unwrap_or_default()
+    };
+
     let text = RichText {
-        text: data.text.unwrap_or_default(),
+        text,
+        embedded_objects,
         text_run_formatting: styles,
         text_run_indices: data.text_run_indices,
-        paragraph_style: style,
+        paragraph_style,
         paragraph_space_before: data.paragraph_space_before,
         paragraph_space_after: data.paragraph_space_after,
         paragraph_line_spacing_exact: data.paragraph_line_spacing_exact,
@@ -333,13 +466,52 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result
     Ok(text)
 }
 
-fn parse_style(style_id: ExGuid, space: &ObjectSpace) -> Result<ParagraphStyling> {
-    let object = space
-        .get_object(style_id)
-        .ok_or_else(|| ErrorKind::MalformedOneNoteData("paragraph styling is missing".into()))?;
-    let data = paragraph_style_object::parse(object)?;
+fn parse_embedded_ink_data(
+    embedded_id: ExGuid,
+    space: &ObjectSpace,
+    data: embedded_ink_container::Data,
+) -> Result<EmbeddedInkContainer> {
+    let (strokes, bb) = parse_ink_data(embedded_id, space, None, None)?;
 
-    let styling = ParagraphStyling {
+    let display_bb = data
+        .start_x
+        .zip(data.start_y)
+        .zip(data.height)
+        .zip(data.width)
+        .map(|(((x, y), height), width)| InkBoundingBox {
+            x,
+            y,
+            height,
+            width,
+        });
+
+    let data = EmbeddedInkContainer {
+        ink: Ink {
+            ink_strokes: strokes,
+            bounding_box: bb,
+            offset_horizontal: data.offset_horiz,
+            offset_vertical: data.offset_vert,
+        },
+        bounding_box: display_bb,
+    };
+
+    Ok(data)
+}
+
+fn parse_embedded_ink_space(data: embedded_ink_container::Data) -> Result<EmbeddedInkSpace> {
+    let width = data.space_width.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("embedded ink space has no width".into())
+    })?;
+
+    let height = data.space_height.ok_or_else(|| {
+        ErrorKind::MalformedOneNoteFileData("embedded ink space has no height".into())
+    })?;
+
+    Ok(EmbeddedInkSpace { height, width })
+}
+
+fn parse_style(data: paragraph_style_object::Data) -> ParagraphStyling {
+    ParagraphStyling {
         charset: data.charset,
         bold: data.bold,
         italic: data.italic,
@@ -360,7 +532,5 @@ fn parse_style(style_id: ExGuid, space: &ObjectSpace) -> Result<ParagraphStyling
         language_code: data.language_code,
         math_formatting: data.math_formatting,
         hyperlink: data.hyperlink,
-    };
-
-    Ok(styling)
+    }
 }

@@ -3,6 +3,7 @@ use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property_set::PropertySetId;
 use crate::onenote::parser::embedded_file::{parse_embedded_file, EmbeddedFile};
 use crate::onenote::parser::image::{parse_image, Image};
+use crate::onenote::parser::ink::{parse_ink, Ink};
 use crate::onenote::parser::outline::{parse_outline, Outline};
 use crate::onestore::object_space::ObjectSpace;
 
@@ -13,6 +14,7 @@ pub enum PageContent {
     Outline(Outline),
     Image(Image),
     EmbeddedFile(EmbeddedFile),
+    Ink(Ink),
     Unknown,
 }
 
@@ -43,6 +45,15 @@ impl PageContent {
             None
         }
     }
+
+    /// Return the ink data if it's an ink content.
+    pub fn ink(&self) -> Option<&Ink> {
+        if let PageContent::Ink(ink) = self {
+            Some(ink)
+        } else {
+            None
+        }
+    }
 }
 
 pub(crate) fn parse_page_content(content_id: ExGuid, space: &ObjectSpace) -> Result<PageContent> {
@@ -62,13 +73,8 @@ pub(crate) fn parse_page_content(content_id: ExGuid, space: &ObjectSpace) -> Res
             PageContent::EmbeddedFile(parse_embedded_file(content_id, space)?)
         }
         PropertySetId::OutlineNode => PageContent::Outline(parse_outline(content_id, space)?),
-        PropertySetId::InkNode => PageContent::Unknown,
-        _ => {
-            return Err(ErrorKind::MalformedOneNoteData(
-                format!("invalid content type: {:?}", id).into(),
-            )
-            .into())
-        }
+        PropertySetId::InkContainer => PageContent::Ink(parse_ink(content_id, space)?),
+        _ => PageContent::Unknown,
     };
 
     Ok(content)

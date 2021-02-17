@@ -41,10 +41,13 @@ pub mod contents {
     pub use crate::onenote::parser::content::Content;
     pub use crate::onenote::parser::embedded_file::EmbeddedFile;
     pub use crate::onenote::parser::image::Image;
+    pub use crate::onenote::parser::ink::{Ink, InkBoundingBox, InkPoint, InkStroke};
     pub use crate::onenote::parser::list::List;
     pub use crate::onenote::parser::note_tag::NoteTag;
     pub use crate::onenote::parser::outline::{Outline, OutlineElement, OutlineGroup, OutlineItem};
-    pub use crate::onenote::parser::rich_text::RichText;
+    pub use crate::onenote::parser::rich_text::{
+        EmbeddedInkContainer, EmbeddedInkSpace, EmbeddedObject, ParagraphStyling, RichText,
+    };
     pub use crate::onenote::parser::table::{Table, TableCell, TableRow};
 }
 

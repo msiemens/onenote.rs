@@ -31,6 +31,7 @@ pub(crate) struct Data {
     pub(crate) hyperlink_protected: bool,
     pub(crate) hidden: bool,
     pub(crate) text_run_is_embedded_object: bool,
+    pub(crate) text_run_object_type: Option<u32>,
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
@@ -69,6 +70,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
     let hidden = simple::parse_bool(PropertyType::Hidden, object)?.unwrap_or_default();
     let text_run_is_embedded_object =
         simple::parse_bool(PropertyType::TextRunIsEmbeddedObject, object)?.unwrap_or_default();
+    let text_run_object_type = simple::parse_u32(PropertyType::EmbeddedObjectType, object)?;
 
     let data = Data {
         charset,
@@ -94,6 +96,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
         hyperlink_protected,
         hidden,
         text_run_is_embedded_object,
+        text_run_object_type,
     };
 
     Ok(data)
