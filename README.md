@@ -13,7 +13,7 @@ supported.
 
 - Read OneNote files available through both the OneNote 2016 application as
   well as through OneDrive download
-- Convert OneNote notebooks and sections into HTML
+- Convert OneNote notebooks and sections into HTML (see the [one2html] project)
 
 ## Non-Goals
 
@@ -38,3 +38,4 @@ author does not have any affiliation with Microsoft.
 [\[MS-FSSHTTPB\]: Binary Requests for File Synchronization via SOAP Protocol]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/f59fc37d-2232-4b14-baac-25f98e9e7b5a
 [LibMsON]: https://github.com/blu-base/libmson/
 [FSSHTTP - parser tools for protocol FSSHTTP/B/D]: https://github.com/marx-yu/FSSHTTP
+[one2html]: https://github.com/msiemens/one2html
