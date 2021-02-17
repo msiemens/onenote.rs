@@ -112,7 +112,6 @@ pub enum ErrorKind {
 
     /// An I/O failure was encountered during parsing.
     #[error("I/O failure: {err}")]
-    #[allow(clippy::upper_case_acronyms)]
     IO {
         #[from]
         err: io::Error,
