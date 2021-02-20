@@ -2,8 +2,8 @@ use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::{outline_element_node, outline_group, outline_node, PropertySetId};
-use crate::onenote::parser::content::{parse_content, Content};
-use crate::onenote::parser::list::{parse_list, List};
+use crate::onenote::content::{parse_content, Content};
+use crate::onenote::list::{parse_list, List};
 use crate::onestore::object_space::ObjectSpace;
 
 /// A content outline.

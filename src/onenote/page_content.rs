@@ -1,10 +1,10 @@
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property_set::PropertySetId;
-use crate::onenote::parser::embedded_file::{parse_embedded_file, EmbeddedFile};
-use crate::onenote::parser::image::{parse_image, Image};
-use crate::onenote::parser::ink::{parse_ink, Ink};
-use crate::onenote::parser::outline::{parse_outline, Outline};
+use crate::onenote::embedded_file::{parse_embedded_file, EmbeddedFile};
+use crate::onenote::image::{parse_image, Image};
+use crate::onenote::ink::{parse_ink, Ink};
+use crate::onenote::outline::{parse_outline, Outline};
 use crate::onestore::object_space::ObjectSpace;
 
 /// The contents of a page.

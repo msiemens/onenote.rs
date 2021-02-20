@@ -1,7 +1,7 @@
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property_set::toc_container;
-use crate::onenote::parser::section::SectionEntry;
+use crate::onenote::section::SectionEntry;
 use crate::onestore::object_space::ObjectSpace;
 use itertools::Itertools;
 

@@ -1,7 +1,7 @@
 use crate::errors::{ErrorKind, Result};
 use crate::one::property::color::Color;
 use crate::one::property_set::{section_metadata_node, section_node};
-use crate::onenote::parser::page_series::{parse_page_series, PageSeries};
+use crate::onenote::page_series::{parse_page_series, PageSeries};
 use crate::onestore::object_space::ObjectSpace;
 use crate::onestore::OneStore;
 

@@ -1,11 +1,11 @@
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property_set::PropertySetId;
-use crate::onenote::parser::embedded_file::{parse_embedded_file, EmbeddedFile};
-use crate::onenote::parser::image::{parse_image, Image};
-use crate::onenote::parser::ink::{parse_ink, Ink};
-use crate::onenote::parser::rich_text::{parse_rich_text, RichText};
-use crate::onenote::parser::table::{parse_table, Table};
+use crate::onenote::embedded_file::{parse_embedded_file, EmbeddedFile};
+use crate::onenote::image::{parse_image, Image};
+use crate::onenote::ink::{parse_ink, Ink};
+use crate::onenote::rich_text::{parse_rich_text, RichText};
+use crate::onenote::table::{parse_table, Table};
 use crate::onestore::object_space::ObjectSpace;
 
 /// The content of an outline.
