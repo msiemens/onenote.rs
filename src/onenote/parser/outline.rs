@@ -14,7 +14,7 @@ use crate::onestore::object_space::ObjectSpace;
 /// [\[MS-ONE 2.2.20\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b25fa331-e07e-474e-99c9-b3603b7bf937
 #[derive(Clone, Debug)]
 pub struct Outline {
-    pub(crate) items_level: u8,
+    pub(crate) child_level: u8,
     pub(crate) list_spacing: Option<f32>,
     pub(crate) indents: Vec<f32>,
 
@@ -43,8 +43,8 @@ impl Outline {
     /// See [\[MS-ONE 2.3.8\]].
     ///
     /// [\[MS-ONE 2.3.8\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b631036a-9152-4385-8165-60fc324e5efd
-    pub fn items_level(&self) -> u8 {
-        self.items_level
+    pub fn child_level(&self) -> u8 {
+        self.child_level
     }
 
     /// The horizontal distance between a list index number or bullet and the outline content.
@@ -270,7 +270,7 @@ pub(crate) fn parse_outline(outline_id: ExGuid, space: &ObjectSpace) -> Result<O
 
     let outline = Outline {
         items,
-        items_level: data.child_level,
+        child_level: data.child_level,
         list_spacing: data.list_spacing,
         indents: data.outline_indent_distance.into_value(),
         alignment_in_parent: data.layout_alignment_in_parent,
