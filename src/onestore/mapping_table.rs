@@ -1,6 +1,7 @@
 use crate::fsshttpb::data::cell_id::CellId;
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::onestore::types::compact_id::CompactId;
+use itertools::Itertools;
 use std::collections::HashMap;
 
 /// The ID mapping table for an object.
@@ -8,17 +9,16 @@ use std::collections::HashMap;
 /// The specification isn't really clear on how the mapping table works. According to the spec,
 /// the mapping table maps from `CompactId`s to `ExGuid`s for objects and `CellId`s for object
 /// spaces. BUT while it specifies how to build the mapping table, it doesn't mention how it
-/// is used. From testing it looks like one should use the table _index_ to look up IDs, not the
-/// `CompactId`. This would be the way how the global ID table works with regular OneStore files
-/// which map an offset to an ID.
+/// is used. From testing it looks like there cases where a single `CompactId` maps to *multiple*
+/// `ExGuid`s/`CellId`s. In this case we will use the table _index_ as a fallback.
 ///
 /// See [\[MS-ONESTORE 2.7.8\]].
 ///
 /// [\[MS-ONESTORE 2.7.8\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/c2e58ac6-7a86-4009-a1e4-4a84cd21508f
 #[derive(Debug, Clone)]
 pub(crate) struct MappingTable {
-    objects: HashMap<usize, (CompactId, ExGuid)>,
-    object_spaces: HashMap<usize, (CompactId, CellId)>,
+    objects: HashMap<CompactId, Vec<(usize, ExGuid)>>,
+    object_spaces: HashMap<CompactId, Vec<(usize, CellId)>>,
 }
 
 impl MappingTable {
@@ -29,31 +29,48 @@ impl MappingTable {
         objects: I,
         object_spaces: J,
     ) -> MappingTable {
+        let mut objects_map: HashMap<CompactId, Vec<(usize, ExGuid)>> = HashMap::new();
+        for (cid, group) in &objects.enumerate().group_by(|(_, (cid, _))| *cid) {
+            objects_map.insert(cid, group.map(|(i, (_, id))| (i, id)).collect());
+        }
+
+        let mut object_spaces_map: HashMap<CompactId, Vec<(usize, CellId)>> = HashMap::new();
+        for (cid, group) in &object_spaces.enumerate().group_by(|(_, (cid, _))| *cid) {
+            object_spaces_map.insert(cid, group.map(|(i, (_, id))| (i, id)).collect());
+        }
+
         MappingTable {
-            objects: objects.enumerate().collect(),
-            object_spaces: object_spaces.enumerate().collect(),
+            objects: objects_map,
+            object_spaces: object_spaces_map,
         }
     }
 
-    pub(crate) fn get_object(&self, index: usize, id: CompactId) -> Option<ExGuid> {
-        self.objects
-            .get(&index)
-            .copied()
-            .map(|(entry_id, target_id)| {
-                assert_eq!(entry_id, id);
-
-                target_id
-            })
+    pub(crate) fn get_object(&self, index: usize, cid: CompactId) -> Option<ExGuid> {
+        self.get(index, cid, &self.objects)
     }
 
-    pub(crate) fn get_object_space(&self, index: usize, id: CompactId) -> Option<CellId> {
-        self.object_spaces
-            .get(&index)
-            .copied()
-            .map(|(entry_id, target_id)| {
-                assert_eq!(entry_id, id);
+    pub(crate) fn get_object_space(&self, index: usize, cid: CompactId) -> Option<CellId> {
+        self.get(index, cid, &self.object_spaces)
+    }
 
-                target_id
-            })
+    fn get<T: Copy>(
+        &self,
+        index: usize,
+        cid: CompactId,
+        table: &HashMap<CompactId, Vec<(usize, T)>>,
+    ) -> Option<T> {
+        if let Some(entries) = table.get(&cid) {
+            // Only one entry: return it!
+            if let Some((_, id)) = entries.first() {
+                return Some(*id);
+            }
+
+            // Find entry with matching table index
+            if let Some((_, id)) = entries.iter().find(|(i, _)| *i == index) {
+                return Some(*id);
+            }
+        }
+
+        None
     }
 }
