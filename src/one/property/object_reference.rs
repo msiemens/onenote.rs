@@ -17,14 +17,16 @@ impl ObjectReference {
         })?;
 
         // Find the correct object reference
+        let index = Self::get_offset(prop_type, object)?;
+
         let id = object
             .props()
             .object_ids()
             .iter()
-            .nth(Self::get_offset(prop_type, object)?)
+            .nth(index)
             .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("object id index corrupt".into()))?;
 
-        Ok(Self::resolve_id(id, object))
+        Ok(Self::resolve_id(index, id, object))
     }
 
     pub(crate) fn parse_vec(
@@ -37,12 +39,16 @@ impl ObjectReference {
                 "object reference array is not a object id array".into(),
             )
         })?;
+
+        let offset = Self::get_offset(prop_type, object)?;
+
         let object_refs = object.props().object_ids();
         let object_ids = object_refs
             .iter()
-            .skip(Self::get_offset(prop_type, object)?)
+            .skip(offset)
             .take(count as usize)
-            .flat_map(|id| Self::resolve_id(id, object))
+            .enumerate()
+            .flat_map(|(index, id)| Self::resolve_id(index + offset, id, object))
             .collect();
 
         Ok(Some(object_ids))
@@ -69,7 +75,7 @@ impl ObjectReference {
             .sum()
     }
 
-    fn resolve_id(id: &CompactId, object: &Object) -> Option<ExGuid> {
-        object.mapping().get_object(*id)
+    fn resolve_id(index: usize, id: &CompactId, object: &Object) -> Option<ExGuid> {
+        object.mapping().get_object(index, *id)
     }
 }

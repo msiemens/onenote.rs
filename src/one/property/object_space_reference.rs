@@ -19,12 +19,14 @@ impl ObjectSpaceReference {
                 "object space reference array is not a object id array".into(),
             )
         })?;
+        let offset = Self::get_offset(prop_type, object)?;
         let object_refs = object.props().object_space_ids();
         let object_space_ids = object_refs
             .iter()
-            .skip(Self::get_offset(prop_type, object)?)
+            .skip(offset)
             .take(count as usize)
-            .flat_map(|id| Self::resolve_id(id, object))
+            .enumerate()
+            .flat_map(|(index, id)| Self::resolve_id(index, id, object))
             .collect();
 
         Ok(Some(object_space_ids))
@@ -51,10 +53,10 @@ impl ObjectSpaceReference {
             .sum()
     }
 
-    fn resolve_id(id: &CompactId, object: &Object) -> Result<CellId> {
+    fn resolve_id(index: usize, id: &CompactId, object: &Object) -> Result<CellId> {
         object
             .mapping()
-            .get_object_space(*id)
+            .get_object_space(index, *id)
             .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("id not defined in mapping".into()))
             .map_err(|e| e.into())
     }
