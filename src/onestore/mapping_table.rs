@@ -1,7 +1,6 @@
 use crate::fsshttpb::data::cell_id::CellId;
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::onestore::types::compact_id::CompactId;
-use itertools::Itertools;
 use std::collections::HashMap;
 
 /// The ID mapping table for an object.
@@ -30,13 +29,13 @@ impl MappingTable {
         object_spaces: J,
     ) -> MappingTable {
         let mut objects_map: HashMap<CompactId, Vec<(usize, ExGuid)>> = HashMap::new();
-        for (cid, group) in &objects.enumerate().group_by(|(_, (cid, _))| *cid) {
-            objects_map.insert(cid, group.map(|(i, (_, id))| (i, id)).collect());
+        for (i, (cid, id)) in objects.enumerate() {
+            objects_map.entry(cid).or_default().push((i, id));
         }
 
         let mut object_spaces_map: HashMap<CompactId, Vec<(usize, CellId)>> = HashMap::new();
-        for (cid, group) in &object_spaces.enumerate().group_by(|(_, (cid, _))| *cid) {
-            object_spaces_map.insert(cid, group.map(|(i, (_, id))| (i, id)).collect());
+        for (i, (cid, id)) in object_spaces.enumerate() {
+            object_spaces_map.entry(cid).or_default().push((i, id));
         }
 
         MappingTable {
@@ -61,7 +60,7 @@ impl MappingTable {
     ) -> Option<T> {
         if let Some(entries) = table.get(&cid) {
             // Only one entry: return it!
-            if let Some((_, id)) = entries.first() {
+            if let [(_, id)] = &**entries {
                 return Some(*id);
             }
 
