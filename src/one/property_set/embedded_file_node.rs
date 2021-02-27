@@ -1,5 +1,6 @@
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
+use crate::one::property::file_type::FileType;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
@@ -7,7 +8,6 @@ use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::note_tag_container::Data as NoteTagData;
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-use crate::one::property::file_type::FileType;
 
 /// An embedded file.
 ///
