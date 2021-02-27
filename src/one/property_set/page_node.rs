@@ -31,7 +31,6 @@ pub(crate) struct Data {
     pub(crate) page_margin_bottom: Option<f32>, // FIXME: Force this?
     pub(crate) page_size: PageSize,
     pub(crate) rtl: bool,
-    pub(crate) ink_analysis: Option<ExGuid>,
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
@@ -63,7 +62,6 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
     let page_margin_bottom = simple::parse_f32(PropertyType::PageMarginBottom, object)?;
     let page_size = PageSize::parse(PropertyType::PageSize, object)?.unwrap_or_default();
     let rtl = simple::parse_bool(PropertyType::EditRootRtl, object)?.unwrap_or_default();
-    let ink_analysis = ObjectReference::parse(PropertyType::InkAnalysis, object)?;
 
     let data = Data {
         last_modified,
@@ -82,7 +80,6 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
         page_margin_bottom,
         page_size,
         rtl,
-        ink_analysis,
     };
 
     Ok(data)
