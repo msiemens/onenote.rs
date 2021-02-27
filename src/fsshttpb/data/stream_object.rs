@@ -61,11 +61,14 @@ impl ObjectHeader {
 
         let compound = data & 0x4 == 0x4;
         let object_type_value = (data >> 3) & 0x3f;
-        let object_type = ObjectType::from_u16(object_type_value).ok_or_else(|| {
-            ErrorKind::MalformedFssHttpBData(
+        let object_type = if let Some(object_type) = ObjectType::from_u16(object_type_value) {
+            object_type
+        } else {
+            return Err(ErrorKind::MalformedFssHttpBData(
                 format!("invalid object type: 0x{:x}", object_type_value).into(),
             )
-        })?;
+            .into());
+        };
         let length = (data >> 9) as u64;
 
         Ok(ObjectHeader {
@@ -101,11 +104,14 @@ impl ObjectHeader {
 
         let compound = data & 0x4 == 0x4;
         let object_type_value = (data >> 3) & 0x3fff;
-        let object_type = ObjectType::from_u32(object_type_value).ok_or_else(|| {
-            ErrorKind::MalformedFssHttpBData(
+        let object_type = if let Some(object_type) = ObjectType::from_u32(object_type_value) {
+            object_type
+        } else {
+            return Err(ErrorKind::MalformedFssHttpBData(
                 format!("invalid object type: 0x{:x}", object_type_value).into(),
             )
-        })?;
+            .into());
+        };
         let mut length = (data >> 17) as u64;
 
         if length == 0x7fff {
@@ -143,12 +149,15 @@ impl ObjectHeader {
         }
 
         let object_type_value = data >> 2;
-        ObjectType::from_u16(object_type_value).ok_or_else(|| {
-            ErrorKind::MalformedFssHttpBData(
+
+        if let Some(object_type) = ObjectType::from_u16(object_type_value) {
+            Ok(object_type)
+        } else {
+            Err(ErrorKind::MalformedFssHttpBData(
                 format!("invalid object type: 0x{:x}", object_type_value).into(),
             )
-            .into()
-        })
+            .into())
+        }
     }
 
     pub(crate) fn try_parse_end_8(reader: Reader, object_type: ObjectType) -> Result<()> {
@@ -175,12 +184,15 @@ impl ObjectHeader {
         }
 
         let object_type_value = data >> 2;
-        ObjectType::from_u8(object_type_value).ok_or_else(|| {
-            ErrorKind::MalformedFssHttpBData(
+
+        if let Some(object_type) = ObjectType::from_u8(object_type_value) {
+            Ok(object_type)
+        } else {
+            Err(ErrorKind::MalformedFssHttpBData(
                 format!("invalid object type: 0x{:x}", object_type_value).into(),
             )
-            .into()
-        })
+            .into())
+        }
     }
 
     pub(crate) fn has_end_8(reader: Reader, object_type: ObjectType) -> Result<bool> {
