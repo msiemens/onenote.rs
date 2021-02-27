@@ -2,7 +2,7 @@ use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::cell_id::CellId;
 use crate::fsshttpb::data_element::storage_index::StorageIndex;
 use crate::fsshttpb::data_element::storage_manifest::StorageManifest;
-use crate::fsshttpb::packaging::Packaging;
+use crate::fsshttpb::packaging::OneStorePackaging;
 use crate::onestore::header::StoreHeader;
 use crate::onestore::object_space::{ObjectSpace, Revision};
 use crate::shared::guid::Guid;
@@ -37,7 +37,7 @@ impl<'a> OneStore<'a> {
     }
 }
 
-pub(crate) fn parse_store(package: &Packaging) -> Result<OneStore> {
+pub(crate) fn parse_store(package: &OneStorePackaging) -> Result<OneStore> {
     let mut parsed_object_spaces = HashSet::new();
 
     // [ONESTORE] 2.7.1: Parse storage manifest
@@ -120,7 +120,7 @@ pub(crate) fn parse_store(package: &Packaging) -> Result<OneStore> {
 fn parse_object_space<'a, 'b>(
     cell_id: CellId,
     storage_index: &'a StorageIndex,
-    package: &'a Packaging,
+    package: &'a OneStorePackaging,
     revision_cache: &'b mut HashMap<CellId, Revision<'a>>,
 ) -> Result<(CellId, ObjectSpace<'a>)> {
     let mapping = storage_index

@@ -3,7 +3,7 @@ use crate::fsshttpb::data::cell_id::CellId;
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::fsshttpb::data_element::object_group::ObjectGroupData;
 use crate::fsshttpb::data_element::storage_index::{StorageIndex, StorageIndexCellMapping};
-use crate::fsshttpb::packaging::Packaging;
+use crate::fsshttpb::packaging::OneStorePackaging;
 use crate::onestore::object::Object;
 use crate::onestore::revision_role::RevisionRole;
 use std::collections::HashMap;
@@ -54,7 +54,7 @@ impl<'a, 'b> ObjectSpace<'a> {
     pub(crate) fn parse(
         mapping: &'a StorageIndexCellMapping,
         storage_index: &'a StorageIndex,
-        packaging: &'a Packaging,
+        packaging: &'a OneStorePackaging,
         revision_cache: &'b mut HashMap<CellId, Revision<'a>>,
     ) -> Result<(CellId, ObjectSpace<'a>)> {
         let cell_id = mapping.cell_id;
@@ -106,7 +106,7 @@ impl<'a, 'b> ObjectSpace<'a> {
         context_id: ExGuid,
         object_space_id: ExGuid,
         storage_index: &'a StorageIndex,
-        packaging: &'a Packaging,
+        packaging: &'a OneStorePackaging,
         revision_cache: &'b mut HashMap<CellId, Revision<'a>>,
         objects: &'b mut HashMap<ExGuid, Object<'a>>,
         roots: &'b mut HashMap<RevisionRole, ExGuid>,
@@ -157,7 +157,7 @@ impl<'a, 'b> ObjectSpace<'a> {
         context_id: ExGuid,
         group_id: ExGuid,
         object_space_id: ExGuid,
-        packaging: &'a Packaging,
+        packaging: &'a OneStorePackaging,
         objects: &'b mut HashMap<ExGuid, Object<'a>>,
     ) -> Result<()> {
         let group = packaging
@@ -200,7 +200,10 @@ impl<'a, 'b> ObjectSpace<'a> {
         Ok(())
     }
 
-    fn find_cell_manifest_id(cell_manifest_id: ExGuid, packaging: &'a Packaging) -> Option<ExGuid> {
+    fn find_cell_manifest_id(
+        cell_manifest_id: ExGuid,
+        packaging: &'a OneStorePackaging,
+    ) -> Option<ExGuid> {
         packaging
             .data_element_package
             .cell_manifests

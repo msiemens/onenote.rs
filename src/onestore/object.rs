@@ -1,7 +1,7 @@
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::fsshttpb::data_element::object_group::ObjectGroupData;
-use crate::fsshttpb::packaging::Packaging;
+use crate::fsshttpb::packaging::OneStorePackaging;
 use crate::onestore::mapping_table::MappingTable;
 use crate::onestore::object_space::GroupData;
 use crate::onestore::types::jcid::JcId;
@@ -59,7 +59,7 @@ impl<'a> Object<'a> {
         context_id: ExGuid,
         object_space_id: ExGuid,
         objects: &'b GroupData,
-        packaging: &'a Packaging,
+        packaging: &'a OneStorePackaging,
     ) -> Result<Object<'a>> {
         let metadata_object = Object::find_object(object_id, Partition::Metadata, objects)
             .ok_or_else(|| ErrorKind::MalformedOneStoreData("object metadata is missing".into()))?;

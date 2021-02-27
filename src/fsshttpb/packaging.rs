@@ -12,7 +12,7 @@ use crate::Reader;
 ///
 /// [\[MS-ONESTORE\] 2.8.1]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/a2f046ea-109a-49c4-912d-dc2888cf0565
 #[derive(Debug)]
-pub(crate) struct Packaging {
+pub(crate) struct OneStorePackaging {
     pub(crate) file_type: Guid,
     pub(crate) file: Guid,
     pub(crate) legacy_file_version: Guid,
@@ -22,8 +22,8 @@ pub(crate) struct Packaging {
     pub(crate) data_element_package: DataElementPackage,
 }
 
-impl Packaging {
-    pub(crate) fn parse(reader: Reader) -> Result<Packaging> {
+impl OneStorePackaging {
+    pub(crate) fn parse(reader: Reader) -> Result<OneStorePackaging> {
         let file_type = Guid::parse(reader)?;
         let file = Guid::parse(reader)?;
         let legacy_file_version = Guid::parse(reader)?;
@@ -48,7 +48,7 @@ impl Packaging {
 
         ObjectHeader::try_parse_end_16(reader, ObjectType::OneNotePackaging)?;
 
-        Ok(Packaging {
+        Ok(OneStorePackaging {
             file_type,
             file,
             legacy_file_version,

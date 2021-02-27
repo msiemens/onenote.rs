@@ -1,5 +1,5 @@
 use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::packaging::Packaging;
+use crate::fsshttpb::packaging::OneStorePackaging;
 use crate::onenote::notebook::Notebook;
 use crate::onenote::section::{Section, SectionEntry, SectionGroup};
 use crate::onestore::parse_store;
@@ -41,7 +41,7 @@ impl Parser {
     pub fn parse_notebook(&mut self, path: &Path) -> Result<Notebook> {
         let file = File::open(path)?;
         let data = Parser::read(file)?;
-        let packaging = Packaging::parse(&mut Reader::new(data.as_slice()))?;
+        let packaging = OneStorePackaging::parse(&mut Reader::new(data.as_slice()))?;
         let store = parse_store(&packaging)?;
 
         if store.schema_guid() != guid!({E4DBFD38-E5C7-408B-A8A1-0E7B421E1F5F}) {
@@ -82,7 +82,7 @@ impl Parser {
     pub fn parse_section(&mut self, path: &Path) -> Result<Section> {
         let file = File::open(path)?;
         let data = Parser::read(file)?;
-        let packaging = Packaging::parse(&mut Reader::new(data.as_slice()))?;
+        let packaging = OneStorePackaging::parse(&mut Reader::new(data.as_slice()))?;
         let store = parse_store(&packaging)?;
 
         if store.schema_guid() != guid!({1F937CB4-B26F-445F-B9F8-17E20160E461}) {
