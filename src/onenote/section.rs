@@ -66,12 +66,11 @@ pub(crate) fn parse_section(store: OneStore, filename: String) -> Result<Section
     let metadata = parse_metadata(store.data_root())?;
     let content = parse_content(store.data_root())?;
 
-    let display_name = metadata.display_name.unwrap_or_else(|| {
-        filename
-            .strip_suffix(".one")
-            .unwrap_or(&*filename)
-            .to_string()
-    });
+    let display_name = metadata
+        .display_name
+        .unwrap_or(filename)
+        .trim_end_matches(".one")
+        .to_string();
 
     let page_series = content
         .page_series
