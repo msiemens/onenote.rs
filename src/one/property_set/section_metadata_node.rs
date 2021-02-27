@@ -4,6 +4,11 @@ use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+/// A section's metadata.
+///
+/// See [\[MS-ONE\] 2.2.31].
+///
+/// [\[MS-ONE\] 2.2.31]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/c8cd2fe2-593b-45f8-8da0-03ca6f6f704d
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) schema_revision_in_order_to_read: u32,

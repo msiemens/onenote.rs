@@ -7,9 +7,9 @@ use crate::onestore::object_space::ObjectSpace;
 
 /// An embedded file.
 ///
-/// See [\[MS-ONE 2.2.32\]].
+/// See [\[MS-ONE\] 2.2.32].
 ///
-/// [\[MS-ONE 2.2.32\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/a665b5ad-ff40-4c0c-9e42-4b707254dc3f
+/// [\[MS-ONE\] 2.2.32]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/a665b5ad-ff40-4c0c-9e42-4b707254dc3f
 #[derive(Clone, PartialEq, PartialOrd, Debug)]
 pub struct EmbeddedFile {
     pub(crate) filename: String,
@@ -28,18 +28,18 @@ pub struct EmbeddedFile {
 impl EmbeddedFile {
     /// The embedded file's original file name.
     ///
-    /// See [\[MS-ONE 2.2.71\]].
+    /// See [\[MS-ONE\] 2.2.71].
     ///
-    /// [\[MS-ONE 2.2.71\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/9c3409c0-0d81-42a8-bd97-d02a5b130b7d
+    /// [\[MS-ONE\] 2.2.71]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/9c3409c0-0d81-42a8-bd97-d02a5b130b7d
     pub fn filename(&self) -> &str {
         &self.filename
     }
 
     /// The file type.
     ///
-    /// See [\[MS-ONE 2.3.62\]].
+    /// See [\[MS-ONE\] 2.3.62].
     ///
-    /// [\[MS-ONE 2.3.62\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/112836a0-ed3b-4be1-bc4b-49f0f7b02295
+    /// [\[MS-ONE\] 2.3.62]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/112836a0-ed3b-4be1-bc4b-49f0f7b02295
     pub fn file_type(&self) -> &FileType {
         &self.file_type
     }
@@ -51,36 +51,36 @@ impl EmbeddedFile {
 
     /// The max width of the embedded file's icon in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.21\]].
+    /// See [\[MS-ONE\] 2.3.21].
     ///
-    /// [\[MS-ONE 2.3.21\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/2561c763-93b8-4b64-b6c7-1b86335d5b85
+    /// [\[MS-ONE\] 2.3.21]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/2561c763-93b8-4b64-b6c7-1b86335d5b85
     pub fn layout_max_width(&self) -> Option<f32> {
         self.layout_max_width
     }
 
     /// The max height of the embedded file's icon in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.23\]].
+    /// See [\[MS-ONE\] 2.3.23].
     ///
-    /// [\[MS-ONE 2.3.23\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/ce514d53-1229-4e77-9908-ef8de1761ceb
+    /// [\[MS-ONE\] 2.3.23]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/ce514d53-1229-4e77-9908-ef8de1761ceb
     pub fn layout_max_height(&self) -> Option<f32> {
         self.layout_max_height
     }
 
     /// The horizontal offset from the page origin in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.18\]].
+    /// See [\[MS-ONE\] 2.3.18].
     ///
-    /// [\[MS-ONE 2.3.18\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5fb9e84a-c9e9-4537-ab14-e5512f24669a
+    /// [\[MS-ONE\] 2.3.18]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5fb9e84a-c9e9-4537-ab14-e5512f24669a
     pub fn offset_horizontal(&self) -> Option<f32> {
         self.offset_horizontal
     }
 
     /// The vertical offset from the page origin in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.19\]].
+    /// See [\[MS-ONE\] 2.3.19].
     ///
-    /// [\[MS-ONE 2.3.19\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5c4992ba-1db5-43e9-83dd-7299c562104d
+    /// [\[MS-ONE\] 2.3.19]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5c4992ba-1db5-43e9-83dd-7299c562104d
     pub fn offset_vertical(&self) -> Option<f32> {
         self.offset_vertical
     }

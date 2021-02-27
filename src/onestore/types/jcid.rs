@@ -2,6 +2,11 @@ use crate::errors::Result;
 use crate::Reader;
 use std::fmt;
 
+/// An object type.
+///
+/// See [\[MS-ONESTORE\] 2.6.14].
+///
+/// [\[MS-ONESTORE\] 6.14.2]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/388c266c-08e4-4ea4-af0e-5e2c5d1b995c
 #[derive(Copy, Clone, PartialEq)]
 pub(crate) struct JcId(pub(crate) u32);
 

@@ -1,6 +1,11 @@
 use crate::errors::Result;
 use crate::Reader;
 
+/// An object stream header.
+///
+/// See [\[MS-ONESTORE\] 2.6.5].
+///
+/// [\[MS-ONESTORE\] 2.6.5]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/34497a17-3623-4e1d-9488-a2e111a9a279
 #[derive(Debug)]
 pub(crate) struct ObjectStreamHeader {
     pub(crate) count: u32,

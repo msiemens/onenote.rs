@@ -10,9 +10,9 @@ use crate::onestore::object_space::ObjectSpace;
 
 /// A table.
 ///
-/// See [\[MS-ONE 2.2.26\]].
+/// See [\[MS-ONE\] 2.2.26].
 ///
-/// [\[MS-ONE 2.2.26\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/9046980a-2410-4b2d-8a35-ec06e55648e0
+/// [\[MS-ONE\] 2.2.26]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/9046980a-2410-4b2d-8a35-ec06e55648e0
 #[derive(Clone, Debug)]
 pub struct Table {
     pub(crate) rows: u32,
@@ -54,45 +54,45 @@ impl Table {
     /// table.cols_locked()[c / 8] & (1 << (c % 8)) == 1;
     /// ```
     ///
-    /// See [\[MS-ONE 2.3.70\]].
+    /// See [\[MS-ONE\] 2.3.70].
     ///
-    /// [\[MS-ONE 2.3.70\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/465c1f7c-63be-4d8b-a8de-76924afe92c2
+    /// [\[MS-ONE\] 2.3.70]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/465c1f7c-63be-4d8b-a8de-76924afe92c2
     pub fn cols_locked(&self) -> &[u8] {
         &self.cols_locked
     }
 
     /// The column widths in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.66\]].
+    /// See [\[MS-ONE\] 2.3.66].
     ///
-    /// [\[MS-ONE 2.3.66\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/aea7e232-e7f3-444b-8d2c-e8f46fa8cc59
+    /// [\[MS-ONE\] 2.3.66]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/aea7e232-e7f3-444b-8d2c-e8f46fa8cc59
     pub fn col_widths(&self) -> &[f32] {
         &self.col_widths
     }
 
     /// Whether the table borders are visible.
     ///
-    /// See [\[MS-ONE 2.3.65\]].
+    /// See [\[MS-ONE\] 2.3.65].
     ///
-    /// [\[MS-ONE 2.3.65\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/37be8f3c-e015-4c45-be99-615a669439b8
+    /// [\[MS-ONE\] 2.3.65]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/37be8f3c-e015-4c45-be99-615a669439b8
     pub fn borders_visible(&self) -> bool {
         self.borders_visible
     }
 
     /// The table's alignment relative to the containing outline element (if present).
     ///
-    /// See [\[MS-ONE 2.3.27\]].
+    /// See [\[MS-ONE\] 2.3.27].
     ///
-    /// [\[MS-ONE 2.3.27\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/61fa50be-c355-4b8d-ac01-761a2f7f66c0
+    /// [\[MS-ONE\] 2.3.27]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/61fa50be-c355-4b8d-ac01-761a2f7f66c0
     pub fn layout_alignment_in_parent(&self) -> Option<LayoutAlignment> {
         self.layout_alignment_in_parent
     }
 
     /// The table's alignment.
     ///
-    /// See [\[MS-ONE 2.3.33\]].
+    /// See [\[MS-ONE\] 2.3.33].
     ///
-    /// [\[MS-ONE 2.3.33\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4e7fe9db-2fdb-4239-b291-dc4b909c94ad
+    /// [\[MS-ONE\] 2.3.33]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4e7fe9db-2fdb-4239-b291-dc4b909c94ad
     pub fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
         self.layout_alignment_self
     }
@@ -105,9 +105,9 @@ impl Table {
 
 /// A table row.
 ///
-/// See [\[MS-ONE 2.2.27\]].
+/// See [\[MS-ONE\] 2.2.27].
 ///
-/// [\[MS-ONE 2.2.27\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/d22af1aa-5e0b-40ed-b914-f6397979d6b0
+/// [\[MS-ONE\] 2.2.27]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/d22af1aa-5e0b-40ed-b914-f6397979d6b0
 #[derive(Clone, Debug)]
 pub struct TableRow {
     pub(crate) contents: Vec<TableCell>,
@@ -122,9 +122,9 @@ impl TableRow {
 
 /// A table cell.
 ///
-/// See [\[MS-ONE 2.2.28\]].
+/// See [\[MS-ONE\] 2.2.28].
 ///
-/// [\[MS-ONE 2.2.28\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/e5660d6b-72c3-4d9f-bad0-435c00f42183
+/// [\[MS-ONE\] 2.2.28]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/e5660d6b-72c3-4d9f-bad0-435c00f42183
 #[derive(Clone, Debug)]
 pub struct TableCell {
     pub(crate) contents: Vec<OutlineElement>,
@@ -142,18 +142,18 @@ impl TableCell {
 
     /// The content's max width in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.22\]].
+    /// See [\[MS-ONE\] 2.3.22].
     ///
-    /// [\[MS-ONE 2.3.22\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/a770ac4b-2225-4aa6-ba92-d3a51f97c405
+    /// [\[MS-ONE\] 2.3.22]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/a770ac4b-2225-4aa6-ba92-d3a51f97c405
     pub fn layout_max_width(&self) -> Option<f32> {
         self.layout_max_width
     }
 
     /// The indentation size for the table cell contents.
     ///
-    /// See [\[MS-ONE 2.2.2\]].
+    /// See [\[MS-ONE\] 2.2.2].
     ///
-    /// [\[MS-ONE 2.2.2\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/269a3e7b-d85a-4ba8-8e1d-d85e1c840772
+    /// [\[MS-ONE\] 2.2.2]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/269a3e7b-d85a-4ba8-8e1d-d85e1c840772
     pub fn outline_indent_distance(&self) -> &OutlineIndentDistance {
         &self.outline_indent_distance
     }

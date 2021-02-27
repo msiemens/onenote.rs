@@ -1,6 +1,11 @@
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 
+/// A revision's role.
+///
+/// See [\[MS-ONESTORE\] 2.7.4]
+///
+/// [\[MS-ONESTORE\] 2.7.4]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/344c9aa5-2826-4b61-b1bb-1ef841b1b79e
 #[derive(Debug, PartialEq, Hash, Eq, Copy, Clone)]
 pub(crate) enum RevisionRole {
     DefaultContent,

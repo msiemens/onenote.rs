@@ -4,6 +4,7 @@ use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+/// An ink stroke's properties.
 #[allow(dead_code)]
 pub(crate) struct Data {
     pub(crate) aliased: bool,

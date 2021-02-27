@@ -7,6 +7,11 @@ use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+/// A page title.
+///
+/// See [\[MS-ONE\] 2.2.29].
+///
+/// [\[MS-ONE\] 2.2.29]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/08bd4fd5-59fb-4568-9c82-d2d5280eced8
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) last_modified_time: Time,

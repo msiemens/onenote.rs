@@ -8,6 +8,11 @@ use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 use crate::reader::Reader;
 
+/// An outline group.
+///
+/// See [\[MS-ONE\] 2.2.20].
+///
+/// [\[MS-ONE\] 2.2.20]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b25fa331-e07e-474e-99c9-b3603b7bf937
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) last_modified: Time,

@@ -9,6 +9,11 @@ use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 use crate::shared::guid::Guid;
 
+/// A page series.
+///
+/// See [\[MS-ONE\] 2.2.18].
+///
+/// [\[MS-ONE\] 2.2.18]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/e2957d3b-a2a8-4756-8662-4e67fefa9f4e
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) entity_guid: Guid,

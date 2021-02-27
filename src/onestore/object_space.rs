@@ -10,6 +10,13 @@ use std::collections::HashMap;
 
 pub(crate) type GroupData<'a> = HashMap<(ExGuid, u64), &'a ObjectGroupData>;
 
+/// A OneNote object space.
+///
+/// Typically this is a section's metadata or a page and its content.
+///
+/// See [\[MS-ONESTOR\] 2.1.4]
+///
+/// [\[MS-ONESTOR\] 2.1.4]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/1329433f-02a5-4e83-ab41-80d57ade38d9
 #[derive(Debug)]
 pub(crate) struct ObjectSpace<'a> {
     id: ExGuid,
@@ -32,6 +39,11 @@ impl<'a> ObjectSpace<'a> {
     }
 }
 
+/// A OneNote file revision.
+///
+/// See [\[MS-ONESTOR\] 2.1.8]
+///
+/// [\[MS-ONESTOR\] 2.1.8]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/a8ca2a90-d92a-4cf7-bf68-ed18ae476a11
 #[derive(Debug, Clone)]
 pub(crate) struct Revision<'a> {
     objects: HashMap<ExGuid, Object<'a>>,

@@ -8,6 +8,11 @@ use crate::one::property_set::note_tag_container::Data as NoteTagData;
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+/// An embedded file.
+///
+/// See [\[MS-ONE\] 2.2.32].
+///
+/// [\[MS-ONE\] 2.2.32]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/a665b5ad-ff40-4c0c-9e42-4b707254dc3f
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) last_modified: Time,
@@ -33,9 +38,9 @@ pub(crate) struct Data {
 
 /// An embedded file's file type.
 ///
-/// See [\[MS-ONE 2.3.62\]].
+/// See [\[MS-ONE\] 2.3.62].
 ///
-/// [\[MS-ONE 2.3.62\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/112836a0-ed3b-4be1-bc4b-49f0f7b02295
+/// [\[MS-ONE\] 2.3.62]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/112836a0-ed3b-4be1-bc4b-49f0f7b02295
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum FileType {
     /// Unknown

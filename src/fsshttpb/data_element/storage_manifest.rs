@@ -8,6 +8,11 @@ use crate::shared::guid::Guid;
 use crate::Reader;
 use std::collections::HashMap;
 
+/// A storage manifest.
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.12.3]
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.12.3]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/a681199b-45f3-4378-b929-fb13e674ac5c
 #[derive(Debug)]
 pub(crate) struct StorageManifest {
     pub(crate) id: Guid,

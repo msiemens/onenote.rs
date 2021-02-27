@@ -2,6 +2,15 @@ use enum_primitive_derive::Primitive;
 use num_traits::ToPrimitive;
 use std::fmt;
 
+/// Stream object types.
+///
+/// While the FSSHTTPB protocol specified more object types than listed here, we only need a limited
+/// number of them to parse OneNote files stored in FSSHTTPB format.
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.5.1] and [\[MS-FSSHTTPB\] 2.2.1.5.2].
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.5.1]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/a1017f48-a888-49ff-b71d-cc3c707f753a
+/// [\[MS-FSSHTTPB\] 2.2.1.5.2]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/ac629d63-60a1-49b2-9db2-fa3c19971cc9
 #[derive(Debug, Primitive, PartialEq)]
 pub enum ObjectType {
     CellManifest = 0x0B,
@@ -18,6 +27,11 @@ pub enum ObjectType {
     ObjectGroupMetadata = 0x078,
     ObjectGroupMetadataBlock = 0x79,
     ObjectGroupObject = 0x18,
+    /// An indicator that the object contains a OneNote packing object.
+    ///
+    /// See [\[MS-ONESTORE\] 2.8.1] (look for _Packaging Start_)
+    ///
+    /// [\[MS-ONESTORE\] 2.8.1]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/a2f046ea-109a-49c4-912d-dc2888cf0565
     OneNotePackaging = 0x7a,
     RevisionManifest = 0x1A,
     RevisionManifestGroupReference = 0x19,

@@ -6,6 +6,11 @@ use crate::fsshttpb::data::stream_object::ObjectHeader;
 use crate::fsshttpb::data_element::DataElement;
 use crate::Reader;
 
+/// A data element fragment.
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.12.7].
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.12.7]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/9a860e3b-cf61-484b-8ee3-d875afaf7a05
 #[derive(Debug)]
 pub(crate) struct DataElementFragment {
     pub(crate) id: ExGuid,
@@ -21,6 +26,11 @@ pub(crate) struct DataElementFragmentChunkReference {
 }
 
 impl DataElement {
+    /// Parse a data element fragment.
+    ///
+    /// See [\[MS-FSSHTTPB\] 2.2.1.12.7]
+    ///
+    /// [\[MS-FSSHTTPB\] 2.2.1.12.7]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/9a860e3b-cf61-484b-8ee3-d875afaf7a05
     pub(crate) fn parse_data_element_fragment(reader: Reader) -> Result<DataElementFragment> {
         ObjectHeader::try_parse(reader, ObjectType::DataElementFragment)?;
 

@@ -12,9 +12,9 @@ use crate::onestore::object_space::ObjectSpace;
 
 /// A note tag.
 ///
-/// See [\[MS-ONE 2.2.42\]].
+/// See [\[MS-ONE\] 2.2.42].
 ///
-/// [\[MS-ONE 2.2.42\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/283e1611-05cb-4468-9be1-2879a3d1c17d
+/// [\[MS-ONE\] 2.2.42]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/283e1611-05cb-4468-9be1-2879a3d1c17d
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct NoteTag {
     completed_at: Option<Time>,
@@ -27,9 +27,9 @@ impl NoteTag {
     ///
     /// Only set for task-like note tags.
     ///
-    /// See [\[MS-ONE 2.3.90\]].
+    /// See [\[MS-ONE\] 2.3.90].
     ///
-    /// [\[MS-ONE 2.3.90\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/2261a830-3dee-42a8-ab85-97686ebe35bc
+    /// [\[MS-ONE\] 2.3.90]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/2261a830-3dee-42a8-ab85-97686ebe35bc
     pub fn completed_at(&self) -> Option<Time> {
         self.completed_at
     }
@@ -47,9 +47,9 @@ impl NoteTag {
 
 /// The definition of a note tag.
 ///
-/// See [\[MS-ONE 2.3.41\]].
+/// See [\[MS-ONE\] 2.3.41].
 ///
-/// [\[MS-ONE 2.3.41\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/eb5f52d2-c507-45c8-9bda-f8c74d34533a
+/// [\[MS-ONE\] 2.3.41]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/eb5f52d2-c507-45c8-9bda-f8c74d34533a
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct NoteTagDefinition {
     label: String,

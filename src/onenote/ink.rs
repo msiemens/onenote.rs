@@ -28,18 +28,18 @@ impl Ink {
 
     /// The horizontal offset from the page origin in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.18\]].
+    /// See [\[MS-ONE\] 2.3.18].
     ///
-    /// [\[MS-ONE 2.3.18\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5fb9e84a-c9e9-4537-ab14-e5512f24669a
+    /// [\[MS-ONE\] 2.3.18]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5fb9e84a-c9e9-4537-ab14-e5512f24669a
     pub fn offset_horizontal(&self) -> Option<f32> {
         self.offset_horizontal
     }
 
     /// The vertical offset from the page origin in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.19\]].
+    /// See [\[MS-ONE\] 2.3.19].
     ///
-    /// [\[MS-ONE 2.3.19\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5c4992ba-1db5-43e9-83dd-7299c562104d
+    /// [\[MS-ONE\] 2.3.19]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5c4992ba-1db5-43e9-83dd-7299c562104d
     pub fn offset_vertical(&self) -> Option<f32> {
         self.offset_vertical
     }

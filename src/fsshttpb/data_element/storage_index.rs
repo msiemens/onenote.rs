@@ -8,6 +8,11 @@ use crate::fsshttpb::data_element::DataElement;
 use crate::Reader;
 use std::collections::HashMap;
 
+/// A storage index.
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.12.2]
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.12.2]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/f5724986-bd0f-488d-9b85-7d5f954d8e9a
 #[derive(Debug)]
 pub(crate) struct StorageIndex {
     pub(crate) manifest_mappings: Vec<StorageIndexManifestMapping>,
@@ -27,12 +32,14 @@ impl StorageIndex {
     }
 }
 
+/// A storage indexes manifest mapping.
 #[derive(Debug)]
 pub(crate) struct StorageIndexManifestMapping {
     pub(crate) mapping_id: ExGuid,
     pub(crate) serial: SerialNumber,
 }
 
+/// A storage indexes cell mapping.
 #[derive(Debug)]
 pub(crate) struct StorageIndexCellMapping {
     pub(crate) cell_id: CellId,
@@ -40,6 +47,7 @@ pub(crate) struct StorageIndexCellMapping {
     pub(crate) serial: SerialNumber,
 }
 
+/// A storage indexes revision mapping.
 #[derive(Debug)]
 pub(crate) struct StorageIndexRevisionMapping {
     pub(crate) revision_mapping: ExGuid,

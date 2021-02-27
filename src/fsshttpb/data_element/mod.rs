@@ -22,6 +22,11 @@ pub(crate) mod revision_manifest;
 pub(crate) mod storage_index;
 pub(crate) mod storage_manifest;
 
+/// A FSSHTTPB data element package.
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.12].
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.12]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/99a25464-99b5-4262-a964-baabed2170eb
 #[derive(Debug)]
 pub(crate) struct DataElementPackage {
     pub(crate) storage_indexes: HashMap<ExGuid, StorageIndex>,
@@ -64,6 +69,7 @@ impl DataElementPackage {
         Ok(package)
     }
 
+    /// Look up the object groups referenced by a cell.
     pub(crate) fn find_objects(
         &self,
         cell: ExGuid,
@@ -94,31 +100,42 @@ impl DataElementPackage {
             .collect::<Result<_>>()
     }
 
+    /// Look up a blob by its ID.
     pub(crate) fn find_blob(&self, id: ExGuid) -> Option<&[u8]> {
         self.object_data_blobs.get(&id).map(|blob| blob.value())
     }
 
+    /// Find the first storage index.
     pub(crate) fn find_storage_index(&self) -> Option<&StorageIndex> {
         self.storage_indexes.values().next()
     }
 
+    /// Find the first storage manifest.
     pub(crate) fn find_storage_manifest(&self) -> Option<&StorageManifest> {
         self.storage_manifests.values().next()
     }
 
+    /// Look up a cell revision ID by the cell's manifest ID.
     pub(crate) fn find_cell_revision_id(&self, id: ExGuid) -> Option<ExGuid> {
         self.cell_manifests.get(&id).copied()
     }
 
+    /// Look up a revision manifest by its ID.
     pub(crate) fn find_revision_manifest(&self, id: ExGuid) -> Option<&RevisionManifest> {
         self.revision_manifests.get(&id)
     }
 
+    /// Look up an object group by its ID.
     pub(crate) fn find_object_group(&self, id: ExGuid) -> Option<&ObjectGroup> {
         self.object_groups.get(&id)
     }
 }
 
+/// A parser for a single data element.
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.12.1]
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.12.1]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/f0901ac0-4f26-413f-805b-a6830781f64c
 #[derive(Debug)]
 pub(crate) struct DataElement;
 

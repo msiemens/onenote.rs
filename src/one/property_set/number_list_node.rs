@@ -6,6 +6,11 @@ use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 use std::char::{decode_utf16, REPLACEMENT_CHARACTER};
 
+/// A number list definition.
+///
+/// See [\[MS-ONE\] 2.2.25].
+///
+/// [\[MS-ONE\] 2.2.25]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/1a141e7a-4455-4971-bf0b-1621e221984e
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) last_modified: Time,

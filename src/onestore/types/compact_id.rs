@@ -1,6 +1,11 @@
 use crate::errors::Result;
 use crate::Reader;
 
+/// A compact reference to an ID in the mapping table.
+///
+/// See [\[MS-ONESTORE\] 2.2.2].
+///
+/// [\[MS-ONESTORE\] 2.2.2]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/8de02f24-9b9c-48a9-bd26-5c0230814bf4
 #[derive(Debug, Hash, Eq, PartialEq, Copy, Clone)]
 pub(crate) struct CompactId {
     n: u8,

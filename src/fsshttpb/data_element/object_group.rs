@@ -9,6 +9,11 @@ use crate::fsshttpb::data_element::DataElement;
 use crate::Reader;
 use std::fmt;
 
+/// An object group.
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.12.6]
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.12.6]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/21404be6-0334-490e-80b5-82fccb9c04af
 #[derive(Debug)]
 pub(crate) struct ObjectGroup {
     pub(crate) declarations: Vec<ObjectGroupDeclaration>,
@@ -16,6 +21,11 @@ pub(crate) struct ObjectGroup {
     pub(crate) objects: Vec<ObjectGroupData>,
 }
 
+/// An object group declaration.
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.12.6.1]
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.12.6.1]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/ef660e4b-a099-4e76-81f7-ed5c04a70caa
 #[derive(Debug)]
 pub(crate) enum ObjectGroupDeclaration {
     Object {
@@ -50,6 +60,12 @@ impl ObjectGroupDeclaration {
     }
 }
 
+/// An object group's metadata.
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.12.6.3] and [\[MS-FSSHTTPB\] 2.2.1.12.6.3.1]
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.12.6.3]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/d35a8e21-e139-455c-a20b-3f47a5d9fb89
+/// [\[MS-FSSHTTPB\] 2.2.1.12.6.3.1]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/507c6b42-2772-4319-b530-8fbbf4d34afd
 #[derive(Debug)]
 pub(crate) struct ObjectGroupMetadata {
     pub(crate) change_frequency: ObjectChangeFrequency,
@@ -79,17 +95,33 @@ impl ObjectChangeFrequency {
     }
 }
 
+/// An object group's data.
 pub(crate) enum ObjectGroupData {
+    /// An object.
+    ///
+    /// See [\[MS-FSSHTTPB\] 2.2.1.12.6.4]
+    ///
+    /// [\[MS-FSSHTTPB\] 2.2.1.12.6.4]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/d542b89c-9e81-4af6-885a-47b2f9c1ce53
     Object {
         group: Vec<ExGuid>,
         cells: Vec<CellId>,
         data: Vec<u8>,
     },
+    /// An excluded object.
+    ///
+    /// See [\[MS-FSSHTTPB\] 2.2.1.12.6.4]
+    ///
+    /// [\[MS-FSSHTTPB\] 2.2.1.12.6.4]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/d542b89c-9e81-4af6-885a-47b2f9c1ce53
     ObjectExcluded {
         group: Vec<ExGuid>,
         cells: Vec<CellId>,
         size: u64,
     },
+    /// A blob reference.
+    ///
+    /// See [\[MS-FSSHTTPB\] 2.2.1.12.6.5]
+    ///
+    /// [\[MS-FSSHTTPB\] 2.2.1.12.6.5]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/9f73af5e-bd70-4703-8ec6-1866338f1b91
     BlobReference {
         objects: Vec<ExGuid>,
         cells: Vec<CellId>,

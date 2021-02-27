@@ -8,6 +8,11 @@ use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+/// A page.
+///
+/// See [\[MS-ONE\] 2.2.19].
+///
+/// [\[MS-ONE\] 2.2.19]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/e381b7c7-b434-43a2-ba23-0d08bafd281a
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) last_modified: Option<Time>,

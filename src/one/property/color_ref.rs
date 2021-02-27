@@ -3,6 +3,10 @@ use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
 /// An RGB color value.
+///
+/// See [\[MS-ONE\] 2.2.8]
+///
+/// [\[MS-ONE\] 2.2.8]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/3796cb27-7ec3-4dc9-b43e-7c31cc5b765d
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub enum ColorRef {
     /// Determined by the application.

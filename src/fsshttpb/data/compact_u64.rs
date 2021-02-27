@@ -1,6 +1,17 @@
 use crate::errors::{ErrorKind, Result};
 use crate::Reader;
 
+/// A compact unsigned 64-bit integer.
+///
+/// The first byte encodes the total width of the integer. If the first byte is zero, there is no
+/// further data and the integer value is zero. Otherwise the index of the lowest bit with value 1
+/// of the first byte indicates the width of the remaining integer data:
+/// If the lowest bit is set, the integer data is 1 byte wide; if the second bit is set, the
+/// integer data is 2 bytes wide etc.   
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.1].
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.1]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/8eb74ebe-81d1-4569-a29a-308a6128a52f
 #[derive(Debug)]
 pub(crate) struct CompactU64(u64);
 

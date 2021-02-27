@@ -6,6 +6,11 @@ use crate::fsshttpb::data_element::DataElement;
 use crate::Reader;
 use std::fmt;
 
+/// An object data blob.
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.12.8]
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.12.8]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/d36dd2b4-bad1-441b-93c7-adbe3069152c
 pub(crate) struct ObjectDataBlob(Vec<u8>);
 
 impl ObjectDataBlob {

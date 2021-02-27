@@ -5,6 +5,11 @@ use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+/// An note tag shared definition container.
+///
+/// See [\[MS-ONE\] 2.2.41].
+///
+/// [\[MS-ONE\] 2.2.41]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/eb5f52d2-c507-45c8-9bda-f8c74d34533a
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) label: String,
@@ -54,9 +59,9 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
 
 /// The status of a note tag.
 ///
-/// See [\[MS-ONE 2.3.87\]].
+/// See [\[MS-ONE\] 2.3.87].
 ///
-/// [\[MS-ONE 2.3.87\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/24274836-ec41-4fee-913f-225d65ac457c
+/// [\[MS-ONE\] 2.3.87]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/24274836-ec41-4fee-913f-225d65ac457c
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct NoteTagPropertyStatus {
     has_label: bool,
@@ -155,9 +160,9 @@ impl NoteTagPropertyStatus {
 
 /// The shape of a note tag icon.
 ///
-/// See [\[MS-ONE 2.3.86\]].
+/// See [\[MS-ONE\] 2.3.86].
 ///
-/// [\[MS-ONE 2.3.86\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/aa5c7aba-d5e4-4bf8-b265-9100eeb9a7a7
+/// [\[MS-ONE\] 2.3.86]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/aa5c7aba-d5e4-4bf8-b265-9100eeb9a7a7
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 #[allow(missing_docs)]
 pub enum NoteTagShape {

@@ -15,10 +15,10 @@ pub enum SectionEntry {
 
 /// A OneNote section.
 ///
-/// See [\[MS-ONE 1.3.1\]] and [\[MS-ONE 2.2.17\]].
+/// See [\[MS-ONE\] 1.3.1] and [\[MS-ONE\] 2.2.17].
 ///
-/// [\[MS-ONE 1.3.1\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/1603b29c-1c9f-4e85-b9b9-59684122374a
-/// [\[MS-ONE 2.2.17\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/6913913f-b7d1-4b29-ab09-231ea3835ac2
+/// [\[MS-ONE\] 1.3.1]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/1603b29c-1c9f-4e85-b9b9-59684122374a
+/// [\[MS-ONE\] 2.2.17]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/6913913f-b7d1-4b29-ab09-231ea3835ac2
 #[derive(Clone, Debug)]
 pub struct Section {
     display_name: String,

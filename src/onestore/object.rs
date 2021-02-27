@@ -8,6 +8,12 @@ use crate::onestore::types::jcid::JcId;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
 use crate::reader::Reader;
 
+/// A OneNote data object.
+///
+/// See [\[MS-ONESTOR\] 2.1.5] and [\[MS-ONESTOR\] 2.7.6]
+///
+/// [\[MS-ONESTOR\] 2.1.5]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/ce60b62f-82e5-401a-bf2c-3255457732ad
+/// [\[MS-ONESTOR\] 2.7.6]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/b4270940-827e-468b-bf42-2c7afee23740
 #[derive(Debug, Clone)]
 pub(crate) struct Object<'a> {
     pub(crate) context_id: ExGuid,

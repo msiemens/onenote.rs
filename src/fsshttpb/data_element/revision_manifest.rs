@@ -5,6 +5,11 @@ use crate::fsshttpb::data::stream_object::ObjectHeader;
 use crate::fsshttpb::data_element::DataElement;
 use crate::Reader;
 
+/// A revision manifest.
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.12.5]
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.12.5]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/eb3351db-8626-4804-a35b-f3eeda13c74d
 #[derive(Debug)]
 pub(crate) struct RevisionManifest {
     pub(crate) rev_id: ExGuid,
@@ -13,6 +18,7 @@ pub(crate) struct RevisionManifest {
     pub(crate) group_references: Vec<ExGuid>,
 }
 
+/// A revision manifest root declaration.
 #[derive(Debug)]
 pub(crate) struct RevisionManifestRootDeclare {
     pub(crate) root_id: ExGuid,

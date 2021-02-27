@@ -11,6 +11,11 @@ use crate::onestore::types::jcid::JcId;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
 use crate::onestore::types::prop_set::PropertySet;
 
+/// A note tag state container.
+///
+/// See [\[MS-ONE\] 2.2.88].
+///
+/// [\[MS-ONE\] 2.2.88]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/a9938236-87f8-41b1-81f3-5f760e1247b8
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) definition: Option<ExGuid>,

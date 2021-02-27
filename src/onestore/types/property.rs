@@ -3,6 +3,7 @@ use crate::onestore::types::prop_set::PropertySet;
 use crate::Reader;
 use std::fmt;
 
+/// A property value.
 #[derive(Debug, Clone)]
 pub(crate) enum PropertyValue {
     Empty,
@@ -170,6 +171,11 @@ impl PropertyValue {
     }
 }
 
+/// A property ID.
+///
+/// See [\[MS-ONESTORE\] 2.6.6].
+///
+/// [\[MS-ONESTORE\] 2.6.6]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/17d8c39e-6cc2-4fcd-8d10-aee950fd0ab2
 #[derive(Copy, Clone, Hash, Eq, PartialEq)]
 pub(crate) struct PropertyId(u32);
 

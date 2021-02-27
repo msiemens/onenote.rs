@@ -5,6 +5,11 @@ use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+/// A section's table of contents.
+///
+/// See [\[MS-ONE\] 2.2.15].
+///
+/// [\[MS-ONE\] 2.2.15]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/6c1dd264-850b-4e46-af62-50b4dba49b62
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) children: Vec<ExGuid>,

@@ -6,6 +6,11 @@ use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+/// An outline group.
+///
+/// See [\[MS-ONE\] 2.2.22].
+///
+/// [\[MS-ONE\] 2.2.22]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/7dcc1618-46ee-4912-b918-ab4df1b52315
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) last_modified: Time,

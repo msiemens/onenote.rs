@@ -2,6 +2,11 @@ use crate::errors::Result;
 use crate::one::property::{simple, PropertyType};
 use crate::onestore::object::Object;
 
+/// The author of an object.
+///
+/// See [\[MS-ONE\] 2.2.67]
+///
+/// [\[MS-ONE\] 2.2.67]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/db06251b-b672-4c9b-8ba5-d948caaa3edd
 #[derive(Debug)]
 pub(crate) struct Author(String);
 

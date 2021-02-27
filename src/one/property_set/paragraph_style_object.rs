@@ -6,6 +6,12 @@ use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+/// A paragraph style.
+///
+/// See [\[MS-ONE\] 2.2.43] and [\[MS-ONE\] 2.2.44]
+///
+/// [\[MS-ONE\] 2.2.43]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/38eb9b74-cfaf-4df7-b061-a83968c7ff5b
+/// [\[MS-ONE\] 2.2.44]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/f0baabae-f42a-42e0-8cb2-869d420e865f
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) charset: Option<Charset>,

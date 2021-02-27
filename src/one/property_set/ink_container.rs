@@ -6,6 +6,7 @@ use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+/// An ink container.
 #[allow(dead_code)]
 pub(crate) struct Data {
     pub(crate) offset_from_parent_horiz: Option<f32>,

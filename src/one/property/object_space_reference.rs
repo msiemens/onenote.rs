@@ -6,6 +6,10 @@ use crate::onestore::object::Object;
 use crate::onestore::types::compact_id::CompactId;
 use crate::onestore::types::property::PropertyValue;
 
+/// A generic object space reference.
+///
+/// This allows for all sorts of object space references (e.g. sections referencing their pages).
+/// It implements parsing these references from the OneStore mapping table.
 pub(crate) struct ObjectSpaceReference;
 
 impl ObjectSpaceReference {

@@ -4,6 +4,11 @@ use crate::fsshttpb::data::object_types::ObjectType;
 use crate::Reader;
 use num_traits::{FromPrimitive, ToPrimitive};
 
+/// A FSSHTTPB stream object header.
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.5].
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.5]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/5faee10f-8e55-43f8-935a-d6e4294856fc
 #[derive(Debug)]
 pub struct ObjectHeader {
     pub compound: bool,
@@ -16,6 +21,7 @@ impl ObjectHeader {
         Self::try_parse_start(reader, object_type, Self::parse)
     }
 
+    /// Parse a 16-bit or 32-bit stream object header.
     pub(crate) fn parse(reader: Reader) -> Result<ObjectHeader> {
         let header_type = reader.bytes().first().ok_or(ErrorKind::UnexpectedEof)?;
 
@@ -33,6 +39,11 @@ impl ObjectHeader {
         Self::try_parse_start(reader, object_type, Self::parse_16)
     }
 
+    /// Parse a 16 bit stream object header.
+    ///
+    /// See [\[MS-FSSHTTPB\] 2.2.1.5.1]
+    ///
+    /// [\[MS-FSSHTTPB\] 2.2.1.5.1]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/a1017f48-a888-49ff-b71d-cc3c707f753a
     pub(crate) fn parse_16(reader: Reader) -> Result<ObjectHeader> {
         let data = reader.get_u16()?;
 
@@ -68,6 +79,11 @@ impl ObjectHeader {
         Self::try_parse_start(reader, object_type, Self::parse_32)
     }
 
+    /// Parse a 32 bit stream object header.
+    ///
+    /// See [\[MS-FSSHTTPB\] 2.2.1.5.2]
+    ///
+    /// [\[MS-FSSHTTPB\] 2.2.1.5.2]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/ac629d63-60a1-49b2-9db2-fa3c19971cc9
     fn parse_32(reader: Reader) -> Result<ObjectHeader> {
         let data = reader.get_u32()?;
 
@@ -107,6 +123,11 @@ impl ObjectHeader {
         Self::try_parse_end(reader, object_type, Self::parse_end_16)
     }
 
+    /// Parse a 16-bit stream object header end.
+    ///
+    /// See [\[MS-FSSHTTPB\] 2.2.1.5.4]
+    ///
+    /// [\[MS-FSSHTTPB\] 2.2.1.5.4]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/d8cedbb8-073b-4711-8867-f88b887ab0a9
     fn parse_end_16(reader: Reader) -> Result<ObjectType> {
         let data = reader.get_u16()?;
         let header_type = data & 0b11;
@@ -134,6 +155,11 @@ impl ObjectHeader {
         Self::try_parse_end(reader, object_type, Self::parse_end_8)
     }
 
+    /// Parse a 8-bit stream object header end.
+    ///
+    /// See [\[MS-FSSHTTPB\] 2.2.1.5.3]
+    ///
+    /// [\[MS-FSSHTTPB\] 2.2.1.5.3]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/544ce81a-44e3-48ff-b094-0e51c7207aa1
     fn parse_end_8(reader: Reader) -> Result<ObjectType> {
         let data = reader.get_u8()?;
         let header_type = data & 0b11;

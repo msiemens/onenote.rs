@@ -1,3 +1,9 @@
+//! The property sets describing OneNote objects we can parse.
+//!
+//! See [\[MS-ONE\] 2.1.13] for the list of properties the OneNote file format specifies.
+//!
+//! [\[MS-ONE\] 2.1.13]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/73d98105-f194-4c05-a795-09840a6d24bf
+
 use crate::onestore::types::jcid::JcId;
 use enum_primitive_derive::Primitive;
 use num_traits::FromPrimitive;
@@ -30,9 +36,6 @@ pub(crate) mod table_node;
 pub(crate) mod table_row_node;
 pub(crate) mod title_node;
 pub(crate) mod toc_container;
-
-// https://github.com/blu-base/libmson/blob/db61ccf61a0f71b9def561381eda38f5b914db40/src/common/properties/JCID.h
-// https://github.com/blu-base/libmson/blob/f69eaee84ab5fe529a936c3d3a1c14247143b7b5/src/common/properties/PropertySet.cpp
 
 #[derive(Debug, Copy, Clone, Primitive)]
 pub(crate) enum PropertySetId {

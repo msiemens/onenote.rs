@@ -53,18 +53,18 @@ impl RichText {
 
     /// The formatting of each text run.
     ///
-    /// See [\[MS-ONE 2.3.77\]].
+    /// See [\[MS-ONE\] 2.3.77].
     ///
-    /// [\[MS-ONE 2.3.77\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/7b560477-14d0-4f2c-a65e-4159f69f299f
+    /// [\[MS-ONE\] 2.3.77]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/7b560477-14d0-4f2c-a65e-4159f69f299f
     pub fn text_run_formatting(&self) -> &[ParagraphStyling] {
         &self.text_run_formatting
     }
 
     /// The character positions where the text runs end.
     ///
-    /// See [\[MS-ONE 2.3.76\]].
+    /// See [\[MS-ONE\] 2.3.76].
     ///
-    /// [\[MS-ONE 2.3.76\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/f5ae3d7a-09dd-4904-a8bd-7a529d8067c3
+    /// [\[MS-ONE\] 2.3.76]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/f5ae3d7a-09dd-4904-a8bd-7a529d8067c3
     pub fn text_run_indices(&self) -> &[u32] {
         &self.text_run_indices
     }
@@ -76,54 +76,54 @@ impl RichText {
 
     /// The paragraph's top margin in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.81\]].
+    /// See [\[MS-ONE\] 2.3.81].
     ///
-    /// [\[MS-ONE 2.3.81\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/1a2958bd-7512-419b-a8a5-eda200edb7cd
+    /// [\[MS-ONE\] 2.3.81]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/1a2958bd-7512-419b-a8a5-eda200edb7cd
     pub fn paragraph_space_before(&self) -> f32 {
         self.paragraph_space_before
     }
 
     /// The paragraph's bottom margin in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.82\]].
+    /// See [\[MS-ONE\] 2.3.82].
     ///
-    /// [\[MS-ONE 2.3.82\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/505393e2-c641-416f-be83-050da44d581d
+    /// [\[MS-ONE\] 2.3.82]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/505393e2-c641-416f-be83-050da44d581d
     pub fn paragraph_space_after(&self) -> f32 {
         self.paragraph_space_after
     }
 
     /// The paragraph's line spacing in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.83\]].
+    /// See [\[MS-ONE\] 2.3.83].
     ///
-    /// [\[MS-ONE 2.3.83\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4474bd74-5407-4675-a9bb-a32f81eb799c
+    /// [\[MS-ONE\] 2.3.83]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4474bd74-5407-4675-a9bb-a32f81eb799c
     pub fn paragraph_line_spacing_exact(&self) -> Option<f32> {
         self.paragraph_line_spacing_exact
     }
 
     /// The paragraph's text alignment.
     ///
-    /// See [\[MS-ONE 2.3.94\]].
+    /// See [\[MS-ONE\] 2.3.94].
     ///
-    /// [\[MS-ONE 2.3.94\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/36edb135-5e8e-400f-9394-82853d662d90
+    /// [\[MS-ONE\] 2.3.94]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/36edb135-5e8e-400f-9394-82853d662d90
     pub fn paragraph_alignment(&self) -> ParagraphAlignment {
         self.paragraph_alignment
     }
 
     /// The paragraph's alignment relative to the containing outline element (if present).
     ///
-    /// See [\[MS-ONE 2.3.27\]].
+    /// See [\[MS-ONE\] 2.3.27].
     ///
-    /// [\[MS-ONE 2.3.27\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/61fa50be-c355-4b8d-ac01-761a2f7f66c0
+    /// [\[MS-ONE\] 2.3.27]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/61fa50be-c355-4b8d-ac01-761a2f7f66c0
     pub fn layout_alignment_in_parent(&self) -> Option<LayoutAlignment> {
         self.layout_alignment_in_parent
     }
 
     /// The paragraph's alignment.
     ///
-    /// See [\[MS-ONE 2.3.33\]].
+    /// See [\[MS-ONE\] 2.3.33].
     ///
-    /// [\[MS-ONE 2.3.33\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4e7fe9db-2fdb-4239-b291-dc4b909c94ad
+    /// [\[MS-ONE\] 2.3.33]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4e7fe9db-2fdb-4239-b291-dc4b909c94ad
     pub fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
         self.layout_alignment_self
     }
@@ -192,10 +192,10 @@ impl EmbeddedInkSpace {
 
 /// A paragraph's style.
 ///
-/// See [\[MS-ONE 2.2.43\]] and [\[MS-ONE 2.2.44\]].
+/// See [\[MS-ONE\] 2.2.43] and [\[MS-ONE\] 2.2.44].
 ///
-/// [\[MS-ONE 2.2.43\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/38eb9b74-cfaf-4df7-b061-a83968c7ff5b
-/// [\[MS-ONE 2.2.44\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/f0baabae-f42a-42e0-8cb2-869d420e865f
+/// [\[MS-ONE\] 2.2.43]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/38eb9b74-cfaf-4df7-b061-a83968c7ff5b
+/// [\[MS-ONE\] 2.2.44]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/f0baabae-f42a-42e0-8cb2-869d420e865f
 #[derive(Clone, Debug)]
 pub struct ParagraphStyling {
     pub(crate) charset: Option<Charset>,
@@ -263,45 +263,45 @@ impl ParagraphStyling {
 
     /// The font size for this text in half-point increments.
     ///
-    /// See [\[MS-ONE 2.3.16\]].
+    /// See [\[MS-ONE\] 2.3.16].
     ///
-    /// [\[MS-ONE 2.3.16\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/f209fd9c-9042-4df2-b90c-1be20ac9c2d3
+    /// [\[MS-ONE\] 2.3.16]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/f209fd9c-9042-4df2-b90c-1be20ac9c2d3
     pub fn font_size(&self) -> Option<u16> {
         self.font_size
     }
 
     /// The font color for this text.
     ///
-    /// See [\[MS-ONE 2.3.45\]].
+    /// See [\[MS-ONE\] 2.3.45].
     ///
-    /// [\[MS-ONE 2.3.45\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/17a7e6a7-7fa9-456f-a3fe-b2d8fef31be3
+    /// [\[MS-ONE\] 2.3.45]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/17a7e6a7-7fa9-456f-a3fe-b2d8fef31be3
     pub fn font_color(&self) -> Option<ColorRef> {
         self.font_color
     }
 
     /// The background color for this text.
     ///
-    /// See [\[MS-ONE 2.3.6\]].
+    /// See [\[MS-ONE\] 2.3.6].
     ///
-    /// [\[MS-ONE 2.3.6\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/9932eafb-8200-4fc6-aa86-3a4d6a60bb62
+    /// [\[MS-ONE\] 2.3.6]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/9932eafb-8200-4fc6-aa86-3a4d6a60bb62
     pub fn highlight(&self) -> Option<ColorRef> {
         self.highlight
     }
 
     /// The name of the default style for the next paragraph.
     ///
-    /// See [\[MS-ONE 2.2.92\]].
+    /// See [\[MS-ONE\] 2.2.92].
     ///
-    /// [\[MS-ONE 2.2.92\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/fa70a53b-2661-4d33-aec7-948488e49fc3
+    /// [\[MS-ONE\] 2.2.92]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/fa70a53b-2661-4d33-aec7-948488e49fc3
     pub fn next_style(&self) -> Option<&str> {
         self.next_style.as_deref()
     }
 
     /// The paragraph style's name.
     ///
-    /// See [\[MS-ONE 2.2.83\]].
+    /// See [\[MS-ONE\] 2.2.83].
     ///
-    /// [\[MS-ONE 2.2.83\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4c9ad3ed-d804-44df-9c49-55b2a867db66
+    /// [\[MS-ONE\] 2.2.83]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4c9ad3ed-d804-44df-9c49-55b2a867db66
     pub fn style_id(&self) -> Option<&str> {
         self.style_id.as_deref()
     }
@@ -313,36 +313,36 @@ impl ParagraphStyling {
 
     /// The paragraph's top margin in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.81\]].
+    /// See [\[MS-ONE\] 2.3.81].
     ///
-    /// [\[MS-ONE 2.3.81\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/1a2958bd-7512-419b-a8a5-eda200edb7cd
+    /// [\[MS-ONE\] 2.3.81]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/1a2958bd-7512-419b-a8a5-eda200edb7cd
     pub fn paragraph_space_before(&self) -> Option<f32> {
         self.paragraph_space_before
     }
 
     /// The paragraph's bottom margin in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.82\]].
+    /// See [\[MS-ONE\] 2.3.82].
     ///
-    /// [\[MS-ONE 2.3.82\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/505393e2-c641-416f-be83-050da44d581d
+    /// [\[MS-ONE\] 2.3.82]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/505393e2-c641-416f-be83-050da44d581d
     pub fn paragraph_space_after(&self) -> Option<f32> {
         self.paragraph_space_after
     }
 
     /// The paragraph's line spacing in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.83\]].
+    /// See [\[MS-ONE\] 2.3.83].
     ///
-    /// [\[MS-ONE 2.3.83\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4474bd74-5407-4675-a9bb-a32f81eb799c
+    /// [\[MS-ONE\] 2.3.83]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4474bd74-5407-4675-a9bb-a32f81eb799c
     pub fn paragraph_line_spacing_exact(&self) -> Option<f32> {
         self.paragraph_line_spacing_exact
     }
 
     /// The LCID language code for the text.
     ///
-    /// See [\[MS-ONE 2.3.26\]].
+    /// See [\[MS-ONE\] 2.3.26].
     ///
-    /// [\[MS-ONE 2.3.26\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/f82cdbc0-d4e9-4cd0-bd0b-8c7734853d7f
+    /// [\[MS-ONE\] 2.3.26]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/f82cdbc0-d4e9-4cd0-bd0b-8c7734853d7f
     pub fn language_code(&self) -> Option<u32> {
         self.language_code
     }

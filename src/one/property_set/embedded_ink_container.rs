@@ -8,6 +8,7 @@ use crate::onestore::types::jcid::JcId;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
 use crate::onestore::types::prop_set::PropertySet;
 
+/// An embedded ink handwriting container.
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) space_width: Option<f32>,

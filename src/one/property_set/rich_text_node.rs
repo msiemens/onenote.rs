@@ -9,6 +9,11 @@ use crate::one::property_set::note_tag_container::Data as NoteTagData;
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+/// A rich text paragraph.
+///
+/// See [\[MS-ONE\] 2.2.23].
+///
+/// [\[MS-ONE\] 2.2.23]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/980fae36-b5dd-4581-bf1e-5ab54177153d
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) last_modified_time: Time,

@@ -6,6 +6,11 @@ use crate::onestore::types::property::PropertyValue;
 use crate::reader::Reader;
 use crate::shared::guid::Guid;
 
+/// A OneStore file's header data.
+///
+/// See [\[MS-ONESTORE\] 2.7.2]
+///
+/// [\[MS-ONESTORE\] 2.7.2]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/07a5dc4d-0d97-4a4c-ab69-aa7957d7115c
 #[derive(Debug)]
 pub(crate) struct StoreHeader {
     file_identity: Guid,

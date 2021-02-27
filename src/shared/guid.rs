@@ -3,6 +3,15 @@ use crate::Reader;
 use std::fmt;
 use uuid::Uuid;
 
+/// A global UUID.
+///
+/// Microsoft is using weird mixed endianness in their GUIDs which we have to consider when
+/// parsing a GUID from a stream of bytes.
+///
+/// See also [\[1\]] and [\[2\]].
+///
+/// [\[1\]]: https://stackoverflow.com/questions/10190817/guid-byte-order-in-net
+/// [\[2\]]: https://docs.microsoft.com/en-us/dotnet/api/system.guid.tobytearray?view=net-5.0#remarks
 #[derive(Clone, Copy, PartialEq, Hash, Eq)]
 pub struct Guid(pub Uuid);
 

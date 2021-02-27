@@ -2,6 +2,11 @@ use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
+/// A layout alignment specification.
+///
+/// See [\[MS-ONE\] 2.3.2]
+///
+/// [\[MS-ONE\] 2.3.2]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/bd99face-5839-4276-863d-a4f2cbb81246
 #[derive(Copy, Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct LayoutAlignment {
     alignment_horizontal: HorizontalAlignment,

@@ -8,10 +8,10 @@ use crate::onestore::object_space::ObjectSpace;
 
 /// A page.
 ///
-/// See [\[MS-ONE 1.3.2\]] and [\[MS-ONE 2.2.19\]].
+/// See [\[MS-ONE\] 1.3.2] and [\[MS-ONE\] 2.2.19].
 ///
-/// [\[MS-ONE 1.3.2\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/2dd687ac-f36b-4723-b959-4d60c8a90ca9
-/// [\[MS-ONE 2.2.19\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/e381b7c7-b434-43a2-ba23-0d08bafd281a
+/// [\[MS-ONE\] 1.3.2]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/2dd687ac-f36b-4723-b959-4d60c8a90ca9
+/// [\[MS-ONE\] 2.2.19]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/e381b7c7-b434-43a2-ba23-0d08bafd281a
 #[derive(Clone, Debug)]
 pub struct Page {
     title: Option<Title>,
@@ -24,18 +24,18 @@ pub struct Page {
 impl Page {
     /// The page's title element.
     ///
-    /// See [\[MS-ONE 2.2.64\]].
+    /// See [\[MS-ONE\] 2.2.64].
     ///
-    /// [\[MS-ONE 2.2.64\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/00f0b68b-db49-4aea-9ad9-7c8e68e5c95d
+    /// [\[MS-ONE\] 2.2.64]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/00f0b68b-db49-4aea-9ad9-7c8e68e5c95d
     pub fn title(&self) -> Option<&Title> {
         self.title.as_ref()
     }
 
     /// The page's level in the section page tree.
     ///
-    /// See [\[MS-ONE 2.3.74\]].
+    /// See [\[MS-ONE\] 2.3.74].
     ///
-    /// [\[MS-ONE 2.3.74\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/a8632c90-e74a-4ef6-8852-707d4c8817cd
+    /// [\[MS-ONE\] 2.3.74]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/a8632c90-e74a-4ef6-8852-707d4c8817cd
     pub fn level(&self) -> i32 {
         self.level
     }
@@ -47,9 +47,9 @@ impl Page {
 
     /// The page's height.
     ///
-    /// See [\[MS-ONE 2.3.7\]].
+    /// See [\[MS-ONE\] 2.3.7].
     ///
-    /// [\[MS-ONE 2.3.7\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/e5d0b5e0-0702-42af-8299-0e27c895ba7e
+    /// [\[MS-ONE\] 2.3.7]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/e5d0b5e0-0702-42af-8299-0e27c895ba7e
     pub fn height(&self) -> Option<f32> {
         self.height
     }
@@ -89,9 +89,9 @@ impl Page {
 
 /// A page title.
 ///
-/// See [\[MS-ONE 2.2.29\]].
+/// See [\[MS-ONE\] 2.2.29].
 ///
-/// [\[MS-ONE 2.2.29\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/08bd4fd5-59fb-4568-9c82-d2d5280eced8
+/// [\[MS-ONE\] 2.2.29]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/08bd4fd5-59fb-4568-9c82-d2d5280eced8
 
 #[derive(Clone, Debug)]
 pub struct Title {
@@ -110,36 +110,36 @@ impl Title {
 
     /// The horizontal offset from the page origin in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.18\]].
+    /// See [\[MS-ONE\] 2.3.18].
     ///
-    /// [\[MS-ONE 2.3.18\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5fb9e84a-c9e9-4537-ab14-e5512f24669a
+    /// [\[MS-ONE\] 2.3.18]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5fb9e84a-c9e9-4537-ab14-e5512f24669a
     pub fn offset_horizontal(&self) -> f32 {
         self.offset_horizontal
     }
 
     /// The vertical offset from the page origin in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.19\]].
+    /// See [\[MS-ONE\] 2.3.19].
     ///
-    /// [\[MS-ONE 2.3.19\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5c4992ba-1db5-43e9-83dd-7299c562104d
+    /// [\[MS-ONE\] 2.3.19]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5c4992ba-1db5-43e9-83dd-7299c562104d
     pub fn offset_vertical(&self) -> f32 {
         self.offset_vertical
     }
 
     /// The title's alignment relative to the containing outline element (if present).
     ///
-    /// See [\[MS-ONE 2.3.27\]].
+    /// See [\[MS-ONE\] 2.3.27].
     ///
-    /// [\[MS-ONE 2.3.27\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/61fa50be-c355-4b8d-ac01-761a2f7f66c0
+    /// [\[MS-ONE\] 2.3.27]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/61fa50be-c355-4b8d-ac01-761a2f7f66c0
     pub fn layout_alignment_in_parent(&self) -> Option<LayoutAlignment> {
         self.layout_alignment_in_parent
     }
 
     /// The title's alignment.
     ///
-    /// See [\[MS-ONE 2.3.33\]].
+    /// See [\[MS-ONE\] 2.3.33].
     ///
-    /// [\[MS-ONE 2.3.33\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4e7fe9db-2fdb-4239-b291-dc4b909c94ad
+    /// [\[MS-ONE\] 2.3.33]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4e7fe9db-2fdb-4239-b291-dc4b909c94ad
     pub fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
         self.layout_alignment_self
     }

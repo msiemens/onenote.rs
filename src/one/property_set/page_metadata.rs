@@ -5,6 +5,11 @@ use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 use crate::shared::guid::Guid;
 
+/// A page's metadata.
+///
+/// See [\[MS-ONE\] 2.2.30].
+///
+/// [\[MS-ONE\] 2.2.30]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/aaabcc70-5836-4dcb-8209-012ce5d45b3c
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) entity_guid: Guid,

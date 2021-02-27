@@ -6,6 +6,7 @@ use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 use crate::shared::multi_byte;
 
+/// An ink stroke.
 #[allow(dead_code)]
 pub(crate) struct Data {
     pub(crate) path: Vec<i64>,

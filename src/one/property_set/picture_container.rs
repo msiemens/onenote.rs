@@ -3,6 +3,11 @@ use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+/// A picture container.
+///
+/// See [\[MS-ONE\] 2.2.36].
+///
+/// [\[MS-ONE\] 2.2.36]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/28112f88-80f5-49b2-8988-d4a66dcc4d80
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) data: Vec<u8>,

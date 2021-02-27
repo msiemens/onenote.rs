@@ -11,9 +11,9 @@ use std::collections::HashMap;
 /// is used. From testing it looks like there cases where a single `CompactId` maps to *multiple*
 /// `ExGuid`s/`CellId`s. In this case we will use the table _index_ as a fallback.
 ///
-/// See [\[MS-ONESTORE 2.7.8\]].
+/// See [\[MS-ONESTORE\] 2.7.8].
 ///
-/// [\[MS-ONESTORE 2.7.8\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/c2e58ac6-7a86-4009-a1e4-4a84cd21508f
+/// [\[MS-ONESTORE\] 2.7.8]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/c2e58ac6-7a86-4009-a1e4-4a84cd21508f
 #[derive(Debug, Clone)]
 pub(crate) struct MappingTable {
     objects: HashMap<CompactId, Vec<(usize, ExGuid)>>,

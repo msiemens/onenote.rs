@@ -4,6 +4,11 @@ use crate::shared::guid::Guid;
 use crate::Reader;
 use std::fmt;
 
+/// A variable-width encoding of an extended GUID (GUID + 32 bit value)
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.7].
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.7]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/bff58e9f-8222-4fbb-b112-5826d5febedd
 #[derive(Clone, Copy, PartialEq, Hash, Eq)]
 pub struct ExGuid {
     pub guid: Guid,
@@ -30,6 +35,7 @@ impl ExGuid {
     pub(crate) fn parse(reader: Reader) -> Result<ExGuid> {
         let data = reader.get_u8()?;
 
+        // A null ExGuid ([FSSHTTPB] 2.2.1.7.1)
         if data == 0 {
             return Ok(ExGuid {
                 guid: Guid::nil(),
@@ -37,6 +43,7 @@ impl ExGuid {
             });
         }
 
+        // A ExGuid with a 5 bit value ([FSSHTTPB] 2.2.1.7.2)
         if data & 0b111 == 4 {
             return Ok(ExGuid {
                 guid: Guid::parse(reader)?,
@@ -44,6 +51,7 @@ impl ExGuid {
             });
         }
 
+        // A ExGuid with a 10 bit value ([FSSHTTPB] 2.2.1.7.3)
         if data & 0b111111 == 32 {
             let value = (reader.get_u8()? as u16) << 2 | (data >> 6) as u16;
 
@@ -53,6 +61,7 @@ impl ExGuid {
             });
         }
 
+        // A ExGuid with a 17 bit value ([FSSHTTPB] 2.2.1.7.4)
         if data & 0b1111111 == 64 {
             let value = (reader.get_u16()? as u32) << 1 | (data >> 7) as u32;
 
@@ -62,6 +71,7 @@ impl ExGuid {
             });
         }
 
+        // A ExGuid with a 32 bit value ([FSSHTTPB] 2.2.1.7.5)
         if data == 128 {
             let value = reader.get_u32()?;
 
@@ -77,6 +87,11 @@ impl ExGuid {
         )
     }
 
+    /// Parse an array of `ExGuid` values.
+    ///
+    /// See [\[MS-FSSHTTPB\] 2.2.1.8]
+    ///
+    /// [\[MS-FSSHTTPB\] 2.2.1.8]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/10d6fb35-d630-4ae3-b530-b9e877fc27d3
     pub(crate) fn parse_array(reader: Reader) -> Result<Vec<ExGuid>> {
         let mut values = vec![];
 

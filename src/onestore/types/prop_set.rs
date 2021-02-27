@@ -3,6 +3,11 @@ use crate::onestore::types::property::{PropertyId, PropertyValue};
 use crate::Reader;
 use std::collections::HashMap;
 
+/// A property set.
+///
+/// See [\[MS-ONESTORE\] 2.6.7].
+///
+/// [\[MS-ONESTORE\] 2.6.7]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/88a64c18-f815-4ebc-8590-ddd432024ab9
 #[derive(Debug, Clone)]
 pub(crate) struct PropertySet {
     values: HashMap<u32, (usize, PropertyValue)>,

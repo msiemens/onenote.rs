@@ -7,9 +7,9 @@ use crate::onestore::object_space::ObjectSpace;
 
 /// An embedded image.
 ///
-/// See [\[MS-ONE 2.2.24\]].
+/// See [\[MS-ONE\] 2.2.24].
 ///
-/// [\[MS-ONE 2.2.24\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b7bb4d1a-2a57-4819-9eb4-5a2ce8cf210f
+/// [\[MS-ONE\] 2.2.24]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b7bb4d1a-2a57-4819-9eb4-5a2ce8cf210f
 #[derive(Clone, PartialEq, PartialOrd, Debug)]
 pub struct Image {
     pub(crate) data: Option<Vec<u8>>,
@@ -59,18 +59,18 @@ impl Image {
 
     /// The maximum width to display the image in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.21\]].
+    /// See [\[MS-ONE\] 2.3.21].
     ///
-    /// [\[MS-ONE 2.3.21\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/2561c763-93b8-4b64-b6c7-1b86335d5b85
+    /// [\[MS-ONE\] 2.3.21]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/2561c763-93b8-4b64-b6c7-1b86335d5b85
     pub fn layout_max_width(&self) -> Option<f32> {
         self.layout_max_width
     }
 
     /// The maximum height to display the image in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.23\]].
+    /// See [\[MS-ONE\] 2.3.23].
     ///
-    /// [\[MS-ONE 2.3.23\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/ce514d53-1229-4e77-9908-ef8de1761ceb
+    /// [\[MS-ONE\] 2.3.23]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/ce514d53-1229-4e77-9908-ef8de1761ceb
     pub fn layout_max_height(&self) -> Option<f32> {
         self.layout_max_height
     }
@@ -79,45 +79,45 @@ impl Image {
     ///
     /// Usually this seems to be the result of OneNote's OCR processing.
     ///
-    /// See [\[MS-ONE 2.2.79\]].
+    /// See [\[MS-ONE\] 2.2.79].
     ///
-    /// [\[MS-ONE 2.2.79\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/f39569a6-84fa-4d5b-8a65-2b3e0ee36117
+    /// [\[MS-ONE\] 2.2.79]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/f39569a6-84fa-4d5b-8a65-2b3e0ee36117
     pub fn alt_text(&self) -> Option<&str> {
         self.alt_text.as_deref()
     }
 
     /// The image's alignment relative to the containing outline element (if present).
     ///
-    /// See [\[MS-ONE 2.3.27\]].
+    /// See [\[MS-ONE\] 2.3.27].
     ///
-    /// [\[MS-ONE 2.3.27\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/61fa50be-c355-4b8d-ac01-761a2f7f66c0
+    /// [\[MS-ONE\] 2.3.27]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/61fa50be-c355-4b8d-ac01-761a2f7f66c0
     pub fn layout_alignment_in_parent(&self) -> Option<LayoutAlignment> {
         self.layout_alignment_in_parent
     }
 
     /// The image's alignment.
     ///
-    /// See [\[MS-ONE 2.3.33\]].
+    /// See [\[MS-ONE\] 2.3.33].
     ///
-    /// [\[MS-ONE 2.3.33\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4e7fe9db-2fdb-4239-b291-dc4b909c94ad
+    /// [\[MS-ONE\] 2.3.33]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/4e7fe9db-2fdb-4239-b291-dc4b909c94ad
     pub fn layout_alignment_self(&self) -> Option<LayoutAlignment> {
         self.layout_alignment_self
     }
 
     /// The image's original file name.
     ///
-    /// See [\[MS-ONE 2.2.75\]].
+    /// See [\[MS-ONE\] 2.2.75].
     ///
-    /// [\[MS-ONE 2.2.75\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/91f543ab-dfe5-47ce-9c61-a49680c726bb
+    /// [\[MS-ONE\] 2.2.75]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/91f543ab-dfe5-47ce-9c61-a49680c726bb
     pub fn image_filename(&self) -> Option<&str> {
         self.image_filename.as_deref()
     }
 
     /// The page number to display if the image file contains multiple pages (e.g. XPS, PDF).
     ///
-    /// See [\[MS-ONE 2.3.95\]].
+    /// See [\[MS-ONE\] 2.3.95].
     ///
-    /// [\[MS-ONE 2.3.95\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/acf52570-aa45-45ef-a62e-38f4a5844d5e
+    /// [\[MS-ONE\] 2.3.95]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/acf52570-aa45-45ef-a62e-38f4a5844d5e
     pub fn displayed_page_number(&self) -> Option<u32> {
         self.displayed_page_number
     }
@@ -134,18 +134,18 @@ impl Image {
 
     /// The image's width in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.100\]].
+    /// See [\[MS-ONE\] 2.3.100].
     ///
-    /// [\[MS-ONE 2.3.100\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b4feae22-69cb-4623-8d40-faf97a026465
+    /// [\[MS-ONE\] 2.3.100]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b4feae22-69cb-4623-8d40-faf97a026465
     pub fn picture_width(&self) -> Option<f32> {
         self.picture_width
     }
 
     /// The image's height in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.101\]].
+    /// See [\[MS-ONE\] 2.3.101].
     ///
-    /// [\[MS-ONE 2.3.101\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/65454c84-1a39-4e81-ba50-053666d92dd0
+    /// [\[MS-ONE\] 2.3.101]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/65454c84-1a39-4e81-ba50-053666d92dd0
     pub fn picture_height(&self) -> Option<f32> {
         self.picture_height
     }
@@ -157,27 +157,27 @@ impl Image {
 
     /// The horizontal offset from the page origin in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.18\]].
+    /// See [\[MS-ONE\] 2.3.18].
     ///
-    /// [\[MS-ONE 2.3.18\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5fb9e84a-c9e9-4537-ab14-e5512f24669a
+    /// [\[MS-ONE\] 2.3.18]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5fb9e84a-c9e9-4537-ab14-e5512f24669a
     pub fn offset_horizontal(&self) -> Option<f32> {
         self.offset_horizontal
     }
 
     /// The vertical offset from the page origin in half-inch increments.
     ///
-    /// See [\[MS-ONE 2.3.19\]].
+    /// See [\[MS-ONE\] 2.3.19].
     ///
-    /// [\[MS-ONE 2.3.19\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5c4992ba-1db5-43e9-83dd-7299c562104d
+    /// [\[MS-ONE\] 2.3.19]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/5c4992ba-1db5-43e9-83dd-7299c562104d
     pub fn offset_vertical(&self) -> Option<f32> {
         self.offset_vertical
     }
 
     /// Whether the image is a background image.
     ///
-    /// See [\[MS-ONE 2.3.61\]].
+    /// See [\[MS-ONE\] 2.3.61].
     ///
-    /// [\[MS-ONE 2.3.61\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/d8623a4b-7496-48fd-af00-8c8f9507c93b
+    /// [\[MS-ONE\] 2.3.61]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/d8623a4b-7496-48fd-af00-8c8f9507c93b
     pub fn is_background(&self) -> bool {
         self.is_background
     }

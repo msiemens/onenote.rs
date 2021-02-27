@@ -6,10 +6,10 @@ use crate::onestore::OneStore;
 
 /// A series of page.
 ///
-/// See [\[MS-ONE 1.3.2\]] and [\[MS-ONE 2.2.18\]].
+/// See [\[MS-ONE\] 1.3.2] and [\[MS-ONE\] 2.2.18].
 ///
-/// [\[MS-ONE 1.3.2\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/2dd687ac-f36b-4723-b959-4d60c8a90ca9
-/// [\[MS-ONE 2.2.18\]]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/e2957d3b-a2a8-4756-8662-4e67fefa9f4e
+/// [\[MS-ONE\] 1.3.2]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/2dd687ac-f36b-4723-b959-4d60c8a90ca9
+/// [\[MS-ONE\] 2.2.18]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/e2957d3b-a2a8-4756-8662-4e67fefa9f4e
 #[derive(Clone, Debug)]
 pub struct PageSeries {
     pages: Vec<Page>,

@@ -6,6 +6,11 @@ use crate::fsshttpb::data_element::DataElementPackage;
 use crate::shared::guid::Guid;
 use crate::Reader;
 
+/// A OneNote file packaged in FSSHTTPB format.
+///
+/// See [\[MS-ONESTORE\] 2.8.1]
+///
+/// [\[MS-ONESTORE\] 2.8.1]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/a2f046ea-109a-49c4-912d-dc2888cf0565
 #[derive(Debug)]
 pub(crate) struct Packaging {
     pub(crate) file_type: Guid,

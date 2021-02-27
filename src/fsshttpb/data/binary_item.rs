@@ -2,6 +2,11 @@ use crate::errors::Result;
 use crate::fsshttpb::data::compact_u64::CompactU64;
 use crate::Reader;
 
+/// A byte array with the length determined by a `CompactU64`.
+///
+/// See [\[MS-FSSHTTPB\] 2.2.1.3].
+///
+/// [\[MS-FSSHTTPB\] 2.2.1.3]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/6bdda105-af7f-4757-8dbe-0c7f3100647e
 pub(crate) struct BinaryItem(Vec<u8>);
 
 impl BinaryItem {

@@ -3,6 +3,10 @@ use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 
 /// A RGBA color value.
+///
+/// See [\[MS-ONE\] 2.2.7]
+///
+/// [\[MS-ONE\] 2.2.7]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/6e4a87f9-18f0-4ad6-bc7d-0f326d61e136
 #[derive(Debug, Copy, Clone, PartialEq)]
 pub struct Color {
     alpha: u8,

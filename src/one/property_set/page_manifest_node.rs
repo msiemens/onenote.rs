@@ -5,6 +5,11 @@ use crate::one::property::PropertyType;
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
+/// A page manifest.
+///
+/// See [\[MS-ONE\] 2.2.34].
+///
+/// [\[MS-ONE\] 2.2.34]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/284dd0c5-786f-499f-8ca3-454f85091b29
 #[derive(Debug)]
 pub(crate) struct Data {
     pub(crate) page: ExGuid,
