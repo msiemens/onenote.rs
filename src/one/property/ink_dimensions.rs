@@ -14,29 +14,28 @@ pub(crate) struct InkDimension {
 
 impl InkDimension {
     pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Result<Vec<InkDimension>> {
-        object
-            .props()
-            .get(prop_type)
-            .map(|value| {
-                value.to_vec().ok_or_else(|| {
-                    ErrorKind::MalformedOneNoteFileData("ink dimensions is not a vec".into())
-                })
-            })
-            .transpose()?
-            .iter()
-            .flat_map(|data| data.chunks_exact(32))
-            .map(|entry| {
-                let mut reader = Reader::new(entry);
-                let id = Guid::parse(&mut reader)?;
-                let limit_lower = reader.get_u32()? as i32;
-                let limit_upper = reader.get_u32()? as i32;
+        let data = match object.props().get(prop_type) {
+            Some(value) => value.to_vec().ok_or_else(|| {
+                ErrorKind::MalformedOneNoteFileData("ink dimensions is not a vec".into())
+            })?,
+            None => return Ok(Vec::new()),
+        };
 
-                Ok(InkDimension {
-                    id,
-                    limit_lower,
-                    limit_upper,
-                })
-            })
+        data.chunks_exact(32)
+            .map(InkDimension::parse_entry)
             .collect::<Result<Vec<_>>>()
+    }
+
+    fn parse_entry(data: &[u8]) -> Result<InkDimension> {
+        let mut reader = Reader::new(data);
+        let id = Guid::parse(&mut reader)?;
+        let limit_lower = reader.get_u32()? as i32;
+        let limit_upper = reader.get_u32()? as i32;
+
+        Ok(InkDimension {
+            id,
+            limit_lower,
+            limit_upper,
+        })
     }
 }

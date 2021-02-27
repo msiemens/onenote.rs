@@ -15,10 +15,12 @@ pub(crate) struct ObjectReference;
 impl ObjectReference {
     pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Result<Option<ExGuid>> {
         // Validate the value of the property
-        let property = unwrap_or_return!(object.props().get(prop_type));
-        property.to_object_id().ok_or_else(|| {
-            ErrorKind::MalformedOneNoteFileData("object reference is not a object id".into())
-        })?;
+        match object.props().get(prop_type) {
+            Some(property) => property.to_object_id().ok_or_else(|| {
+                ErrorKind::MalformedOneNoteFileData("object reference is not a object id".into())
+            })?,
+            None => return Ok(None),
+        };
 
         // Find the correct object reference
         let index = Self::get_offset(prop_type, object)?;
@@ -37,17 +39,23 @@ impl ObjectReference {
         prop_type: PropertyType,
         object: &Object,
     ) -> Result<Option<Vec<ExGuid>>> {
-        let prop = unwrap_or_return!(object.props().get(prop_type));
-        let count = prop.to_object_ids().ok_or_else(|| {
-            ErrorKind::MalformedOneNoteFileData(
-                "object reference array is not a object id array".into(),
-            )
-        })?;
+        // Determine the number of object references
+        let count = match object.props().get(prop_type) {
+            Some(prop) => prop.to_object_ids().ok_or_else(|| {
+                ErrorKind::MalformedOneNoteFileData(
+                    "object reference array is not a object id array".into(),
+                )
+            })?,
+            None => return Ok(None),
+        };
 
+        // Determine offset for the property for which we want to look up the object reference
         let offset = Self::get_offset(prop_type, object)?;
 
-        let object_refs = object.props().object_ids();
-        let object_ids = object_refs
+        let references = object.props().object_ids();
+
+        // Look up the object references by offset/count and resolve them
+        let object_ids = references
             .iter()
             .skip(offset)
             .take(count as usize)

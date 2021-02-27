@@ -7,6 +7,7 @@ use crate::onestore::types::compact_id::CompactId;
 use crate::onestore::types::jcid::JcId;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
 use crate::onestore::types::prop_set::PropertySet;
+use crate::onestore::types::property::PropertyId;
 
 /// An embedded ink handwriting container.
 #[derive(Debug)]
@@ -24,66 +25,70 @@ pub(crate) struct Data {
 
 impl Data {
     pub(crate) fn parse(object: &Object) -> Result<Option<Vec<Data>>> {
-        object
-            .props
-            .get(PropertyType::TextRunData)
-            .map(|value| {
-                value.to_property_values().ok_or_else(|| {
-                    ErrorKind::MalformedOneNoteFileData(
-                        "embedded ink container is not a property values list".into(),
-                    )
-                })
+        let (prop_id, prop_sets) = match object.props().get(PropertyType::TextRunData) {
+            Some(value) => value.to_property_values().ok_or_else(|| {
+                ErrorKind::MalformedOneNoteFileData(
+                    "embedded ink container is not a property values list".into(),
+                )
+            })?,
+            None => return Ok(None),
+        };
+
+        let data = prop_sets
+            .into_iter()
+            .map(|props| {
+                let object = Self::parse_object(object, prop_id, props)?;
+                let data = Self::parse_data(object)?;
+
+                Ok(data)
             })
-            .transpose()?
-            .map(|(id, sets)| {
-                sets.iter()
-                    .map(|props| -> Result<Object> {
-                        Ok(Object {
-                            context_id: object.context_id,
-                            jc_id: JcId(id.value()),
-                            props: ObjectPropSet {
-                                object_ids: Self::get_object_ids(props, object)?,
-                                object_space_ids: Self::get_object_space_ids(props, object)?,
-                                context_ids: vec![],
-                                properties: props.clone(),
-                            },
-                            file_data: None,
-                            mapping: object.mapping.clone(),
-                        })
-                    })
-                    .collect::<Result<Vec<_>>>()?
-                    .iter()
-                    .map(|object| {
-                        let space_width =
-                            simple::parse_f32(PropertyType::EmbeddedInkSpaceWidth, object)?;
-                        let space_height =
-                            simple::parse_f32(PropertyType::EmbeddedInkSpaceHeight, object)?;
+            .collect::<Result<Vec<_>>>()?;
 
-                        let start_x = simple::parse_f32(PropertyType::EmbeddedInkStartX, object)?;
-                        let start_y = simple::parse_f32(PropertyType::EmbeddedInkStartY, object)?;
-                        let height = simple::parse_f32(PropertyType::EmbeddedInkHeight, object)?;
-                        let width = simple::parse_f32(PropertyType::EmbeddedInkWidth, object)?;
-                        let offset_horiz =
-                            simple::parse_f32(PropertyType::EmbeddedInkOffsetHoriz, object)?;
-                        let offset_vert =
-                            simple::parse_f32(PropertyType::EmbeddedInkOffsetVert, object)?;
+        Ok(Some(data))
+    }
 
-                        let data = Data {
-                            space_width,
-                            space_height,
-                            start_x,
-                            start_y,
-                            height,
-                            width,
-                            offset_horiz,
-                            offset_vert,
-                        };
+    fn parse_object<'a>(
+        object: &'a Object,
+        prop_id: PropertyId,
+        props: &PropertySet,
+    ) -> Result<Object<'a>> {
+        Ok(Object {
+            context_id: object.context_id,
+            jc_id: JcId(prop_id.value()),
+            props: ObjectPropSet {
+                object_ids: Self::get_object_ids(props, object)?,
+                object_space_ids: Self::get_object_space_ids(props, object)?,
+                context_ids: vec![],
+                properties: props.clone(),
+            },
+            file_data: None,
+            mapping: object.mapping.clone(),
+        })
+    }
 
-                        Ok(data)
-                    })
-                    .collect::<Result<Vec<_>>>()
-            })
-            .transpose()
+    fn parse_data(object: Object) -> Result<Data> {
+        let space_width = simple::parse_f32(PropertyType::EmbeddedInkSpaceWidth, &object)?;
+        let space_height = simple::parse_f32(PropertyType::EmbeddedInkSpaceHeight, &object)?;
+
+        let start_x = simple::parse_f32(PropertyType::EmbeddedInkStartX, &object)?;
+        let start_y = simple::parse_f32(PropertyType::EmbeddedInkStartY, &object)?;
+        let height = simple::parse_f32(PropertyType::EmbeddedInkHeight, &object)?;
+        let width = simple::parse_f32(PropertyType::EmbeddedInkWidth, &object)?;
+        let offset_horiz = simple::parse_f32(PropertyType::EmbeddedInkOffsetHoriz, &object)?;
+        let offset_vert = simple::parse_f32(PropertyType::EmbeddedInkOffsetVert, &object)?;
+
+        let data = Data {
+            space_width,
+            space_height,
+            start_x,
+            start_y,
+            height,
+            width,
+            offset_horiz,
+            offset_vert,
+        };
+
+        Ok(data)
     }
 
     fn get_object_ids(props: &PropertySet, object: &Object) -> Result<Vec<CompactId>> {

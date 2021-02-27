@@ -10,6 +10,7 @@ use crate::onestore::types::compact_id::CompactId;
 use crate::onestore::types::jcid::JcId;
 use crate::onestore::types::object_prop_set::ObjectPropSet;
 use crate::onestore::types::prop_set::PropertySet;
+use crate::onestore::types::property::PropertyId;
 
 /// A note tag state container.
 ///
@@ -26,64 +27,66 @@ pub(crate) struct Data {
 
 impl Data {
     pub(crate) fn parse(object: &Object) -> Result<Option<Vec<Data>>> {
-        object
-            .props()
-            .get(PropertyType::NoteTags)
-            .map(|value| {
-                value.to_property_values().ok_or_else(|| {
-                    ErrorKind::MalformedOneNoteFileData(
-                        "note tag state is not a property values list".into(),
-                    )
-                })
+        let (prop_id, prop_sets) = match object.props().get(PropertyType::NoteTags) {
+            Some(value) => value.to_property_values().ok_or_else(|| {
+                ErrorKind::MalformedOneNoteFileData(
+                    "note tag state is not a property values list".into(),
+                )
+            })?,
+            None => return Ok(None),
+        };
+
+        let data = prop_sets
+            .into_iter()
+            .map(|props| {
+                let object = Self::parse_object(object, prop_id, props)?;
+                let data = Self::parse_data(object)?;
+
+                Ok(data)
             })
-            .transpose()?
-            .map(|(id, sets)| {
-                sets.iter()
-                    .map(|props| {
-                        Ok(Object {
-                            context_id: object.context_id,
-                            jc_id: JcId(id.value()),
-                            props: ObjectPropSet {
-                                object_ids: Self::get_object_ids(props, object)?,
-                                object_space_ids: Self::get_object_space_ids(props, object)?,
-                                context_ids: vec![],
-                                properties: props.clone(),
-                            },
-                            file_data: None,
-                            mapping: object.mapping.clone(),
-                        })
-                    })
-                    .collect::<Result<Vec<_>>>()?
-                    .iter()
-                    .map(|object| {
-                        let definition =
-                            ObjectReference::parse(PropertyType::NoteTagDefinitionOid, &object)?;
+            .collect::<Result<Vec<_>>>()?;
 
-                        let created_at = Time::parse(PropertyType::NoteTagCreated, &object)?
-                            .ok_or_else(|| {
-                                ErrorKind::MalformedOneNoteFileData(
-                                    "note tag has no created at time".into(),
-                                )
-                            })?;
+        Ok(Some(data))
+    }
 
-                        let completed_at = Time::parse(PropertyType::NoteTagCompleted, &object)?;
+    fn parse_data(object: Object) -> Result<Data> {
+        let definition = ObjectReference::parse(PropertyType::NoteTagDefinitionOid, &object)?;
 
-                        let item_status = ActionItemStatus::parse(&object)?.ok_or_else(|| {
-                            ErrorKind::MalformedOneNoteFileData(
-                                "note tag container has no item status".into(),
-                            )
-                        })?;
+        let created_at = Time::parse(PropertyType::NoteTagCreated, &object)?.ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("note tag has no created at time".into())
+        })?;
 
-                        Ok(Data {
-                            definition,
-                            created_at,
-                            completed_at,
-                            item_status,
-                        })
-                    })
-                    .collect::<Result<Vec<_>>>()
-            })
-            .transpose()
+        let completed_at = Time::parse(PropertyType::NoteTagCompleted, &object)?;
+
+        let item_status = ActionItemStatus::parse(&object)?.ok_or_else(|| {
+            ErrorKind::MalformedOneNoteFileData("note tag container has no item status".into())
+        })?;
+
+        Ok(Data {
+            definition,
+            created_at,
+            completed_at,
+            item_status,
+        })
+    }
+
+    fn parse_object<'a>(
+        object: &'a Object,
+        id: PropertyId,
+        props: &PropertySet,
+    ) -> Result<Object<'a>> {
+        Ok(Object {
+            context_id: object.context_id,
+            jc_id: JcId(id.value()),
+            props: ObjectPropSet {
+                object_ids: Self::get_object_ids(props, object)?,
+                object_space_ids: Self::get_object_space_ids(props, object)?,
+                context_ids: vec![],
+                properties: props.clone(),
+            },
+            file_data: None,
+            mapping: object.mapping.clone(),
+        })
     }
 
     fn get_object_ids(props: &PropertySet, object: &Object) -> Result<Vec<CompactId>> {

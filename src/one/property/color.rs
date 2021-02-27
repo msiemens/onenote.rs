@@ -39,23 +39,20 @@ impl Color {
 
 impl Color {
     pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Result<Option<Color>> {
-        let color = object
-            .props()
-            .get(prop_type)
-            .map(|value| {
-                value
-                    .to_u32()
-                    .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("color is not a u32".into()))
-            })
-            .transpose()?
-            .map(|value| value.to_le_bytes())
-            .map(|value| Color {
-                alpha: 255 - value[3],
-                r: value[0],
-                g: value[1],
-                b: value[2],
-            });
+        let value = match object.props().get(prop_type) {
+            Some(value) => value
+                .to_u32()
+                .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("color is not a u32".into()))?,
+            None => return Ok(None),
+        };
 
-        Ok(color)
+        let bytes = value.to_le_bytes();
+
+        Ok(Some(Color {
+            alpha: 255 - bytes[3],
+            r: bytes[0],
+            g: bytes[1],
+            b: bytes[2],
+        }))
     }
 }

@@ -18,23 +18,19 @@ pub enum ParagraphAlignment {
 
 impl ParagraphAlignment {
     pub(crate) fn parse(object: &Object) -> Result<Option<ParagraphAlignment>> {
-        let alignment = object
-            .props()
-            .get(PropertyType::ParagraphAlignment)
-            .map(|value| {
-                value.to_u8().ok_or_else(|| {
-                    ErrorKind::MalformedOneNoteFileData("paragraph alignment is not a u8".into())
-                })
-            })
-            .transpose()?
-            .map(|value| match value {
-                0 => ParagraphAlignment::Left,
-                1 => ParagraphAlignment::Center,
-                2 => ParagraphAlignment::Right,
-                _ => ParagraphAlignment::Unknown,
-            });
+        let value = match object.props().get(PropertyType::ParagraphAlignment) {
+            Some(value) => value.to_u8().ok_or_else(|| {
+                ErrorKind::MalformedOneNoteFileData("page size is not a u8".into())
+            })?,
+            None => return Ok(None),
+        };
 
-        Ok(alignment)
+        Ok(Some(match value {
+            0 => ParagraphAlignment::Left,
+            1 => ParagraphAlignment::Center,
+            2 => ParagraphAlignment::Right,
+            _ => ParagraphAlignment::Unknown,
+        }))
     }
 }
 

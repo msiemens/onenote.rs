@@ -33,40 +33,42 @@ pub enum Charset {
 
 impl Charset {
     pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Result<Option<Charset>> {
-        object
-            .props()
-            .get(prop_type)
-            .map(|value| {
-                value.to_u8().ok_or_else(|| {
-                    ErrorKind::MalformedOneNoteFileData("charset is not a u8".into())
-                })
-            })
-            .transpose()?
-            .map(|value| match value {
-                0 => Ok(Charset::Ansi),
-                1 => Ok(Charset::Default),
-                2 => Ok(Charset::Symbol),
-                77 => Ok(Charset::Mac),
-                128 => Ok(Charset::ShiftJis),
-                129 => Ok(Charset::Hangul),
-                130 => Ok(Charset::Johab),
-                134 => Ok(Charset::Gb2312),
-                136 => Ok(Charset::ChineseBig5),
-                161 => Ok(Charset::Greek),
-                162 => Ok(Charset::Turkish),
-                163 => Ok(Charset::Vietnamese),
-                177 => Ok(Charset::Hebrew),
-                178 => Ok(Charset::Arabic),
-                186 => Ok(Charset::Baltic),
-                204 => Ok(Charset::Russian),
-                222 => Ok(Charset::Thai),
-                238 => Ok(Charset::EastEurope),
-                255 => Ok(Charset::Oem),
-                _ => Err(ErrorKind::MalformedOneNoteFileData(
+        let value = match object.props().get(prop_type) {
+            Some(value) => value
+                .to_u8()
+                .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("charset is not a u8".into()))?,
+            None => return Ok(None),
+        };
+
+        let charset = match value {
+            0 => Charset::Ansi,
+            1 => Charset::Default,
+            2 => Charset::Symbol,
+            77 => Charset::Mac,
+            128 => Charset::ShiftJis,
+            129 => Charset::Hangul,
+            130 => Charset::Johab,
+            134 => Charset::Gb2312,
+            136 => Charset::ChineseBig5,
+            161 => Charset::Greek,
+            162 => Charset::Turkish,
+            163 => Charset::Vietnamese,
+            177 => Charset::Hebrew,
+            178 => Charset::Arabic,
+            186 => Charset::Baltic,
+            204 => Charset::Russian,
+            222 => Charset::Thai,
+            238 => Charset::EastEurope,
+            255 => Charset::Oem,
+            _ => {
+                return Err(ErrorKind::MalformedOneNoteFileData(
                     format!("invalid charset: {}", value).into(),
                 )
-                .into()),
-            })
-            .transpose()
+                .into())
+                .into()
+            }
+        };
+
+        Ok(Some(charset))
     }
 }

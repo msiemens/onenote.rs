@@ -38,38 +38,28 @@ impl LayoutAlignment {
         prop_type: PropertyType,
         object: &Object,
     ) -> Result<Option<LayoutAlignment>> {
-        object
-            .props()
-            .get(prop_type)
-            .map(|value| {
-                value.to_u32().ok_or_else(|| {
-                    ErrorKind::MalformedOneNoteFileData("layout alignment is not a u32".into())
-                })
-            })
-            .transpose()?
-            .and_then(|value| {
-                if (value >> 31) & 0x1 != 0 {
-                    None
-                } else {
-                    Some(value)
-                }
-            })
-            .map(|value| {
-                let alignment_horizontal = HorizontalAlignment::parse(value & 0x7)?;
-                let alignment_margin_horizontal =
-                    HorizontalAlignmentMargin::parse((value >> 3) & 0x1)?;
-                let alignment_vertical = VerticalAlignment::parse((value >> 16) & 0x1)?;
-                let alignment_margin_vertical =
-                    VerticalAlignmentMargin::parse((value >> 19) & 0x1)?;
+        let value = match object.props().get(prop_type) {
+            Some(value) => value.to_u32().ok_or_else(|| {
+                ErrorKind::MalformedOneNoteFileData("layout alignment is not a u32".into())
+            })?,
+            None => return Ok(None),
+        };
 
-                Ok(LayoutAlignment {
-                    alignment_horizontal,
-                    alignment_margin_horizontal,
-                    alignment_vertical,
-                    alignment_margin_vertical,
-                })
-            })
-            .transpose()
+        if (value >> 31) & 0x1 != 0 {
+            return Ok(None);
+        }
+
+        let alignment_horizontal = HorizontalAlignment::parse(value & 0x7)?;
+        let alignment_margin_horizontal = HorizontalAlignmentMargin::parse((value >> 3) & 0x1)?;
+        let alignment_vertical = VerticalAlignment::parse((value >> 16) & 0x1)?;
+        let alignment_margin_vertical = VerticalAlignmentMargin::parse((value >> 19) & 0x1)?;
+
+        Ok(Some(LayoutAlignment {
+            alignment_horizontal,
+            alignment_margin_horizontal,
+            alignment_vertical,
+            alignment_margin_vertical,
+        }))
     }
 }
 

@@ -25,28 +25,31 @@ pub enum ColorRef {
 
 impl ColorRef {
     pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Result<Option<ColorRef>> {
-        object
-            .props()
-            .get(prop_type)
-            .map(|value| {
-                value.to_u32().ok_or_else(|| {
-                    ErrorKind::MalformedOneNoteFileData("color ref is not a u32".into())
-                })
-            })
-            .transpose()?
-            .map(|value| value.to_le_bytes())
-            .map(|value| match value[3] {
-                0xFF => Ok(ColorRef::Auto),
-                0x00 => Ok(ColorRef::Manual {
-                    r: value[0],
-                    g: value[1],
-                    b: value[2],
-                }),
-                _ => Err(ErrorKind::MalformedOneNoteFileData(
-                    format!("invalid color ref: 0x{:08X}", u32::from_le_bytes(value)).into(),
+        let value = match object.props().get(prop_type) {
+            Some(value) => value.to_u32().ok_or_else(|| {
+                ErrorKind::MalformedOneNoteFileData("color ref is not a u32".into())
+            })?,
+            None => return Ok(None),
+        };
+
+        let bytes = value.to_le_bytes();
+
+        let color = match bytes[3] {
+            0xFF => ColorRef::Auto,
+            0x00 => ColorRef::Manual {
+                r: bytes[0],
+                g: bytes[1],
+                b: bytes[2],
+            },
+            _ => {
+                return Err(ErrorKind::MalformedOneNoteFileData(
+                    format!("invalid color ref: 0x{:08X}", value).into(),
                 )
-                .into()),
-            })
-            .transpose()
+                .into())
+                .into()
+            }
+        };
+
+        Ok(Some(color))
     }
 }

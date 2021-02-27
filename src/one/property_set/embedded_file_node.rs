@@ -55,24 +55,23 @@ pub enum FileType {
 
 impl FileType {
     fn parse(object: &Object) -> Result<FileType> {
-        let file_type = object
-            .props()
-            .get(PropertyType::IRecordMedia)
-            .map(|value| {
-                value.to_u32().ok_or_else(|| {
-                    ErrorKind::MalformedOneNoteFileData("file type is not a u32".into())
-                })
-            })
-            .transpose()?
-            .map(|value| match value {
-                1 => Ok(FileType::Audio),
-                2 => Ok(FileType::Video),
-                _ => Err(ErrorKind::MalformedOneNoteFileData(
+        let value = match object.props().get(PropertyType::IRecordMedia) {
+            Some(value) => value.to_u32().ok_or_else(|| {
+                ErrorKind::MalformedOneNoteFileData("file type status is not a u32".into())
+            })?,
+            None => return Ok(FileType::Unknown),
+        };
+
+        let file_type = match value {
+            1 => FileType::Audio,
+            2 => FileType::Video,
+            _ => {
+                return Err(ErrorKind::MalformedOneNoteFileData(
                     format!("invalid file type: {}", value).into(),
-                )),
-            })
-            .transpose()?
-            .unwrap_or(FileType::Unknown);
+                )
+                .into())
+            }
+        };
 
         Ok(file_type)
     }

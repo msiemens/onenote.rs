@@ -130,31 +130,27 @@ impl NoteTagPropertyStatus {
 
 impl NoteTagPropertyStatus {
     fn parse(object: &Object) -> Result<Option<NoteTagPropertyStatus>> {
-        let status = object
-            .props()
-            .get(PropertyType::NoteTagPropertyStatus)
-            .map(|value| {
-                value.to_u32().ok_or_else(|| {
-                    ErrorKind::MalformedOneNoteFileData(
-                        "note tag property status is not a u32".into(),
-                    )
-                })
-            })
-            .transpose()?
-            .map(|value| NoteTagPropertyStatus {
-                has_label: value & 0x1 != 0,
-                has_font_color: (value >> 1) & 0x1 != 0,
-                has_highlight_color: (value >> 2) & 0x1 != 0,
-                has_icon: (value >> 3) & 0x1 != 0,
-                due_today: (value >> 6) & 0x1 != 0,
-                due_tomorrow: (value >> 7) & 0x1 != 0,
-                due_this_week: (value >> 8) & 0x1 != 0,
-                due_next_week: (value >> 9) & 0x1 != 0,
-                due_later: (value >> 10) & 0x1 != 0,
-                due_custom: (value >> 11) & 0x1 != 0,
-            });
+        let value = match object.props().get(PropertyType::NoteTagPropertyStatus) {
+            Some(value) => value.to_u32().ok_or_else(|| {
+                ErrorKind::MalformedOneNoteFileData("note tag property status is not a u32".into())
+            })?,
+            None => return Ok(None),
+        };
 
-        Ok(status)
+        let status = NoteTagPropertyStatus {
+            has_label: value & 0x1 != 0,
+            has_font_color: (value >> 1) & 0x1 != 0,
+            has_highlight_color: (value >> 2) & 0x1 != 0,
+            has_icon: (value >> 3) & 0x1 != 0,
+            due_today: (value >> 6) & 0x1 != 0,
+            due_tomorrow: (value >> 7) & 0x1 != 0,
+            due_this_week: (value >> 8) & 0x1 != 0,
+            due_next_week: (value >> 9) & 0x1 != 0,
+            due_later: (value >> 10) & 0x1 != 0,
+            due_custom: (value >> 11) & 0x1 != 0,
+        };
+
+        Ok(Some(status))
     }
 }
 

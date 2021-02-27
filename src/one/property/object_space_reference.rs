@@ -17,15 +17,24 @@ impl ObjectSpaceReference {
         prop_type: PropertyType,
         object: &Object,
     ) -> Result<Option<Vec<CellId>>> {
-        let prop = unwrap_or_return!(object.props().get(prop_type));
-        let count = prop.to_object_space_ids().ok_or_else(|| {
-            ErrorKind::MalformedOneNoteFileData(
-                "object space reference array is not a object id array".into(),
-            )
-        })?;
+        // Determine the number of object space references
+        let count = match object.props().get(prop_type) {
+            Some(prop) => prop.to_object_space_ids().ok_or_else(|| {
+                ErrorKind::MalformedOneNoteFileData(
+                    "object space reference array is not a object id array".into(),
+                )
+            })?,
+            None => return Ok(None),
+        };
+
+        // Determine offset for the property for which we want to look up the object space
+        // reference
         let offset = Self::get_offset(prop_type, object)?;
-        let object_refs = object.props().object_space_ids();
-        let object_space_ids = object_refs
+
+        let references = object.props().object_space_ids();
+
+        // Look up the object space references by offset/count and resolve them
+        let object_space_ids = references
             .iter()
             .skip(offset)
             .take(count as usize)
