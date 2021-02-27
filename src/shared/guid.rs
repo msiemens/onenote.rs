@@ -21,6 +21,7 @@ impl Guid {
     }
 
     pub(crate) fn parse(reader: Reader) -> Result<Guid> {
+        // Read as little endian
         let v = reader.get_u128()?;
 
         let guid = Guid(Uuid::from_bytes([
