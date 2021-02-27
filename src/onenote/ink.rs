@@ -264,9 +264,6 @@ fn parse_ink_path(
     scale_x: Option<f32>,
     scale_y: Option<f32>,
 ) -> Result<Vec<InkPoint>> {
-    // Ignore the first value, we don't know what it means
-    let data = &data[1..];
-
     // Find dimension indexes
     let idx_x = props
         .dimensions
