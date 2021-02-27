@@ -4,7 +4,8 @@ use crate::fsshttpb::data_element::storage_index::StorageIndex;
 use crate::fsshttpb::data_element::storage_manifest::StorageManifest;
 use crate::fsshttpb::packaging::OneStorePackaging;
 use crate::onestore::header::StoreHeader;
-use crate::onestore::object_space::{ObjectSpace, Revision};
+use crate::onestore::object_space::ObjectSpace;
+use crate::onestore::revision::Revision;
 use crate::shared::guid::Guid;
 use std::collections::{HashMap, HashSet};
 
@@ -12,6 +13,7 @@ pub(crate) mod header;
 pub(crate) mod mapping_table;
 pub(crate) mod object;
 pub(crate) mod object_space;
+pub(crate) mod revision;
 mod revision_role;
 pub(crate) mod types;
 
