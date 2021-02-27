@@ -1,6 +1,6 @@
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
-use crate::one::property_set::embedded_file_node::FileType;
+use crate::one::property::file_type::FileType;
 use crate::one::property_set::{embedded_file_container, embedded_file_node};
 use crate::onenote::note_tag::{parse_note_tags, NoteTag};
 use crate::onestore::object_space::ObjectSpace;

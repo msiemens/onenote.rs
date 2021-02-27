@@ -2,12 +2,11 @@ use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property::note_tag::{ActionItemStatus, ActionItemType};
+use crate::one::property::note_tag_property_status::NoteTagPropertyStatus;
+use crate::one::property::note_tag_shape::NoteTagShape;
 use crate::one::property::time::Time;
 use crate::one::property_set::note_tag_container::Data;
 use crate::one::property_set::note_tag_shared_definition_container;
-use crate::one::property_set::note_tag_shared_definition_container::{
-    NoteTagPropertyStatus, NoteTagShape,
-};
 use crate::onestore::object_space::ObjectSpace;
 
 /// A note tag.

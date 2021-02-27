@@ -61,15 +61,14 @@ pub mod property {
 
     /// Properties related to embedded files.
     pub mod embedded_file {
-        pub use crate::one::property_set::embedded_file_node::FileType;
+        pub use crate::one::property::file_type::FileType;
     }
 
     /// Properties related to note tags.
     pub mod note_tag {
         pub use crate::one::property::note_tag::{ActionItemStatus, ActionItemType};
-        pub use crate::one::property_set::note_tag_shared_definition_container::{
-            NoteTagPropertyStatus, NoteTagShape,
-        };
+        pub use crate::one::property::note_tag_property_status::NoteTagPropertyStatus;
+        pub use crate::one::property::note_tag_shape::NoteTagShape;
         pub use crate::onenote::note_tag::NoteTagDefinition;
     }
 

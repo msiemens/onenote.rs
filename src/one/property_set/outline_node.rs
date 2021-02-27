@@ -2,6 +2,7 @@ use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::object_reference::ObjectReference;
+use crate::one::property::outline_indent_distance::OutlineIndentDistance;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
@@ -37,38 +38,6 @@ pub(crate) struct Data {
     pub(crate) is_read_only: bool,
     pub(crate) descendants_cannot_be_moved: bool,
     pub(crate) tight_layout: bool,
-}
-
-#[derive(Debug, Clone)]
-pub struct OutlineIndentDistance(Vec<f32>);
-
-impl OutlineIndentDistance {
-    pub fn value(&self) -> &[f32] {
-        &self.0
-    }
-
-    pub(crate) fn into_value(self) -> Vec<f32> {
-        self.0
-    }
-
-    pub(crate) fn parse(object: &Object) -> Result<Option<OutlineIndentDistance>> {
-        let value = match object.props().get(PropertyType::RgOutlineIndentDistance) {
-            Some(value) => value.to_vec().ok_or_else(|| {
-                ErrorKind::MalformedOneNoteFileData("outline indent distance is not a vec".into())
-            })?,
-            None => return Ok(None),
-        };
-
-        let mut reader = Reader::new(value);
-        let count = reader.get_u8()?;
-        reader.advance(3)?;
-
-        let distances = (0..count)
-            .map(|_| reader.get_f32())
-            .collect::<Result<Vec<_>>>()?;
-
-        Ok(Some(OutlineIndentDistance(distances)))
-    }
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
