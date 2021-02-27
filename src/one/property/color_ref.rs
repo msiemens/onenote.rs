@@ -46,7 +46,6 @@ impl ColorRef {
                     format!("invalid color ref: 0x{:08X}", value).into(),
                 )
                 .into())
-                .into()
             }
         };
 

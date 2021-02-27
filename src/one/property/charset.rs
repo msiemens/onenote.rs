@@ -65,7 +65,6 @@ impl Charset {
                     format!("invalid charset: {}", value).into(),
                 )
                 .into())
-                .into()
             }
         };
 

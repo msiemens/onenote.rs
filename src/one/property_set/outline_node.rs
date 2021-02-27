@@ -7,7 +7,6 @@ use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
-use crate::reader::Reader;
 
 /// An outline group.
 ///

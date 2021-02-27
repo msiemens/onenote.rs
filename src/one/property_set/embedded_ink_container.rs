@@ -35,7 +35,7 @@ impl Data {
         };
 
         let data = prop_sets
-            .into_iter()
+            .iter()
             .map(|props| {
                 let object = Self::parse_object(object, prop_id, props)?;
                 let data = Self::parse_data(object)?;
