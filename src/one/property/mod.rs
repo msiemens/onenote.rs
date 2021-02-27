@@ -203,4 +203,8 @@ pub(crate) enum PropertyType {
     EmbeddedInkOffsetVert = 0x140034A3,
     EmbeddedInkSpaceWidth = 0x14001C27,
     EmbeddedInkSpaceHeight = 0x14001C28,
+    InkAnalysis = 0x200035D7,
+    InkAnalysisReference = 0x240035D9,
+    InkAnalysisWordAlternatives = 0x1C0035DA,
+    InkAnalysisWordLanguageId = 0x100035DC,
 }

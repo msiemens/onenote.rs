@@ -2,6 +2,7 @@ use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::{page_manifest_node, page_metadata, page_node, title_node};
+use crate::onenote::ink_analysis::{parse_ink_analysis, InkAnalysis};
 use crate::onenote::outline::{parse_outline, Outline};
 use crate::onenote::page_content::{parse_page_content, PageContent};
 use crate::onestore::object_space::ObjectSpace;
@@ -19,6 +20,7 @@ pub struct Page {
     author: Option<String>,
     height: Option<f32>,
     contents: Vec<PageContent>,
+    ink_analysis: Option<InkAnalysis>,
 }
 
 impl Page {
@@ -163,12 +165,18 @@ pub(crate) fn parse_page(page_space: &ObjectSpace) -> Result<Page> {
         .map(|content_id| parse_page_content(content_id, page_space))
         .collect::<Result<_>>()?;
 
+    let ink_analysis = data
+        .ink_analysis
+        .map(|id| parse_ink_analysis(id, page_space))
+        .transpose()?;
+
     Ok(Page {
         title,
         level,
         author: data.author.map(|author| author.into_value()),
         height: data.page_height,
         contents,
+        ink_analysis,
     })
 }
 

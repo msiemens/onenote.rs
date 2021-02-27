@@ -12,6 +12,10 @@ pub(crate) mod embedded_file_container;
 pub(crate) mod embedded_file_node;
 pub(crate) mod embedded_ink_container;
 pub(crate) mod image_node;
+pub(crate) mod ink_analysis;
+pub(crate) mod ink_analysis_line;
+pub(crate) mod ink_analysis_paragraph;
+pub(crate) mod ink_analysis_word;
 pub(crate) mod ink_container;
 pub(crate) mod ink_data_node;
 pub(crate) mod ink_stroke_node;
@@ -70,6 +74,10 @@ pub(crate) enum PropertySetId {
     InkDataNode = 0x0002003B,
     InkStrokeNode = 0x00020047,
     StrokePropertiesNode = 0x00120048,
+    InkAnalysis = 0x00020054,
+    InkAnalysisParagraph = 0x00020055,
+    InkAnalysisLine = 0x00020056,
+    InkAnalysisWord = 0x00020057,
 }
 
 impl PropertySetId {

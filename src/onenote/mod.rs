@@ -13,6 +13,7 @@ pub(crate) mod content;
 pub(crate) mod embedded_file;
 pub(crate) mod image;
 pub(crate) mod ink;
+pub(crate) mod ink_analysis;
 pub(crate) mod list;
 pub(crate) mod note_tag;
 pub(crate) mod notebook;
