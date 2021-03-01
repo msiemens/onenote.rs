@@ -2,6 +2,7 @@ use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::{image_node, picture_container};
+use crate::onenote::iframe::{parse_iframe, IFrame};
 use crate::onenote::note_tag::{parse_note_tags, NoteTag};
 use crate::onestore::object_space::ObjectSpace;
 
@@ -42,6 +43,8 @@ pub struct Image {
     pub(crate) is_background: bool,
 
     pub(crate) note_tags: Vec<NoteTag>,
+
+    pub(crate) embeds: Vec<IFrame>,
 }
 
 impl Image {
@@ -186,6 +189,11 @@ impl Image {
     pub fn note_tags(&self) -> &[NoteTag] {
         &self.note_tags
     }
+
+    /// Embedded iframes for this image.
+    pub fn embeds(&self) -> &[IFrame] {
+        &self.embeds
+    }
 }
 
 pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Result<Image> {
@@ -211,6 +219,12 @@ pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Result<Image
         (None, None)
     };
 
+    let embed = node
+        .iframe
+        .into_iter()
+        .map(|iframe_id| parse_iframe(iframe_id, space))
+        .collect::<Result<_>>()?;
+
     // TODO: Parse language code
 
     let image = Image {
@@ -232,6 +246,7 @@ pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Result<Image
         offset_vertical: node.offset_from_parent_vert,
         is_background: node.is_background,
         note_tags: parse_note_tags(node.note_tags, space)?,
+        embeds: embed,
     };
 
     Ok(image)

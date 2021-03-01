@@ -11,6 +11,7 @@ use std::path::Path;
 
 pub(crate) mod content;
 pub(crate) mod embedded_file;
+pub(crate) mod iframe;
 pub(crate) mod image;
 pub(crate) mod ink;
 pub(crate) mod list;

@@ -203,4 +203,6 @@ pub(crate) enum PropertyType {
     EmbeddedInkOffsetVert = 0x140034A3,
     EmbeddedInkSpaceWidth = 0x14001C27,
     EmbeddedInkSpaceHeight = 0x14001C28,
+    ImageEmbedType = 0x140035F2,
+    ImageEmbeddedUrl = 0x1C0035F3,
 }

@@ -11,6 +11,7 @@ use num_traits::FromPrimitive;
 pub(crate) mod embedded_file_container;
 pub(crate) mod embedded_file_node;
 pub(crate) mod embedded_ink_container;
+pub(crate) mod iframe_node;
 pub(crate) mod image_node;
 pub(crate) mod ink_container;
 pub(crate) mod ink_data_node;
@@ -70,6 +71,7 @@ pub(crate) enum PropertySetId {
     InkDataNode = 0x0002003B,
     InkStrokeNode = 0x00020047,
     StrokePropertiesNode = 0x00120048,
+    IFrameNode = 0x00060058,
 }
 
 impl PropertySetId {

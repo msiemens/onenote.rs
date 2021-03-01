@@ -35,6 +35,7 @@ pub(crate) struct Data {
     pub(crate) offset_from_parent_horiz: Option<f32>,
     pub(crate) offset_from_parent_vert: Option<f32>,
     pub(crate) is_background: bool,
+    pub(crate) iframe: Vec<ExGuid>,
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
@@ -72,6 +73,9 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
 
     let note_tags = NoteTagData::parse(object)?.unwrap_or_default();
 
+    let iframe =
+        ObjectReference::parse_vec(PropertyType::ContentChildNodes, object)?.unwrap_or_default();
+
     let data = Data {
         last_modified,
         picture_container,
@@ -93,6 +97,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
         offset_from_parent_horiz,
         offset_from_parent_vert,
         is_background,
+        iframe,
     };
 
     Ok(data)
