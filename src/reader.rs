@@ -40,7 +40,7 @@ impl<'a> Reader<'a> {
     }
 
     pub(crate) fn bytes(&self) -> &[u8] {
-        self.0.bytes()
+        self.0.chunk()
     }
 
     pub(crate) fn remaining(&self) -> usize {
