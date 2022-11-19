@@ -51,8 +51,8 @@ impl From<std::string::FromUtf16Error> for Error {
     }
 }
 
-impl From<widestring::MissingNulError<u16>> for Error {
-    fn from(err: widestring::MissingNulError<u16>) -> Self {
+impl From<widestring::error::MissingNulTerminator> for Error {
+    fn from(err: widestring::error::MissingNulTerminator) -> Self {
         ErrorKind::from(err).into()
     }
 }
@@ -128,6 +128,6 @@ pub enum ErrorKind {
     #[error("UTF-16 string is missing null terminator: {err}")]
     Utf16MissingNull {
         #[from]
-        err: widestring::MissingNulError<u16>,
+        err: widestring::error::MissingNulTerminator,
     },
 }
