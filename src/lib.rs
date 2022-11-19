@@ -2,7 +2,8 @@
 
 #![warn(missing_docs)]
 #![deny(unused_must_use)]
-#![cfg_attr(feature = "backtrace", feature(backtrace))]
+#![cfg_attr(feature = "backtrace", feature(error_generic_member_access))]
+#![cfg_attr(feature = "backtrace", feature(provide_any))]
 
 pub mod errors;
 mod fsshttpb;

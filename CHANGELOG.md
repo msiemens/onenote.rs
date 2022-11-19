@@ -10,6 +10,12 @@ and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0
 
 - Feature: Add support for parsing embed URLs for images.
 
+### Changed
+
+- Internal: Update dependencies
+- Internal: Add `provide_any` and `error_generic_member_access` features when
+  `backtrace` feature is enabled
+
 ## [0.3.0] - 2021-02-20
 
 ### Added
