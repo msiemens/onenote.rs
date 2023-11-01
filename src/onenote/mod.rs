@@ -6,8 +6,9 @@ use crate::onestore::parse_store;
 use crate::reader::Reader;
 use std::ffi::OsStr;
 use std::fs::File;
-use std::io::{BufReader, Read};
+use std::io::{BufReader, Read, Cursor};
 use std::path::Path;
+use std::str::FromStr;
 
 pub(crate) mod content;
 pub(crate) mod embedded_file;
@@ -74,6 +75,26 @@ impl Parser {
             .collect::<Result<_>>()?;
 
         Ok(Notebook { entries: sections })
+    }
+
+    /// Parse a OneNote section buffer.
+    ///
+    /// The `data` argument must contain a OneNote section.
+    pub fn parse_section_buffer(&mut self, data: &[u8], file_name: &Path) -> Result<Section> {
+        let packaging = OneStorePackaging::parse(&mut Reader::new(data))?;
+        let store = parse_store(&packaging)?;
+
+        if store.schema_guid() != guid!({1F937CB4-B26F-445F-B9F8-17E20160E461}) {
+            return Err(ErrorKind::NotASectionFile {
+                file: file_name.to_string_lossy().into_owned(),
+            }
+            .into());
+        }
+
+        section::parse_section(
+            store,
+            file_name.to_string_lossy().into_owned(),
+        )
     }
 
     /// Parse a OneNote section file.
