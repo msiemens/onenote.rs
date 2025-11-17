@@ -26,6 +26,7 @@ pub(crate) mod time;
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[allow(dead_code)]
 #[allow(clippy::enum_clike_unportable_variant)]
+#[allow(overflowing_literals)]
 pub(crate) enum PropertyType {
     ActionItemSchemaVersion = 0x0C003473,
     ActionItemStatus = 0x10003470,
