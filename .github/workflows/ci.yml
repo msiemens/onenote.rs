@@ -28,8 +28,15 @@ jobs:
           components: rustfmt, clippy
 
       - uses: actions-rs/cargo@v1
+        if: ${{ matrix.rust != 'nightly' }}
         with:
           command: build
+
+      - uses: actions-rs/cargo@v1
+        if: ${{ matrix.rust == 'nightly' }}
+        with:
+          command: build
+          args: --all-features
 
       - uses: actions-rs/cargo@v1
         with:
