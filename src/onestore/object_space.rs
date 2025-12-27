@@ -27,7 +27,7 @@ pub(crate) struct ObjectSpace<'a> {
 }
 
 impl<'a, 'b> ObjectSpace<'a> {
-    pub(crate) fn get_object(&self, id: ExGuid) -> Option<&Object> {
+    pub(crate) fn get_object(&self, id: ExGuid) -> Option<&Object<'_>> {
         self.objects.get(&id)
     }
 

@@ -1,6 +1,6 @@
 use crate::errors::{ErrorKind, Result};
 use bytes::Buf;
-use paste::paste;
+use pastey::paste;
 use std::mem;
 
 macro_rules! try_get {

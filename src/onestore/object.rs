@@ -45,7 +45,7 @@ impl<'a> Object<'a> {
     }
 
     pub(crate) fn file_data(&self) -> Option<&[u8]> {
-        self.file_data.as_deref()
+        self.file_data
     }
 
     pub(crate) fn mapping(&self) -> &MappingTable {

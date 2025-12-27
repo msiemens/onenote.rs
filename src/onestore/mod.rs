@@ -30,7 +30,7 @@ impl<'a> OneStore<'a> {
         self.schema
     }
 
-    pub(crate) fn data_root(&'a self) -> &'a ObjectSpace {
+    pub(crate) fn data_root(&'a self) -> &'a ObjectSpace<'a> {
         &self.data_root
     }
 
@@ -39,7 +39,7 @@ impl<'a> OneStore<'a> {
     }
 }
 
-pub(crate) fn parse_store(package: &OneStorePackaging) -> Result<OneStore> {
+pub(crate) fn parse_store(package: &OneStorePackaging) -> Result<OneStore<'_>> {
     let mut parsed_object_spaces = HashSet::new();
 
     // [ONESTORE] 2.7.1: Parse storage manifest
@@ -63,7 +63,7 @@ pub(crate) fn parse_store(package: &OneStorePackaging) -> Result<OneStore> {
     // [ONESTORE] 2.7.2: Parse header cell
     let header_cell = package
         .data_element_package
-        .find_objects(header_cell_mapping_id, &storage_index)?
+        .find_objects(header_cell_mapping_id, storage_index)?
         .into_iter()
         .next()
         .ok_or_else(|| {
@@ -83,7 +83,7 @@ pub(crate) fn parse_store(package: &OneStorePackaging) -> Result<OneStore> {
     let (_, data_root) = parse_object_space(
         data_root_cell_id,
         storage_index,
-        &package,
+        package,
         &mut revision_cache,
     )?;
 
@@ -105,7 +105,7 @@ pub(crate) fn parse_store(package: &OneStorePackaging) -> Result<OneStore> {
         let (id, group) = parse_object_space(
             mapping.cell_id,
             storage_index,
-            &package,
+            package,
             &mut revision_cache,
         )?;
         object_spaces.insert(id, group);
@@ -119,11 +119,11 @@ pub(crate) fn parse_store(package: &OneStorePackaging) -> Result<OneStore> {
     })
 }
 
-fn parse_object_space<'a, 'b>(
+fn parse_object_space<'a>(
     cell_id: CellId,
     storage_index: &'a StorageIndex,
     package: &'a OneStorePackaging,
-    revision_cache: &'b mut HashMap<CellId, Revision<'a>>,
+    revision_cache: &mut HashMap<CellId, Revision<'a>>,
 ) -> Result<(CellId, ObjectSpace<'a>)> {
     let mapping = storage_index
         .cell_mappings

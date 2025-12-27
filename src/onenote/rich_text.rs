@@ -395,7 +395,7 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result
         .flat_map(|(object_data, style_data)| {
             style_data
                 .text_run_is_embedded_object
-                .then(|| (style_data.text_run_object_type, object_data))
+                .then_some((style_data.text_run_object_type, object_data))
         })
         .collect_vec();
 
