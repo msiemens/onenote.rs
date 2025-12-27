@@ -102,12 +102,8 @@ pub(crate) fn parse_store(package: &OneStorePackaging) -> Result<OneStore<'_>> {
             continue;
         }
 
-        let (id, group) = parse_object_space(
-            mapping.cell_id,
-            storage_index,
-            package,
-            &mut revision_cache,
-        )?;
+        let (id, group) =
+            parse_object_space(mapping.cell_id, storage_index, package, &mut revision_cache)?;
         object_spaces.insert(id, group);
     }
 
