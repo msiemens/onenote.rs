@@ -23,6 +23,7 @@ mod references;
 pub(crate) mod simple;
 pub(crate) mod time;
 
+#[repr(u32)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[allow(dead_code)]
 #[allow(clippy::enum_clike_unportable_variant)]
