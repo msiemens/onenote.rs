@@ -45,4 +45,4 @@ jobs:
         with:
           command: clippy
 
-      - uses: EmbarkStudios/cargo-deny-action@v1
+      - uses: EmbarkStudios/cargo-deny-action@v2
