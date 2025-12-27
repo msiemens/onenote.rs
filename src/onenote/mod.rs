@@ -6,7 +6,7 @@ use crate::onestore::parse_store;
 use crate::reader::Reader;
 use std::ffi::OsStr;
 use std::fs::File;
-use std::io::{BufReader, Read, Cursor};
+use std::io::{BufReader, Cursor, Read};
 use std::path::Path;
 use std::str::FromStr;
 
@@ -84,17 +84,14 @@ impl Parser {
         let packaging = OneStorePackaging::parse(&mut Reader::new(data))?;
         let store = parse_store(&packaging)?;
 
-        if store.schema_guid() != guid!({1F937CB4-B26F-445F-B9F8-17E20160E461}) {
+        if store.schema_guid() != guid!({ 1F937CB4 - B26F - 445F - B9F8 - 17E20160E461 }) {
             return Err(ErrorKind::NotASectionFile {
                 file: file_name.to_string_lossy().into_owned(),
             }
             .into());
         }
 
-        section::parse_section(
-            store,
-            file_name.to_string_lossy().into_owned(),
-        )
+        section::parse_section(store, file_name.to_string_lossy().into_owned())
     }
 
     /// Parse a OneNote section file.
