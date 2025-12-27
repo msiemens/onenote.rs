@@ -51,15 +51,16 @@ impl<'a, 'b> ObjectSpace<'a> {
         let context_id = cell_id.0;
         let object_space_id = cell_id.1;
 
-        let cell_revision_id = packaging.data_element_package.find_cell_revision_id(mapping.id);
+        let cell_revision_id = packaging
+            .data_element_package
+            .find_cell_revision_id(mapping.id);
 
         let revision_manifest_id = packaging
             .data_element_package
             .resolve_cell_revision_manifest_id(storage_index, mapping.id)
             .or_else(|| storage_index.find_revision_mapping_by_serial(&mapping.serial));
 
-        if revision_manifest_id.is_none()
-            && cell_revision_id.map(|id| id.is_nil()).unwrap_or(false)
+        if revision_manifest_id.is_none() && cell_revision_id.map(|id| id.is_nil()).unwrap_or(false)
         {
             return Ok((
                 cell_id,
@@ -105,5 +106,4 @@ impl<'a, 'b> ObjectSpace<'a> {
 
         Ok((cell_id, space))
     }
-
 }

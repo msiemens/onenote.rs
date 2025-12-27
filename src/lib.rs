@@ -4,10 +4,11 @@
 #![deny(unused_must_use)]
 #![cfg_attr(feature = "backtrace", feature(error_generic_member_access))]
 
-pub mod errors;
-mod fsshttpb;
 #[macro_use]
 mod macros;
+
+pub mod errors;
+mod fsshttpb;
 mod one;
 mod onenote;
 mod onestore;
@@ -15,7 +16,7 @@ mod reader;
 mod shared;
 mod utils;
 
-pub(crate) type Reader<'a, 'b> = &'b mut crate::reader::Reader<'a>;
+pub(crate) type Reader<'a, 'b> = &'b mut reader::Reader<'a>;
 
 pub use crate::onenote::Parser;
 

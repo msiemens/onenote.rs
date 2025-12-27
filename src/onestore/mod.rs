@@ -134,7 +134,7 @@ fn parse_object_space<'a>(
 fn find_header_cell_id(manifest: &StorageManifest) -> Result<CellId> {
     manifest
         .roots
-        .get(&exguid!({{1A5A319C-C26B-41AA-B9C5-9BD8C44E07D4}, 1}))
+        .get(&exguid!({{"1A5A319C-C26B-41AA-B9C5-9BD8C44E07D4"}, 1}))
         .copied()
         .ok_or_else(|| ErrorKind::MalformedOneStoreData("no header cell root".into()).into())
 }
@@ -142,7 +142,7 @@ fn find_header_cell_id(manifest: &StorageManifest) -> Result<CellId> {
 fn find_data_root_cell_id(manifest: &StorageManifest) -> Result<CellId> {
     manifest
         .roots
-        .get(&exguid!({{84DEFAB9-AAA3-4A0D-A3A8-520C77AC7073}, 2}))
+        .get(&exguid!({{"84DEFAB9-AAA3-4A0D-A3A8-520C77AC7073"}, 2}))
         .copied()
         .ok_or_else(|| ErrorKind::MalformedOneStoreData("no header cell root".into()).into())
 }
