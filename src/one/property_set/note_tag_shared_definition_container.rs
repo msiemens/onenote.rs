@@ -13,6 +13,7 @@ use crate::onestore::object::Object;
 ///
 /// [\[MS-ONE\] 2.2.41]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/eb5f52d2-c507-45c8-9bda-f8c74d34533a
 #[derive(Debug)]
+#[allow(dead_code)]
 pub(crate) struct Data {
     pub(crate) label: String,
     pub(crate) status: NoteTagPropertyStatus,

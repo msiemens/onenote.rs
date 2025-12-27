@@ -6,6 +6,7 @@ use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
 /// An ink data container.
+#[allow(dead_code)]
 pub(crate) struct Data {
     pub(crate) strokes: Vec<ExGuid>,
     pub(crate) bounding_box: Option<[u32; 4]>,

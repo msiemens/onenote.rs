@@ -6,9 +6,8 @@ use crate::onestore::parse_store;
 use crate::reader::Reader;
 use std::ffi::OsStr;
 use std::fs::File;
-use std::io::{BufReader, Cursor, Read};
+use std::io::{BufReader, Read};
 use std::path::Path;
-use std::str::FromStr;
 
 pub(crate) mod content;
 pub(crate) mod embedded_file;

@@ -4,6 +4,7 @@ use crate::Reader;
 use std::fmt;
 
 /// A property value.
+#[allow(dead_code)]
 #[derive(Debug, Clone)]
 pub(crate) enum PropertyValue {
     Empty,

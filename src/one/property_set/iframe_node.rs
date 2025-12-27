@@ -4,6 +4,7 @@ use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 
 /// An ink data container.
+#[allow(dead_code)]
 pub(crate) struct Data {
     pub(crate) embed_type: Option<u32>,
     pub(crate) source_url: String,

@@ -11,6 +11,7 @@ use crate::onestore::object::Object;
 ///
 /// [\[MS-ONE\] 2.2.15]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/6c1dd264-850b-4e46-af62-50b4dba49b62
 #[derive(Debug)]
+#[allow(dead_code)]
 pub(crate) struct Data {
     pub(crate) children: Vec<ExGuid>,
     pub(crate) filename: Option<String>,

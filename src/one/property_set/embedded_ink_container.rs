@@ -11,6 +11,7 @@ use crate::onestore::types::property::PropertyId;
 
 /// An embedded ink handwriting container.
 #[derive(Debug)]
+#[allow(dead_code)]
 pub(crate) struct Data {
     pub(crate) space_width: Option<f32>,
     pub(crate) space_height: Option<f32>,
