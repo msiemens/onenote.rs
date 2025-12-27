@@ -17,3 +17,11 @@ fn test_parse_notebook() {
     let mut parser = Parser::new();
     assert_debug_snapshot!(parser.parse_notebook(&path).unwrap());
 }
+
+#[test]
+fn test_parse_section_with_image_missing_last_modified() {
+    let path = PathBuf::from("tests/samples/Schnelle Notizen.one");
+
+    let mut parser = Parser::new();
+    assert_debug_snapshot!(parser.parse_section(&path).unwrap());
+}

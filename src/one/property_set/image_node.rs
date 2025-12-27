@@ -15,7 +15,7 @@ use crate::onestore::object::Object;
 /// [\[MS-ONE\] 2.2.24]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b7bb4d1a-2a57-4819-9eb4-5a2ce8cf210f
 #[derive(Debug)]
 pub(crate) struct Data {
-    pub(crate) last_modified: Time,
+    pub(crate) last_modified: Option<Time>,
     pub(crate) picture_container: Option<ExGuid>,
     pub(crate) layout_max_width: Option<f32>,
     pub(crate) layout_max_height: Option<f32>,
@@ -46,9 +46,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
         .into());
     }
 
-    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {
-        ErrorKind::MalformedOneNoteFileData("image has no last modified time".into())
-    })?;
+    let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?;
     let picture_container = ObjectReference::parse(PropertyType::PictureContainer, object)?;
     let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object)?;
     let layout_max_height = simple::parse_f32(PropertyType::LayoutMaxHeight, object)?;
