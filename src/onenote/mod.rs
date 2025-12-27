@@ -45,7 +45,7 @@ impl Parser {
         let packaging = OneStorePackaging::parse(&mut Reader::new(data.as_slice()))?;
         let store = parse_store(&packaging)?;
 
-        if store.schema_guid() != guid!({E4DBFD38-E5C7-408B-A8A1-0E7B421E1F5F}) {
+        if store.schema_guid() != guid!({ E4DBFD38 - E5C7 - 408B - A8A1 - 0E7B421E1F5F }) {
             return Err(ErrorKind::NotATocFile {
                 file: path.to_string_lossy().to_string(),
             }
@@ -86,7 +86,7 @@ impl Parser {
         let packaging = OneStorePackaging::parse(&mut Reader::new(data.as_slice()))?;
         let store = parse_store(&packaging)?;
 
-        if store.schema_guid() != guid!({1F937CB4-B26F-445F-B9F8-17E20160E461}) {
+        if store.schema_guid() != guid!({ 1F937CB4 - B26F - 445F - B9F8 - 17E20160E461 }) {
             return Err(ErrorKind::NotASectionFile {
                 file: path.to_string_lossy().to_string(),
             }
