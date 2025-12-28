@@ -25,26 +25,29 @@ impl Notebook {
     }
 }
 
+struct TocEntry {
+    entries: Vec<(u32, String)>,
+    color: Option<Color>,
+}
+
 pub(crate) fn parse_toc(space: &ObjectSpace) -> Result<(Vec<String>, Option<Color>)> {
     let content_id = space
         .content_root()
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("notebook has no content root".into()))?;
 
-    let (entries, color) = parse_toc_entry(content_id, space)?;
-    let toc = entries
+    let entry = parse_toc_entry(content_id, space)?;
+    let toc = entry
+        .entries
         .into_iter()
         .sorted_by_key(|(ordering_id, _)| *ordering_id)
         .dedup_by(|(_, a), (_, b)| a == b)
         .map(|(_, name)| name)
         .collect();
 
-    Ok((toc, color))
+    Ok((toc, entry.color))
 }
 
-fn parse_toc_entry(
-    content_id: ExGuid,
-    space: &ObjectSpace,
-) -> Result<(Vec<(u32, String)>, Option<Color>)> {
+fn parse_toc_entry(content_id: ExGuid, space: &ObjectSpace) -> Result<TocEntry> {
     let content = space.get_object(content_id).ok_or_else(|| {
         ErrorKind::MalformedOneNoteData("notebook content root is missing".into())
     })?;
@@ -56,7 +59,10 @@ fn parse_toc_entry(
             .ordering_id
             .ok_or_else(|| ErrorKind::MalformedOneNoteData("section has no order id".into()))?;
 
-        Ok((vec![(ordering_id, name)], toc.color))
+        Ok(TocEntry {
+            entries: vec![(ordering_id, name)],
+            color: toc.color,
+        })
     } else {
         let children = toc
             .children
@@ -64,9 +70,12 @@ fn parse_toc_entry(
             .map(|content_id| parse_toc_entry(content_id, space))
             .collect::<Result<Vec<_>>>()?
             .into_iter()
-            .flat_map(|(children, _)| children)
+            .flat_map(|entry| entry.entries)
             .collect();
 
-        Ok((children, toc.color))
+        Ok(TocEntry {
+            entries: children,
+            color: toc.color,
+        })
     }
 }
