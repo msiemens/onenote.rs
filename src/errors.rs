@@ -13,8 +13,8 @@ pub type Result<T> = std::result::Result<T, Error>;
 ///
 /// If the crate is compiled with the `backtrace` feature enabled, the
 /// parsing error struct will contain a backtrace of the location where
-/// the error occured. The backtrace can be accessed using
-/// [`std::error::Error::backtrace()`].
+/// the error occurred. The backtrace can be accessed using
+/// `std::error::Error::backtrace`.
 #[derive(Error, Debug)]
 #[error("{kind}")]
 pub struct Error {

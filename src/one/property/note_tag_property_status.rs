@@ -22,7 +22,7 @@ pub struct NoteTagPropertyStatus {
 }
 
 impl NoteTagPropertyStatus {
-    /// Whether the note tag has a labe.
+    /// Whether the note tag has a label.
     pub fn has_label(&self) -> bool {
         self.has_label
     }
@@ -42,32 +42,32 @@ impl NoteTagPropertyStatus {
         self.has_icon
     }
 
-    /// Whether the note tag has is due today.
+    /// Whether the note tag is due today.
     pub fn due_today(&self) -> bool {
         self.due_today
     }
 
-    /// Whether the note tag has is due tomorrow.
+    /// Whether the note tag is due tomorrow.
     pub fn due_tomorrow(&self) -> bool {
         self.due_tomorrow
     }
 
-    /// Whether the note tag has is due this week.
+    /// Whether the note tag is due this week.
     pub fn due_this_week(&self) -> bool {
         self.due_this_week
     }
 
-    /// Whether the note tag has is due next week.
+    /// Whether the note tag is due next week.
     pub fn due_next_week(&self) -> bool {
         self.due_next_week
     }
 
-    /// Whether the note tag has is due later.
+    /// Whether the note tag is due later.
     pub fn due_later(&self) -> bool {
         self.due_later
     }
 
-    /// Whether the note tag has is due at a custom date.
+    /// Whether the note tag is due at a custom date.
     pub fn due_custom(&self) -> bool {
         self.due_custom
     }

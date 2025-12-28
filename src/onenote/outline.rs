@@ -197,7 +197,7 @@ impl OutlineGroup {
     }
 }
 
-/// A container for a outline's content element.
+/// A container for an outline's content element.
 ///
 /// See [\[MS-ONE\] 1.3.2.2] and [\[MS-ONE\] 2.2.21].
 ///

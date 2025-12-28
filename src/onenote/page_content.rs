@@ -8,13 +8,17 @@ use crate::onenote::outline::{Outline, parse_outline};
 use crate::onestore::object_space::ObjectSpace;
 
 /// The contents of a page.
-#[allow(missing_docs)]
 #[derive(Clone, Debug)]
 pub enum PageContent {
+    /// An outline block.
     Outline(Outline),
+    /// An embedded image.
     Image(Image),
+    /// An embedded file.
     EmbeddedFile(EmbeddedFile),
+    /// An ink drawing.
     Ink(Ink),
+    /// Content of unknown type.
     Unknown,
 }
 

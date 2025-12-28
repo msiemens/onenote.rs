@@ -7,7 +7,7 @@ fn main() {
     let path = env::args().nth(1).expect("usage: parse <file>");
     let path = PathBuf::from(path);
 
-    let mut parser = Parser::new();
+    let parser = Parser::new();
     if path.extension() == Some(&OsString::from("onetoc2".to_string())) {
         let notebook = parser.parse_notebook(&path).unwrap();
         println!("{:#?}", notebook);

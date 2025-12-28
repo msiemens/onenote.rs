@@ -48,7 +48,7 @@ impl Table {
 
     /// Which columns have a locked width.
     ///
-    /// To determine if column `c` has a locked with, calculate:
+    /// To determine if column `c` has a locked width, calculate:
     ///
     /// ```ignore
     /// table.cols_locked()[c / 8] & (1 << (c % 8)) == 1;

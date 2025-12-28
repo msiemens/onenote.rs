@@ -11,9 +11,12 @@ pub struct IFrame {
 }
 
 impl IFrame {
+    /// The iframe's embed type, if provided.
     pub fn embed_type(&self) -> Option<u32> {
         self.embed_type
     }
+
+    /// The iframe's source URL.
     pub fn source_url(&self) -> &str {
         &self.source_url
     }

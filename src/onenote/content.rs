@@ -23,7 +23,7 @@ pub enum Content {
     /// An embedded file.
     EmbeddedFile(EmbeddedFile),
 
-    /// An ink drawing
+    /// An ink drawing.
     Ink(Ink),
 
     /// Content of unknown type.
@@ -49,7 +49,7 @@ impl Content {
         }
     }
 
-    /// Return the image data if it's a image content block.
+    /// Return the image data if it's an image content block.
     pub fn image(&self) -> Option<&Image> {
         if let Content::Image(image) = self {
             Some(image)
@@ -58,7 +58,7 @@ impl Content {
         }
     }
 
-    /// Return the embedded file data if it's a embedded file content block.
+    /// Return the embedded file data if it's an embedded file content block.
     pub fn embedded_file(&self) -> Option<&EmbeddedFile> {
         if let Content::EmbeddedFile(file) = self {
             Some(file)

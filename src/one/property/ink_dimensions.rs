@@ -4,7 +4,7 @@ use crate::onestore::object::Object;
 use crate::reader::Reader;
 use crate::shared::guid::Guid;
 
-/// The dimensions (X or Y) for an ink stoke with lower and upper limits.
+/// The dimensions (X or Y) for an ink stroke with lower and upper limits.
 #[allow(dead_code)]
 pub(crate) struct InkDimension {
     pub(crate) id: Guid,
