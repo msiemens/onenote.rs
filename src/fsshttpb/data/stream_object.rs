@@ -198,8 +198,11 @@ impl ObjectHeader {
 
     pub(crate) fn has_end_8(reader: Reader, object_type: ObjectType) -> Result<bool> {
         let data = reader.bytes().first().ok_or(ErrorKind::UnexpectedEof)?;
+        let expected = object_type.to_u8().ok_or_else(|| {
+            ErrorKind::MalformedFssHttpBData(format!("invalid object type: {object_type:?}").into())
+        })?;
 
-        Ok(data & 0b11 == 0x1 && data >> 2 == object_type.to_u8().unwrap())
+        Ok(data & 0b11 == 0x1 && data >> 2 == expected)
     }
 
     fn try_parse_start(

@@ -1,4 +1,4 @@
-use crate::errors::Result;
+use crate::errors::{ErrorKind, Result};
 use widestring::U16CString;
 
 pub(crate) trait Utf16ToString {
@@ -13,6 +13,9 @@ impl Utf16ToString for &[u8] {
             .collect();
 
         let value = U16CString::from_vec_truncate(data);
-        Ok(value.to_string().unwrap())
+        value.to_string().map_err(|err| {
+            ErrorKind::MalformedOneNoteData(format!("UTF-16 string conversion failed: {err}").into())
+                .into()
+        })
     }
 }

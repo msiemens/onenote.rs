@@ -130,4 +130,8 @@ pub enum ErrorKind {
         #[from]
         err: widestring::error::MissingNulTerminator,
     },
+
+    /// A filesystem path was missing required components.
+    #[error("Invalid path: {message}")]
+    InvalidPath { message: Cow<'static, str> },
 }

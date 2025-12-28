@@ -45,7 +45,7 @@ pub enum ObjectType {
 
 impl fmt::LowerHex for ObjectType {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
-        let value = self.to_u64().unwrap();
+        let value = self.to_u64().ok_or(fmt::Error)?;
         fmt::LowerHex::fmt(&value, f)
     }
 }

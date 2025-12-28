@@ -52,7 +52,9 @@ impl Parser {
             .into());
         }
 
-        let base_dir = path.parent().expect("no base dir found");
+        let base_dir = path.parent().ok_or_else(|| ErrorKind::InvalidPath {
+            message: "path has no parent directory".into(),
+        })?;
         let sections = notebook::parse_toc(store.data_root())?
             .iter()
             .map(|name| {
@@ -113,7 +115,9 @@ impl Parser {
         section::parse_section(
             store,
             path.file_name()
-                .expect("file without file name")
+                .ok_or_else(|| ErrorKind::InvalidPath {
+                    message: "path has no file name".into(),
+                })?
                 .to_string_lossy()
                 .to_string(),
         )
@@ -122,7 +126,9 @@ impl Parser {
     fn parse_section_group(&mut self, path: &Path) -> Result<SectionGroup> {
         let display_name = path
             .file_name()
-            .expect("file without file name")
+            .ok_or_else(|| ErrorKind::InvalidPath {
+                message: "path has no file name".into(),
+            })?
             .to_string_lossy()
             .to_string();
 
