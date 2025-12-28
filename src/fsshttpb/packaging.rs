@@ -70,7 +70,6 @@ impl OneStorePackaging {
     ) -> Result<OneStorePackaging> {
         let last_writer_version = reader.get_u32()?;
         if last_writer_version != 0x0000002A && last_writer_version != 0x0000001B {
-            // TODO: Check with .one/onetoc2
             return Err(
                 ErrorKind::MalformedFssHttpBData("unknown last writer version".into()).into(),
             );
@@ -78,7 +77,6 @@ impl OneStorePackaging {
 
         let oldest_writer_version = reader.get_u32()?;
         if oldest_writer_version != 0x0000002A && oldest_writer_version != 0x0000001B {
-            // TODO: Check with .one/onetoc2
             return Err(
                 ErrorKind::MalformedFssHttpBData("unknown oldest writer version".into()).into(),
             );
@@ -86,7 +84,6 @@ impl OneStorePackaging {
 
         let newest_writer_version = reader.get_u32()?;
         if newest_writer_version != 0x0000002A && newest_writer_version != 0x0000001B {
-            // TODO: Check with .one/onetoc2
             return Err(
                 ErrorKind::MalformedFssHttpBData("unknown newest writer version".into()).into(),
             );
@@ -94,7 +91,6 @@ impl OneStorePackaging {
 
         let oldest_reader_version = reader.get_u32()?;
         if oldest_reader_version != 0x0000002A && oldest_reader_version != 0x0000001B {
-            // TODO: Check with .one/onetoc2
             return Err(
                 ErrorKind::MalformedFssHttpBData("unknown oldest reader version".into()).into(),
             );

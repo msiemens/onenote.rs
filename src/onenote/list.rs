@@ -90,8 +90,6 @@ pub(crate) fn parse_list(list_id: ExGuid, space: &ObjectSpace) -> Result<List> {
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("rich text content is missing".into()))?;
     let data = number_list_node::parse(object)?;
 
-    // TODO: Parse language code
-
     let list = List {
         list_font: data.list_font,
         list_restart: data.list_restart,

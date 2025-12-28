@@ -439,9 +439,6 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result
     // Parse the styles text runs (part 2)
     let styles = styles_data.into_iter().map(parse_style).collect_vec();
 
-    // TODO: Parse lang code into iso code
-    // dia-i18n = "0.8.0"
-
     let text = if !embedded_objects.is_empty() {
         "".to_string()
     } else {

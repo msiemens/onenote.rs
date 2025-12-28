@@ -225,8 +225,6 @@ pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Result<Image
         .map(|iframe_id| parse_iframe(iframe_id, space))
         .collect::<Result<_>>()?;
 
-    // TODO: Parse language code
-
     let image = Image {
         data,
         extension,

@@ -103,8 +103,6 @@ pub(crate) fn parse_embedded_file(file_id: ExGuid, space: &ObjectSpace) -> Resul
     })?;
     let container = embedded_file_container::parse(container_object)?;
 
-    // TODO: Resolve picture container
-
     let file = EmbeddedFile {
         filename: node.embedded_file_name,
         file_type: node.file_type,
