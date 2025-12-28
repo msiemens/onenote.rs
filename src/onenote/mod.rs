@@ -55,7 +55,8 @@ impl Parser {
         let base_dir = path.parent().ok_or_else(|| ErrorKind::InvalidPath {
             message: "path has no parent directory".into(),
         })?;
-        let sections = notebook::parse_toc(store.data_root())?
+        let (entries, color) = notebook::parse_toc(store.data_root())?;
+        let sections = entries
             .iter()
             .map(|name| {
                 let mut file = base_dir.to_path_buf();
@@ -75,7 +76,10 @@ impl Parser {
             })
             .collect::<Result<_>>()?;
 
-        Ok(Notebook { entries: sections })
+        Ok(Notebook {
+            entries: sections,
+            color,
+        })
     }
 
     /// Parse a OneNote section buffer.

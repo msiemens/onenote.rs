@@ -4,6 +4,7 @@ use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
+use crate::property::common::Color;
 
 /// A section's table of contents.
 ///
@@ -16,7 +17,7 @@ pub(crate) struct Data {
     pub(crate) children: Vec<ExGuid>,
     pub(crate) filename: Option<String>,
     pub(crate) ordering_id: Option<u32>,
-    // FIXME: Color!?
+    pub(crate) color: Option<Color>,
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
@@ -33,10 +34,12 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
         .map(|s| s.replace("^M", "+"))
         .map(|s| s.replace("^J", ","));
     let ordering_id = simple::parse_u32(PropertyType::NotebookElementOrderingId, object)?;
+    let color = Color::parse(PropertyType::SectionColor, object)?;
 
     Ok(Data {
         children,
         filename,
         ordering_id,
+        color,
     })
 }
