@@ -1,3 +1,4 @@
+use crate::Reader;
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::binary_item::BinaryItem;
 use crate::fsshttpb::data::cell_id::CellId;
@@ -6,7 +7,6 @@ use crate::fsshttpb::data::exguid::ExGuid;
 use crate::fsshttpb::data::object_types::ObjectType;
 use crate::fsshttpb::data::stream_object::ObjectHeader;
 use crate::fsshttpb::data_element::DataElement;
-use crate::Reader;
 use std::fmt;
 
 /// An object group.
@@ -194,7 +194,7 @@ impl DataElement {
                 return Err(ErrorKind::MalformedFssHttpBData(
                     format!("unexpected object type: {:x}", object_header.object_type).into(),
                 )
-                .into())
+                .into());
             }
         }
         let objects = DataElement::parse_object_group_data(reader)?;
@@ -254,7 +254,7 @@ impl DataElement {
                     return Err(ErrorKind::MalformedFssHttpBData(
                         format!("unexpected object type: {:x}", object_header.object_type).into(),
                     )
-                    .into())
+                    .into());
                 }
             }
         }
@@ -324,7 +324,7 @@ impl DataElement {
                     return Err(ErrorKind::MalformedFssHttpBData(
                         format!("unexpected object type: {:x}", object_header.object_type).into(),
                     )
-                    .into())
+                    .into());
                 }
             }
         }

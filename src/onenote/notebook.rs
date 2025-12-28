@@ -64,8 +64,7 @@ fn parse_toc_entry(
             .map(|content_id| parse_toc_entry(content_id, space))
             .collect::<Result<Vec<_>>>()?
             .into_iter()
-            .map(|(children, _)| children)
-            .flatten()
+            .flat_map(|(children, _)| children)
             .collect();
 
         Ok((children, toc.color))

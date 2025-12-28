@@ -1,10 +1,10 @@
+use crate::Reader;
 use crate::errors::Result;
 use crate::fsshttpb::data::compact_u64::CompactU64;
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::fsshttpb::data::object_types::ObjectType;
 use crate::fsshttpb::data::stream_object::ObjectHeader;
 use crate::fsshttpb::data_element::DataElement;
-use crate::Reader;
 
 /// A data element fragment.
 ///

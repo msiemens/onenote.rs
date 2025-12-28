@@ -1,5 +1,5 @@
-use crate::errors::Result;
 use crate::Reader;
+use crate::errors::Result;
 
 /// An object stream header.
 ///

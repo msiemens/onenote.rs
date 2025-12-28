@@ -64,7 +64,7 @@ impl Charset {
                 return Err(ErrorKind::MalformedOneNoteFileData(
                     format!("invalid charset: {}", value).into(),
                 )
-                .into())
+                .into());
             }
         };
 

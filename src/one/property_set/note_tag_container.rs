@@ -1,10 +1,10 @@
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
+use crate::one::property::PropertyType;
 use crate::one::property::note_tag::ActionItemStatus;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::object_space_reference::ObjectSpaceReference;
 use crate::one::property::time::Time;
-use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
 use crate::onestore::types::compact_id::CompactId;
 use crate::onestore::types::jcid::JcId;

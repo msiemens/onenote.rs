@@ -1,6 +1,6 @@
 use insta::assert_debug_snapshot;
 use onenote_parser::Parser;
-use std::path::PathBuf;
+use std::path::{Path, PathBuf};
 
 #[test]
 fn test_parse_section() {
@@ -32,4 +32,14 @@ fn test_parse_section_with_image_missing_last_modified() {
 
     let mut parser = Parser::new();
     assert_debug_snapshot!(parser.parse_section(&path).unwrap());
+}
+
+#[test]
+fn test_readme_example_parse_notebook() {
+    let mut parser = Parser::new();
+    let notebook = parser
+        .parse_notebook(Path::new("tests/samples/Open Notebook.onetoc2"))
+        .unwrap();
+
+    assert!(!notebook.entries().is_empty());
 }

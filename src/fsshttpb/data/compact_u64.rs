@@ -1,5 +1,5 @@
-use crate::errors::{ErrorKind, Result};
 use crate::Reader;
+use crate::errors::{ErrorKind, Result};
 
 /// A compact unsigned 64-bit integer.
 ///

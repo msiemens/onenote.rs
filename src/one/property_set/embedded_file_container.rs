@@ -1,5 +1,5 @@
 use crate::errors::{ErrorKind, Result};
-use crate::one::property_set::{assert_property_set, PropertySetId};
+use crate::one::property_set::{PropertySetId, assert_property_set};
 use crate::onestore::object::Object;
 
 /// An embedded file data container.

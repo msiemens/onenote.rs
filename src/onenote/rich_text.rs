@@ -5,8 +5,8 @@ use crate::one::property::color_ref::ColorRef;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::paragraph_alignment::ParagraphAlignment;
 use crate::one::property_set::{embedded_ink_container, paragraph_style_object, rich_text_node};
-use crate::onenote::ink::{parse_ink_data, Ink, InkBoundingBox};
-use crate::onenote::note_tag::{parse_note_tags, NoteTag};
+use crate::onenote::ink::{Ink, InkBoundingBox, parse_ink_data};
+use crate::onenote::note_tag::{NoteTag, parse_note_tags};
 use crate::onestore::object_space::ObjectSpace;
 use itertools::Itertools;
 

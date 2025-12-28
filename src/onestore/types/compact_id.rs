@@ -1,5 +1,5 @@
-use crate::errors::Result;
 use crate::Reader;
+use crate::errors::Result;
 
 /// A compact reference to an ID in the mapping table.
 ///

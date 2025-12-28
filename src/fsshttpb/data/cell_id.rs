@@ -1,7 +1,7 @@
+use crate::Reader;
 use crate::errors::Result;
 use crate::fsshttpb::data::compact_u64::CompactU64;
 use crate::fsshttpb::data::exguid::ExGuid;
-use crate::Reader;
 
 /// A FSSHTTP cell identifier.
 ///

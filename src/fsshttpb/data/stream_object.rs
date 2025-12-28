@@ -1,7 +1,7 @@
+use crate::Reader;
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::compact_u64::CompactU64;
 use crate::fsshttpb::data::object_types::ObjectType;
-use crate::Reader;
 use num_traits::{FromPrimitive, ToPrimitive};
 
 /// A FSSHTTPB stream object header.

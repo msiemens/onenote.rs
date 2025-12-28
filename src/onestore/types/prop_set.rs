@@ -1,6 +1,6 @@
+use crate::Reader;
 use crate::errors::Result;
 use crate::onestore::types::property::{PropertyId, PropertyValue};
-use crate::Reader;
 use std::collections::HashMap;
 
 /// A property set.

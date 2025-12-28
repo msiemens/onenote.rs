@@ -3,8 +3,8 @@ use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
-use crate::one::property::{simple, PropertyType};
-use crate::one::property_set::{assert_property_set, PropertySetId};
+use crate::one::property::{PropertyType, simple};
+use crate::one::property_set::{PropertySetId, assert_property_set};
 use crate::onestore::object::Object;
 
 /// A page title.

@@ -1,9 +1,9 @@
+use crate::Reader;
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::fsshttpb::data::object_types::ObjectType;
 use crate::fsshttpb::data::stream_object::ObjectHeader;
 use crate::fsshttpb::data_element::DataElement;
-use crate::Reader;
 
 /// A revision manifest.
 ///
@@ -62,7 +62,7 @@ impl DataElement {
                     return Err(ErrorKind::MalformedFssHttpBData(
                         format!("unexpected object type: {:x}", object_header.object_type).into(),
                     )
-                    .into())
+                    .into());
                 }
             }
         }

@@ -1,7 +1,7 @@
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::cell_id::CellId;
-use crate::one::property::references::References;
 use crate::one::property::PropertyType;
+use crate::one::property::references::References;
 use crate::onestore::object::Object;
 use crate::onestore::types::compact_id::CompactId;
 use crate::onestore::types::property::PropertyValue;

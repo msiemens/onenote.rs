@@ -1,10 +1,10 @@
+use crate::Reader;
 use crate::errors::Result;
 use crate::one::property::PropertyType;
 use crate::onestore::types::compact_id::CompactId;
 use crate::onestore::types::object_stream_header::ObjectStreamHeader;
 use crate::onestore::types::prop_set::PropertySet;
 use crate::onestore::types::property::{PropertyId, PropertyValue};
-use crate::Reader;
 
 /// An object's properties.
 ///

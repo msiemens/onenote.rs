@@ -1,7 +1,7 @@
+use crate::Reader;
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::compact_u64::CompactU64;
 use crate::shared::guid::Guid;
-use crate::Reader;
 use std::fmt;
 
 /// A variable-width encoding of an extended GUID (GUID + 32 bit value)
@@ -21,11 +21,7 @@ impl ExGuid {
     }
 
     pub(crate) fn as_option(&self) -> Option<ExGuid> {
-        if self.is_nil() {
-            None
-        } else {
-            Some(*self)
-        }
+        if self.is_nil() { None } else { Some(*self) }
     }
 
     pub(crate) fn from_guid(guid: Guid, value: u32) -> ExGuid {

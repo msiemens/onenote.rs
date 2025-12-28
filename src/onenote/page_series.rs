@@ -1,7 +1,7 @@
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property_set::page_series_node;
-use crate::onenote::page::{parse_page, Page};
+use crate::onenote::page::{Page, parse_page};
 use crate::onestore::OneStore;
 
 /// A series of page.

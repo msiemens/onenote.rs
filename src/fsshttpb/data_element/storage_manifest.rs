@@ -1,3 +1,4 @@
+use crate::Reader;
 use crate::errors::Result;
 use crate::fsshttpb::data::cell_id::CellId;
 use crate::fsshttpb::data::exguid::ExGuid;
@@ -5,7 +6,6 @@ use crate::fsshttpb::data::object_types::ObjectType;
 use crate::fsshttpb::data::stream_object::ObjectHeader;
 use crate::fsshttpb::data_element::DataElement;
 use crate::shared::guid::Guid;
-use crate::Reader;
 use std::collections::HashMap;
 
 /// A storage manifest.

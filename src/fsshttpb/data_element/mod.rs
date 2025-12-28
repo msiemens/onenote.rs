@@ -1,3 +1,4 @@
+use crate::Reader;
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::compact_u64::CompactU64;
 use crate::fsshttpb::data::exguid::ExGuid;
@@ -10,7 +11,6 @@ use crate::fsshttpb::data_element::object_group::ObjectGroup;
 use crate::fsshttpb::data_element::revision_manifest::RevisionManifest;
 use crate::fsshttpb::data_element::storage_index::StorageIndex;
 use crate::fsshttpb::data_element::storage_manifest::StorageManifest;
-use crate::Reader;
 use std::collections::HashMap;
 use std::fmt::Debug;
 
@@ -220,7 +220,7 @@ impl DataElement {
                 return Err(ErrorKind::MalformedFssHttpBData(
                     format!("invalid element type: 0x{:X}", x).into(),
                 )
-                .into())
+                .into());
             }
         }
 

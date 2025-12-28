@@ -1,6 +1,6 @@
+use crate::Reader;
 use crate::errors::Result;
 use crate::shared::guid::Guid;
-use crate::Reader;
 
 /// A variable-width serial number.
 ///

@@ -1,10 +1,10 @@
+use crate::Reader;
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::fsshttpb::data::object_types::ObjectType;
 use crate::fsshttpb::data::stream_object::ObjectHeader;
 use crate::fsshttpb::data_element::DataElementPackage;
 use crate::shared::guid::Guid;
-use crate::Reader;
 
 /// A OneNote file packaged in FSSHTTPB format.
 ///

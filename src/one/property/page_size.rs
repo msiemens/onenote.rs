@@ -58,7 +58,7 @@ impl PageSize {
                 return Err(ErrorKind::MalformedOneNoteFileData(
                     format!("invalid page size: {}", value).into(),
                 )
-                .into())
+                .into());
             }
         };
 

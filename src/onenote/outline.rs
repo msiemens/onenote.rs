@@ -1,9 +1,9 @@
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::layout_alignment::LayoutAlignment;
-use crate::one::property_set::{outline_element_node, outline_group, outline_node, PropertySetId};
-use crate::onenote::content::{parse_content, Content};
-use crate::onenote::list::{parse_list, List};
+use crate::one::property_set::{PropertySetId, outline_element_node, outline_group, outline_node};
+use crate::onenote::content::{Content, parse_content};
+use crate::onenote::list::{List, parse_list};
 use crate::onestore::object_space::ObjectSpace;
 
 /// A content outline.
@@ -307,7 +307,7 @@ fn parse_outline_item(item_id: ExGuid, space: &ObjectSpace) -> Result<OutlineIte
             return Err(ErrorKind::MalformedOneNoteData(
                 format!("invalid outline item type: {:?}", id).into(),
             )
-            .into())
+            .into());
         }
     };
 

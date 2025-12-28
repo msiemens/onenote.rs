@@ -2,8 +2,8 @@ use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::{image_node, picture_container};
-use crate::onenote::iframe::{parse_iframe, IFrame};
-use crate::onenote::note_tag::{parse_note_tags, NoteTag};
+use crate::onenote::iframe::{IFrame, parse_iframe};
+use crate::onenote::note_tag::{NoteTag, parse_note_tags};
 use crate::onestore::object_space::ObjectSpace;
 
 /// An embedded image.

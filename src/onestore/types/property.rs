@@ -1,6 +1,6 @@
+use crate::Reader;
 use crate::errors::{ErrorKind, Result};
 use crate::onestore::types::prop_set::PropertySet;
-use crate::Reader;
 use std::fmt;
 
 /// A property value.
@@ -141,7 +141,7 @@ impl PropertyValue {
                 return Err(ErrorKind::MalformedOneStoreData(
                     format!("unexpected property type: 0x{:x}", v).into(),
                 )
-                .into())
+                .into());
             }
         };
 

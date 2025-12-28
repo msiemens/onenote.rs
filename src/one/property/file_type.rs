@@ -35,7 +35,7 @@ impl FileType {
                 return Err(ErrorKind::MalformedOneNoteFileData(
                     format!("invalid file type: {}", value).into(),
                 )
-                .into())
+                .into());
             }
         };
 

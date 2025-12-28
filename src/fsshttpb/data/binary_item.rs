@@ -1,6 +1,6 @@
+use crate::Reader;
 use crate::errors::Result;
 use crate::fsshttpb::data::compact_u64::CompactU64;
-use crate::Reader;
 
 /// A byte array with the length determined by a `CompactU64`.
 ///

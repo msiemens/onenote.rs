@@ -1,10 +1,10 @@
 use crate::errors::{ErrorKind, Result};
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property::time::Time;
-use crate::one::property::{simple, PropertyType};
-use crate::one::property_set::{assert_property_set, PropertySetId};
+use crate::one::property::{PropertyType, simple};
+use crate::one::property_set::{PropertySetId, assert_property_set};
 use crate::onestore::object::Object;
-use std::char::{decode_utf16, REPLACEMENT_CHARACTER};
+use std::char::{REPLACEMENT_CHARACTER, decode_utf16};
 
 /// A number list definition.
 ///

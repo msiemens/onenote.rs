@@ -178,7 +178,7 @@ pub(crate) fn parse_ink(ink_container_id: ExGuid, space: &ObjectSpace) -> Result
                 bounding_box: None,
                 offset_horizontal: container.offset_from_parent_horiz,
                 offset_vertical: container.offset_from_parent_vert,
-            })
+            });
         }
     };
 
