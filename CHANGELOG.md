@@ -5,6 +5,22 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [1.0.0] - 2025-12-28
+
+### Added
+
+- Support for non-legacy MS-ONESTORE format.
+- Parse notebook colors.
+
+### Changed
+
+- Improve crate documentation.
+- Upgrade to Rust 2024 edition.
+- Improve revision manifest resolution and fallback logic.
+- Replace panics with error handling.
+- Improve error handling in parsing logic.
+- Internal refactorings for maintainability.
+
 ## [0.4.1] - 2025-12-27
 
 ### Fixed
