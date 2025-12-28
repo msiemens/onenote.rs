@@ -110,7 +110,10 @@ impl CompactU64 {
             return Ok(CompactU64(reader.get_u64()?));
         }
 
-        panic!("unexpected compact u64 type: {:x}", first_byte)
+        Err(ErrorKind::MalformedFssHttpBData(
+            format!("unexpected compact u64 type: {first_byte:x}").into(),
+        )
+        .into())
     }
 }
 

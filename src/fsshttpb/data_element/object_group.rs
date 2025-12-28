@@ -84,8 +84,8 @@ pub(crate) enum ObjectChangeFrequency {
 }
 
 impl ObjectChangeFrequency {
-    fn parse(value: u64) -> ObjectChangeFrequency {
-        match value {
+    fn parse(value: u64) -> Result<ObjectChangeFrequency> {
+        let frequency = match value {
             x if x == ObjectChangeFrequency::Unknown as u64 => ObjectChangeFrequency::Unknown,
             x if x == ObjectChangeFrequency::Frequent as u64 => ObjectChangeFrequency::Frequent,
             x if x == ObjectChangeFrequency::Infrequent as u64 => ObjectChangeFrequency::Infrequent,
@@ -93,8 +93,15 @@ impl ObjectChangeFrequency {
                 ObjectChangeFrequency::Independent
             }
             x if x == ObjectChangeFrequency::Custom as u64 => ObjectChangeFrequency::Custom,
-            x => panic!("unexpected change frequency: {}", x),
-        }
+            x => {
+                return Err(ErrorKind::MalformedFssHttpBData(
+                    format!("unexpected change frequency: {x}").into(),
+                )
+                .into());
+            }
+        };
+
+        Ok(frequency)
     }
 }
 
@@ -276,7 +283,7 @@ impl DataElement {
 
             let frequency = CompactU64::parse(reader)?;
             declarations.push(ObjectGroupMetadata {
-                change_frequency: ObjectChangeFrequency::parse(frequency.value()),
+                change_frequency: ObjectChangeFrequency::parse(frequency.value())?,
             })
         }
 

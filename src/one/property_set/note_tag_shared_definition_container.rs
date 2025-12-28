@@ -34,6 +34,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
     })?;
     let shape = simple::parse_u16(PropertyType::NoteTagShape, object)?
         .map(NoteTagShape::parse)
+        .transpose()?
         .ok_or_else(|| {
             ErrorKind::MalformedOneNoteFileData("note tag container has no shape".into())
         })?;

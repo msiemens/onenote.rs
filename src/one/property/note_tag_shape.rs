@@ -1,3 +1,5 @@
+use crate::errors::{ErrorKind, Result};
+
 /// The shape of a note tag icon.
 ///
 /// See [\[MS-ONE\] 2.3.86].
@@ -153,8 +155,8 @@ pub enum NoteTagShape {
 }
 
 impl NoteTagShape {
-    pub(crate) fn parse(value: u16) -> NoteTagShape {
-        match value {
+    pub(crate) fn parse(value: u16) -> Result<NoteTagShape> {
+        let shape = match value {
             0 => NoteTagShape::NoIcon,
             1 => NoteTagShape::GreenCheckBox,
             2 => NoteTagShape::YellowCheckBox,
@@ -299,8 +301,15 @@ impl NoteTagShape {
             141 => NoteTagShape::Cloud,
             142 => NoteTagShape::Heart,
             143 => NoteTagShape::Sunflower,
-            _ => panic!("invalid note tag shape: {}", value),
-        }
+            _ => {
+                return Err(ErrorKind::MalformedOneNoteFileData(
+                    format!("invalid note tag shape: {value}").into(),
+                )
+                .into());
+            }
+        };
+
+        Ok(shape)
     }
 
     /// Whether the note tag icon is checkable.
