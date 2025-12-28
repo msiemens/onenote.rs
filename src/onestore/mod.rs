@@ -76,7 +76,9 @@ pub(crate) fn parse_store(package: &OneStorePackaging) -> Result<OneStore<'_>> {
 
     parsed_object_spaces.insert(header_cell_id);
 
-    // FIXME: document revision cache
+    // Revision cache deduplicates already parsed revisions by cell id.
+    // Object spaces can reference revisions across cells; caching avoids re-parsing and
+    // preserves identity when multiple spaces share the same revision.
     let mut revision_cache = HashMap::new();
 
     // Parse data root

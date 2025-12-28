@@ -97,7 +97,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
         note_tags,
         offset_from_parent_horiz,
         offset_from_parent_vert,
-        recording_duration: None, // FIXME: Parse this
+        recording_duration: None,
     };
 
     Ok(data)

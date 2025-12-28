@@ -20,7 +20,7 @@ pub(crate) struct Data {
     pub(crate) entity_guid: Guid,
     pub(crate) page_spaces: Vec<CellId>,
     pub(crate) page_metadata: Vec<ExGuid>,
-    pub(crate) created_at: Option<Timestamp>, // FIXME: Force this?
+    pub(crate) created_at: Option<Timestamp>,
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
