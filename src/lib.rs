@@ -1,4 +1,67 @@
 //! A OneNote file parser.
+//!
+//! `onenote_parser` provides a high-level API to parse OneNote notebooks and
+//! inspect sections, pages, and their contents. It implements the underlying
+//! OneNote file format layers (FSSHTTPB, OneStore, and MS-ONE) and exposes a
+//! stable surface for consumers through the [`Parser`] type.
+//!
+//! The parser targets OneNote files obtained from OneDrive downloads (FSSHTTP
+//! packaging). It is read-only and does not aim to support legacy OneNote 2016
+//! desktop files.
+//!
+//! # Usage
+//!
+//! ```no_run
+//! use onenote_parser::Parser;
+//! use std::path::Path;
+//!
+//! # fn main() -> Result<(), Box<dyn std::error::Error>> {
+//! let mut parser = Parser::new();
+//! let notebook = parser.parse_notebook(Path::new("My Notebook.onetoc2"))?;
+//! println!("sections: {}", notebook.entries().len());
+//! # Ok(())
+//! # }
+//! ```
+//!
+//! # Features
+//!
+//! - `backtrace`: Captures a `std::backtrace::Backtrace` on parse errors and
+//!   exposes it via `std::error::Error::backtrace()`.
+//!
+//! # Architecture
+//!
+//! The parser mirrors the OneNote file format layers:
+//! - FSSHTTPB: binary packaging used by OneDrive downloads
+//! - OneStore: revision store embedded in the package
+//! - MS-ONE: object model for sections, pages, and content
+//! - `onenote`: high-level API that resolves references between objects
+//!
+//! # Error handling
+//!
+//! Most fallible APIs return [`errors::Result`], which wraps an [`errors::Error`]
+//! containing an error kind. You can format the error for user-facing messages
+//! and (with the `backtrace` feature enabled) access the captured backtrace via
+//! `std::error::Error::backtrace()`.
+//!
+//! # Input files
+//!
+//! Use `.onetoc2` and `.one` files from OneDrive downloads (FSSHTTP packaging). For `.onetoc2`
+//! files, the parser expects the `.one` file to be in the same directory. The parser does not
+//! support legacy OneNote 2016 desktop files.
+//!
+//! # Stability
+//!
+//! The public API follows semantic versioning and is intended to be stable.
+//!
+//! # References
+//!
+//! - [\[MS-ONESTORE\]: OneNote Revision Store File Format]
+//! - [\[MS-ONE\]: OneNote File Format]
+//! - [\[MS-FSSHTTPB\]: Binary Requests for File Synchronization via SOAP Protocol]
+//!
+//! [\[MS-ONESTORE\]: OneNote Revision Store File Format]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-onestore/ae670cd2-4b38-4b24-82d1-87cfb2cc3725
+//! [\[MS-ONE\]: OneNote File Format]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/73d22548-a613-4350-8c23-07d15576be50
+//! [\[MS-FSSHTTPB\]: Binary Requests for File Synchronization via SOAP Protocol]: https://docs.microsoft.com/en-us/openspecs/sharepoint_protocols/ms-fsshttpb/f59fc37d-2232-4b14-baac-25f98e9e7b5a
 
 #![warn(missing_docs)]
 #![deny(unused_must_use)]

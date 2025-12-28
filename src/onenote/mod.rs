@@ -26,10 +26,22 @@ pub(crate) mod section;
 pub(crate) mod table;
 
 /// The OneNote file parser.
+///
+/// Use [`Parser::parse_notebook`] to load a notebook from a `.onetoc2` file or
+/// [`Parser::parse_section`] to load a single `.one` section. These methods
+/// expect OneDrive downloads (FSSHTTP packaging) and will return an error if the
+/// input is not the expected file type.
+///
+/// # Thread safety
+///
+/// The parser is stateless and can be shared across threads.
 pub struct Parser;
 
 impl Parser {
     /// Create a new OneNote file parser.
+    ///
+    /// The parser holds no state; reuse a single instance across multiple
+    /// parses if desired.
     pub fn new() -> Parser {
         Parser {}
     }
@@ -39,7 +51,10 @@ impl Parser {
     /// The `path` argument must point to a `.onetoc2` file. This will parse the
     /// table of contents of the notebook as well as all contained
     /// sections from the folder that the table of contents file is in.
-    pub fn parse_notebook(&mut self, path: &Path) -> Result<Notebook> {
+    ///
+    /// Returns [`ErrorKind::NotATocFile`] if the file is not a notebook table of
+    /// contents.
+    pub fn parse_notebook(&self, path: &Path) -> Result<Notebook> {
         let file = File::open(path)?;
         let data = Parser::read(file)?;
         let packaging = OneStorePackaging::parse(&mut Reader::new(data.as_slice()))?;
@@ -85,7 +100,11 @@ impl Parser {
     /// Parse a OneNote section buffer.
     ///
     /// The `data` argument must contain a OneNote section.
-    pub fn parse_section_buffer(&mut self, data: &[u8], file_name: &Path) -> Result<Section> {
+    /// The `file_name` is used to populate section metadata and error messages.
+    ///
+    /// Returns [`ErrorKind::NotASectionFile`] if the buffer does not contain a
+    /// section file.
+    pub fn parse_section_buffer(&self, data: &[u8], file_name: &Path) -> Result<Section> {
         let packaging = OneStorePackaging::parse(&mut Reader::new(data))?;
         let store = parse_store(&packaging)?;
 
@@ -103,7 +122,10 @@ impl Parser {
     ///
     /// The `path` argument must point to a `.one` file that contains a
     /// OneNote section.
-    pub fn parse_section(&mut self, path: &Path) -> Result<Section> {
+    ///
+    /// Returns [`ErrorKind::NotASectionFile`] if the file does not contain a
+    /// section.
+    pub fn parse_section(&self, path: &Path) -> Result<Section> {
         let file = File::open(path)?;
         let data = Parser::read(file)?;
         let packaging = OneStorePackaging::parse(&mut Reader::new(data.as_slice()))?;
@@ -127,7 +149,7 @@ impl Parser {
         )
     }
 
-    fn parse_section_group(&mut self, path: &Path) -> Result<SectionGroup> {
+    fn parse_section_group(&self, path: &Path) -> Result<SectionGroup> {
         let display_name = path
             .file_name()
             .ok_or_else(|| ErrorKind::InvalidPath {
