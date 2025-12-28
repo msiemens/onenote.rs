@@ -1,7 +1,7 @@
 use crate::errors::{ErrorKind, Result};
 use crate::one::property::color::Color;
 use crate::one::property::{simple, PropertyType};
-use crate::one::property_set::PropertySetId;
+use crate::one::property_set::{assert_property_set, PropertySetId};
 use crate::onestore::object::Object;
 
 /// A section's metadata.
@@ -19,12 +19,7 @@ pub(crate) struct Data {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    if object.id() != PropertySetId::SectionMetadata.as_jcid() {
-        return Err(ErrorKind::MalformedOneNoteFileData(
-            format!("unexpected object type: 0x{:X}", object.id().0).into(),
-        )
-        .into());
-    }
+    assert_property_set(object, PropertySetId::SectionMetadata)?;
 
     let schema_revision_in_order_to_read =
         simple::parse_u32(PropertyType::SchemaRevisionInOrderToRead, object)?.ok_or_else(|| {

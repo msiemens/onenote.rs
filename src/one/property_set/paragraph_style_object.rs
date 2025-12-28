@@ -1,9 +1,9 @@
-use crate::errors::{ErrorKind, Result};
+use crate::errors::Result;
 use crate::one::property::charset::Charset;
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property::paragraph_alignment::ParagraphAlignment;
 use crate::one::property::{simple, PropertyType};
-use crate::one::property_set::PropertySetId;
+use crate::one::property_set::{assert_property_set, PropertySetId};
 use crate::onestore::object::Object;
 
 /// A paragraph style.
@@ -42,12 +42,7 @@ pub(crate) struct Data {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    if object.id() != PropertySetId::ParagraphStyleObject.as_jcid() {
-        return Err(ErrorKind::MalformedOneNoteFileData(
-            format!("unexpected object type: 0x{:X}", object.id().0).into(),
-        )
-        .into());
-    }
+    assert_property_set(object, PropertySetId::ParagraphStyleObject)?;
 
     let charset = Charset::parse(PropertyType::Charset, object)?;
     let bold = simple::parse_bool(PropertyType::Bold, object)?.unwrap_or_default();

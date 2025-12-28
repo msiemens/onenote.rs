@@ -6,7 +6,7 @@ use crate::one::property::paragraph_alignment::ParagraphAlignment;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::note_tag_container::Data as NoteTagData;
-use crate::one::property_set::PropertySetId;
+use crate::one::property_set::{assert_property_set, PropertySetId};
 use crate::onestore::object::Object;
 
 /// A rich text paragraph.
@@ -40,12 +40,7 @@ pub(crate) struct Data {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    if object.id() != PropertySetId::RichTextNode.as_jcid() {
-        return Err(ErrorKind::MalformedOneNoteFileData(
-            format!("unexpected object type: 0x{:X}", object.id().0).into(),
-        )
-        .into());
-    }
+    assert_property_set(object, PropertySetId::RichTextNode)?;
 
     let last_modified_time =
         Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {

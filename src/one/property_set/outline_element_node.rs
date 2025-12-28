@@ -3,7 +3,7 @@ use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
-use crate::one::property_set::PropertySetId;
+use crate::one::property_set::{assert_property_set, PropertySetId};
 use crate::onestore::object::Object;
 
 /// An outline element.
@@ -30,12 +30,7 @@ pub(crate) struct Data {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    if object.id() != PropertySetId::OutlineElementNode.as_jcid() {
-        return Err(ErrorKind::MalformedOneNoteFileData(
-            format!("unexpected object type: 0x{:X}", object.id().0).into(),
-        )
-        .into());
-    }
+    assert_property_set(object, PropertySetId::OutlineElementNode)?;
 
     let created_at = Time::parse(PropertyType::CreationTimeStamp, object)?.ok_or_else(|| {
         ErrorKind::MalformedOneNoteFileData("outline element has no creation timestamp".into())

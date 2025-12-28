@@ -14,8 +14,10 @@ impl Utf16ToString for &[u8] {
 
         let value = U16CString::from_vec_truncate(data);
         value.to_string().map_err(|err| {
-            ErrorKind::MalformedOneNoteData(format!("UTF-16 string conversion failed: {err}").into())
-                .into()
+            ErrorKind::MalformedOneNoteData(
+                format!("UTF-16 string conversion failed: {err}").into(),
+            )
+            .into()
         })
     }
 }

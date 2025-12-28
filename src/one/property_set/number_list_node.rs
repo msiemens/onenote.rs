@@ -2,7 +2,7 @@ use crate::errors::{ErrorKind, Result};
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
-use crate::one::property_set::PropertySetId;
+use crate::one::property_set::{assert_property_set, PropertySetId};
 use crate::onestore::object::Object;
 use std::char::{decode_utf16, REPLACEMENT_CHARACTER};
 
@@ -27,12 +27,7 @@ pub(crate) struct Data {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    if object.id() != PropertySetId::NumberListNode.as_jcid() {
-        return Err(ErrorKind::MalformedOneNoteFileData(
-            format!("unexpected object type: 0x{:X}", object.id().0).into(),
-        )
-        .into());
-    }
+    assert_property_set(object, PropertySetId::NumberListNode)?;
 
     let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {
         ErrorKind::MalformedOneNoteFileData("number list has no last modified time".into())

@@ -1,5 +1,5 @@
 use crate::errors::{ErrorKind, Result};
-use crate::one::property_set::PropertySetId;
+use crate::one::property_set::{assert_property_set, PropertySetId};
 use crate::onestore::object::Object;
 
 /// An embedded file data container.
@@ -17,12 +17,7 @@ impl Data {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    if object.id() != PropertySetId::EmbeddedFileContainer.as_jcid() {
-        return Err(ErrorKind::MalformedOneNoteFileData(
-            format!("unexpected object type: 0x{:X}", object.id().0).into(),
-        )
-        .into());
-    }
+    assert_property_set(object, PropertySetId::EmbeddedFileContainer)?;
 
     let data = object
         .file_data()

@@ -4,6 +4,8 @@
 //!
 //! [\[MS-ONE\] 2.1.13]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/73d98105-f194-4c05-a795-09840a6d24bf
 
+use crate::errors::{ErrorKind, Result};
+use crate::onestore::object::Object;
 use crate::onestore::types::jcid::JcId;
 use enum_primitive_derive::Primitive;
 use num_traits::FromPrimitive;
@@ -82,4 +84,15 @@ impl PropertySetId {
     pub(crate) fn from_jcid(id: JcId) -> Option<PropertySetId> {
         PropertySetId::from_u32(id.0)
     }
+}
+
+pub(crate) fn assert_property_set(object: &Object, expected: PropertySetId) -> Result<()> {
+    if object.id() == expected.as_jcid() {
+        return Ok(());
+    }
+
+    Err(ErrorKind::MalformedOneNoteFileData(
+        format!("unexpected object type: 0x{:X}", object.id().0).into(),
+    )
+    .into())
 }

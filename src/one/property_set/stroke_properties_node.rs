@@ -1,7 +1,7 @@
 use crate::errors::{ErrorKind, Result};
 use crate::one::property::ink_dimensions::InkDimension;
 use crate::one::property::{simple, PropertyType};
-use crate::one::property_set::PropertySetId;
+use crate::one::property_set::{assert_property_set, PropertySetId};
 use crate::onestore::object::Object;
 
 /// An ink stroke's properties.
@@ -20,12 +20,7 @@ pub(crate) struct Data {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    if object.id() != PropertySetId::StrokePropertiesNode.as_jcid() {
-        return Err(ErrorKind::MalformedOneNoteFileData(
-            format!("unexpected object type: 0x{:X}", object.id().0).into(),
-        )
-        .into());
-    }
+    assert_property_set(object, PropertySetId::StrokePropertiesNode)?;
 
     let aliased = simple::parse_bool(PropertyType::InkAntialised, object)?.unwrap_or_default();
     let fit_to_curve = simple::parse_bool(PropertyType::InkFitToCurve, object)?.unwrap_or_default();

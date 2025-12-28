@@ -4,7 +4,7 @@ use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
-use crate::one::property_set::PropertySetId;
+use crate::one::property_set::{assert_property_set, PropertySetId};
 use crate::onestore::object::Object;
 
 /// A page title.
@@ -24,12 +24,7 @@ pub(crate) struct Data {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    if object.id() != PropertySetId::TitleNode.as_jcid() {
-        return Err(ErrorKind::MalformedOneNoteFileData(
-            format!("unexpected object type: 0x{:X}", object.id().0).into(),
-        )
-        .into());
-    }
+    assert_property_set(object, PropertySetId::TitleNode)?;
 
     let last_modified_time =
         Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {

@@ -5,7 +5,7 @@ use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::object_space_reference::ObjectSpaceReference;
 use crate::one::property::time::Timestamp;
 use crate::one::property::{simple, PropertyType};
-use crate::one::property_set::PropertySetId;
+use crate::one::property_set::{assert_property_set, PropertySetId};
 use crate::onestore::object::Object;
 use crate::shared::guid::Guid;
 
@@ -24,12 +24,7 @@ pub(crate) struct Data {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    if object.id() != PropertySetId::PageSeriesNode.as_jcid() {
-        return Err(ErrorKind::MalformedOneNoteFileData(
-            format!("unexpected object type: 0x{:X}", object.id().0).into(),
-        )
-        .into());
-    }
+    assert_property_set(object, PropertySetId::PageSeriesNode)?;
 
     let entity_guid = simple::parse_guid(PropertyType::NotebookManagementEntityGuid, object)?
         .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("page series has no guid".into()))?;

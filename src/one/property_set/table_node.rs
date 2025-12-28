@@ -5,7 +5,7 @@ use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
 use crate::one::property::{simple, PropertyType};
 use crate::one::property_set::note_tag_container::Data as NoteTagData;
-use crate::one::property_set::PropertySetId;
+use crate::one::property_set::{assert_property_set, PropertySetId};
 use crate::onestore::object::Object;
 
 /// A table.
@@ -29,12 +29,7 @@ pub(crate) struct Data {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    if object.id() != PropertySetId::TableNode.as_jcid() {
-        return Err(ErrorKind::MalformedOneNoteFileData(
-            format!("unexpected object type: 0x{:X}", object.id().0).into(),
-        )
-        .into());
-    }
+    assert_property_set(object, PropertySetId::TableNode)?;
 
     let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {
         ErrorKind::MalformedOneNoteFileData("table has no last modified time".into())
