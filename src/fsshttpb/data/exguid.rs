@@ -105,3 +105,113 @@ impl fmt::Debug for ExGuid {
         write!(f, "ExGuid {{{}, {}}}", self.guid, self.value)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::ExGuid;
+    use crate::reader::Reader;
+    use crate::shared::guid::Guid;
+    use uuid::Uuid;
+
+    fn guid_bytes() -> [u8; 16] {
+        [
+            0x33, 0x22, 0x11, 0x00, 0x55, 0x44, 0x77, 0x66, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD,
+            0xEE, 0xFF,
+        ]
+    }
+
+    fn expected_guid() -> Guid {
+        Guid(Uuid::parse_str("00112233-4455-6677-8899-aabbccddeeff").expect("valid test guid"))
+    }
+
+    #[test]
+    fn test_parse_nil() {
+        let mut reader = Reader::new(&[0u8]);
+        let guid = ExGuid::parse(&mut reader).unwrap();
+
+        assert!(guid.is_nil());
+        assert!(guid.as_option().is_none());
+    }
+
+    #[test]
+    fn test_parse_5_bit_value() {
+        let value = 17u8;
+        let mut bytes = vec![(value << 3) | 0b100];
+        bytes.extend_from_slice(&guid_bytes());
+
+        let mut reader = Reader::new(&bytes);
+        let guid = ExGuid::parse(&mut reader).unwrap();
+
+        assert_eq!(guid.value, value as u32);
+        assert_eq!(guid.guid, expected_guid());
+    }
+
+    #[test]
+    fn test_parse_10_bit_value() {
+        let value = 0x155u16;
+        let first = 0b100000 | ((value & 0b11) << 6) as u8;
+        let second = (value >> 2) as u8;
+
+        let mut bytes = vec![first, second];
+        bytes.extend_from_slice(&guid_bytes());
+
+        let mut reader = Reader::new(&bytes);
+        let guid = ExGuid::parse(&mut reader).unwrap();
+
+        assert_eq!(guid.value, value as u32);
+        assert_eq!(guid.guid, expected_guid());
+    }
+
+    #[test]
+    fn test_parse_17_bit_value() {
+        let value = 0x1ABCDu32;
+        let first = 0b1000000 | ((value & 0x1) << 7) as u8;
+        let second = ((value >> 1) as u16).to_le_bytes();
+
+        let mut bytes = vec![first, second[0], second[1]];
+        bytes.extend_from_slice(&guid_bytes());
+
+        let mut reader = Reader::new(&bytes);
+        let guid = ExGuid::parse(&mut reader).unwrap();
+
+        assert_eq!(guid.value, value);
+        assert_eq!(guid.guid, expected_guid());
+    }
+
+    #[test]
+    fn test_parse_32_bit_value() {
+        let value = 0xDEAD_BEEFu32;
+        let mut bytes = vec![0x80];
+        bytes.extend_from_slice(&value.to_le_bytes());
+        bytes.extend_from_slice(&guid_bytes());
+
+        let mut reader = Reader::new(&bytes);
+        let guid = ExGuid::parse(&mut reader).unwrap();
+
+        assert_eq!(guid.value, value);
+        assert_eq!(guid.guid, expected_guid());
+    }
+
+    #[test]
+    fn test_parse_array() {
+        let mut bytes = vec![(2u8 << 1) | 0x1];
+        bytes.push(0);
+
+        let value = 3u8;
+        bytes.push((value << 3) | 0b100);
+        bytes.extend_from_slice(&guid_bytes());
+
+        let mut reader = Reader::new(&bytes);
+        let values = ExGuid::parse_array(&mut reader).unwrap();
+
+        assert_eq!(values.len(), 2);
+        assert!(values[0].is_nil());
+        assert_eq!(values[1].value, value as u32);
+    }
+
+    #[test]
+    fn test_parse_invalid_first_byte() {
+        let mut reader = Reader::new(&[0x02u8]);
+        assert!(ExGuid::parse(&mut reader).is_err());
+    }
+}

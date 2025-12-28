@@ -28,3 +28,22 @@ impl ObjectStreamHeader {
         })
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::ObjectStreamHeader;
+    use crate::reader::Reader;
+
+    #[test]
+    fn test_parse_header_flags() {
+        let count: u32 = 0x12_3456;
+        let data: u32 = count | (1 << 30) | (1 << 31);
+        let bytes = data.to_le_bytes();
+
+        let header = ObjectStreamHeader::parse(&mut Reader::new(&bytes)).unwrap();
+
+        assert_eq!(header.count, count);
+        assert!(header.extended_streams_present);
+        assert!(header.osid_stream_not_present);
+    }
+}

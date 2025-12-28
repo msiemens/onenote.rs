@@ -1,5 +1,5 @@
-use crate::Reader;
 use crate::errors::Result;
+use crate::Reader;
 use std::fmt;
 
 /// An object type.
@@ -19,5 +19,19 @@ impl JcId {
 impl fmt::Debug for JcId {
     fn fmt(&self, f: &mut fmt::Formatter<'_>) -> fmt::Result {
         write!(f, "JcId(0x{:08X})", self.0)
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::JcId;
+    use crate::reader::Reader;
+
+    #[test]
+    fn test_parse() {
+        let data = [0x78, 0x56, 0x34, 0x12];
+        let jc_id = JcId::parse(&mut Reader::new(&data)).unwrap();
+
+        assert_eq!(jc_id.0, 0x1234_5678);
     }
 }

@@ -73,3 +73,65 @@ impl MappingTable {
         None
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::MappingTable;
+    use crate::fsshttpb::data::cell_id::CellId;
+    use crate::fsshttpb::data::exguid::ExGuid;
+    use crate::onestore::types::compact_id::CompactId;
+    use crate::reader::Reader;
+    use crate::shared::guid::Guid;
+
+    fn compact_id(n: u8, guid_index: u32) -> CompactId {
+        let data = (guid_index << 8) | n as u32;
+        CompactId::parse(&mut Reader::new(&data.to_le_bytes())).unwrap()
+    }
+
+    fn exguid(value: u32) -> ExGuid {
+        ExGuid::from_guid(Guid::nil(), value)
+    }
+
+    #[test]
+    fn test_single_entry_fallbacks_to_only_value() {
+        let cid = compact_id(1, 0x10);
+        let object = exguid(10);
+        let table = MappingTable::from_entries(
+            vec![(cid, object)].into_iter(),
+            std::iter::empty::<(CompactId, CellId)>(),
+        );
+
+        assert_eq!(table.get_object(0, cid), Some(object));
+        assert_eq!(table.get_object(3, cid), Some(object));
+    }
+
+    #[test]
+    fn test_multiple_entries_match_by_index() {
+        let cid = compact_id(2, 0x20);
+        let first = exguid(1);
+        let second = exguid(2);
+        let table = MappingTable::from_entries(
+            vec![(cid, first), (cid, second)].into_iter(),
+            std::iter::empty::<(CompactId, CellId)>(),
+        );
+
+        assert_eq!(table.get_object(0, cid), Some(first));
+        assert_eq!(table.get_object(1, cid), Some(second));
+        assert_eq!(table.get_object(2, cid), None);
+    }
+
+    #[test]
+    fn test_object_space_lookup() {
+        let cid = compact_id(3, 0x30);
+        let cell_a = CellId(exguid(10), exguid(11));
+        let cell_b = CellId(exguid(20), exguid(21));
+        let table = MappingTable::from_entries(
+            std::iter::empty::<(CompactId, ExGuid)>(),
+            vec![(cid, cell_a), (cid, cell_b)].into_iter(),
+        );
+
+        assert_eq!(table.get_object_space(0, cid), Some(cell_a));
+        assert_eq!(table.get_object_space(1, cid), Some(cell_b));
+        assert_eq!(table.get_object_space(2, cid), None);
+    }
+}

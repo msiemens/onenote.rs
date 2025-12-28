@@ -81,3 +81,46 @@ impl<'a> Reader<'a> {
         try_get!(self, f32::le)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Reader;
+
+    #[test]
+    fn test_read_and_advance() {
+        let data = [1u8, 2, 3, 4];
+        let mut reader = Reader::new(&data);
+
+        assert_eq!(reader.remaining(), 4);
+        assert_eq!(reader.read(2).unwrap(), &[1, 2]);
+        assert_eq!(reader.remaining(), 2);
+
+        reader.advance(1).unwrap();
+        assert_eq!(reader.remaining(), 1);
+        assert_eq!(reader.get_u8().unwrap(), 4);
+        assert!(reader.get_u8().is_err());
+    }
+
+    #[test]
+    fn test_get_numeric_types() {
+        let data = [
+            0x34, 0x12, // u16 = 0x1234
+            0x78, 0x56, 0x34, 0x12, // u32 = 0x12345678
+            0xEF, 0xCD, 0xAB, 0x89, 0x67, 0x45, 0x23, 0x01, // u64
+        ];
+        let mut reader = Reader::new(&data);
+
+        assert_eq!(reader.get_u16().unwrap(), 0x1234);
+        assert_eq!(reader.get_u32().unwrap(), 0x1234_5678);
+        assert_eq!(reader.get_u64().unwrap(), 0x0123_4567_89AB_CDEF);
+    }
+
+    #[test]
+    fn test_get_f32() {
+        let data = [0x00, 0x00, 0x80, 0x3F]; // 1.0 in LE
+        let mut reader = Reader::new(&data);
+
+        assert_eq!(reader.get_f32().unwrap(), 1.0);
+        assert!(reader.get_u8().is_err());
+    }
+}

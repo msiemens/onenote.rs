@@ -60,3 +60,32 @@ fn decode_uint(data: &[u8]) -> (u64, usize) {
 
     (value, count)
 }
+
+#[cfg(test)]
+mod tests {
+    use super::{decode, decode_signed, decode_uint};
+
+    #[test]
+    fn test_decode_uint_single_byte() {
+        assert_eq!(decode_uint(&[0x00]), (0, 1));
+        assert_eq!(decode_uint(&[0x7F]), (127, 1));
+    }
+
+    #[test]
+    fn test_decode_uint_multi_byte() {
+        assert_eq!(decode_uint(&[0x81, 0x01]), (129, 2));
+        assert_eq!(decode_uint(&[0xFF, 0x01]), (255, 2));
+    }
+
+    #[test]
+    fn test_decode_unsigned_values() {
+        let input = [0x04, 0x01, 0x02];
+        assert_eq!(decode(&input), vec![1, 2]);
+    }
+
+    #[test]
+    fn test_decode_signed_values() {
+        let input = [0x04, 0x06, 0x05];
+        assert_eq!(decode_signed(&input), vec![3, -2]);
+    }
+}

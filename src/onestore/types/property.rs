@@ -214,7 +214,17 @@ impl fmt::Debug for PropertyId {
 
 #[cfg(test)]
 mod test {
-    use crate::onestore::types::property::PropertyId;
+    use super::{PropertyId, PropertyValue};
+    use crate::reader::Reader;
+
+    fn make_property_id(prop_type: u32, id: u32, bool_flag: bool) -> PropertyId {
+        let mut value = (prop_type << 26) | (id & 0x3ffffff);
+        if bool_flag {
+            value |= 1 << 31;
+        }
+
+        PropertyId::new(value)
+    }
 
     #[test]
     fn test_property_bool() {
@@ -222,5 +232,141 @@ mod test {
         assert_eq!(PropertyId::new(0x88001C04).bool(), true);
         assert_eq!(PropertyId::new(0x88001C04).id(), 0x1C04);
         assert_eq!(PropertyId::new(0x88001C04).prop_type(), 0x2);
+    }
+
+    #[test]
+    fn test_property_value_scalars() {
+        let value = PropertyValue::parse(make_property_id(0x1, 0x10, false), &mut Reader::new(&[]))
+            .unwrap();
+        assert!(matches!(value, PropertyValue::Empty));
+
+        let value =
+            PropertyValue::parse(make_property_id(0x2, 0x11, true), &mut Reader::new(&[])).unwrap();
+        assert!(matches!(value, PropertyValue::Bool(true)));
+
+        let value = PropertyValue::parse(
+            make_property_id(0x3, 0x12, false),
+            &mut Reader::new(&[0xAB]),
+        )
+        .unwrap();
+        assert!(matches!(value, PropertyValue::U8(0xAB)));
+
+        let value = PropertyValue::parse(
+            make_property_id(0x4, 0x13, false),
+            &mut Reader::new(&[0x34, 0x12]),
+        )
+        .unwrap();
+        assert!(matches!(value, PropertyValue::U16(0x1234)));
+
+        let value = PropertyValue::parse(
+            make_property_id(0x5, 0x14, false),
+            &mut Reader::new(&[0x78, 0x56, 0x34, 0x12]),
+        )
+        .unwrap();
+        assert!(matches!(value, PropertyValue::U32(0x1234_5678)));
+
+        let value = PropertyValue::parse(
+            make_property_id(0x6, 0x15, false),
+            &mut Reader::new(&[0xEF, 0xCD, 0xAB, 0x89, 0x67, 0x45, 0x23, 0x01]),
+        )
+        .unwrap();
+        assert!(matches!(value, PropertyValue::U64(0x0123_4567_89AB_CDEF)));
+    }
+
+    #[test]
+    fn test_property_value_vectors_and_ids() {
+        let value = PropertyValue::parse(
+            make_property_id(0x7, 0x20, false),
+            &mut Reader::new(&[0x03, 0x00, 0x00, 0x00, 0xDE, 0xAD, 0xBE]),
+        )
+        .unwrap();
+        assert!(matches!(value, PropertyValue::Vec(v) if v == vec![0xDE, 0xAD, 0xBE]));
+
+        let value = PropertyValue::parse(make_property_id(0x8, 0x21, false), &mut Reader::new(&[]))
+            .unwrap();
+        assert!(matches!(value, PropertyValue::ObjectId));
+
+        let value = PropertyValue::parse(
+            make_property_id(0x9, 0x22, false),
+            &mut Reader::new(&[0xEF, 0xBE, 0xAD, 0xDE]),
+        )
+        .unwrap();
+        assert!(matches!(value, PropertyValue::ObjectIds(0xDEAD_BEEF)));
+    }
+
+    #[test]
+    fn test_property_value_property_sets() {
+        let nested_prop_id = make_property_id(0x5, 0x30, false);
+        let nested_prop_id_bytes = nested_prop_id.value().to_le_bytes();
+
+        let property_set_bytes = [
+            0x01,
+            0x00, // count
+            nested_prop_id_bytes[0],
+            nested_prop_id_bytes[1],
+            nested_prop_id_bytes[2],
+            nested_prop_id_bytes[3],
+            0x78,
+            0x56,
+            0x34,
+            0x12, // value
+        ];
+
+        let value = PropertyValue::parse(
+            make_property_id(0x11, 0x31, false),
+            &mut Reader::new(&property_set_bytes),
+        )
+        .unwrap();
+
+        match value {
+            PropertyValue::PropertySet(props) => {
+                let inner = props.get(nested_prop_id).unwrap();
+                assert!(matches!(inner, PropertyValue::U32(0x1234_5678)));
+            }
+            _ => panic!("expected property set"),
+        }
+
+        let value = PropertyValue::parse(
+            make_property_id(0x10, 0x32, false),
+            &mut Reader::new(&[
+                0x01,
+                0x00,
+                0x00,
+                0x00, // size
+                nested_prop_id_bytes[0],
+                nested_prop_id_bytes[1],
+                nested_prop_id_bytes[2],
+                nested_prop_id_bytes[3],
+                0x01,
+                0x00, // count
+                nested_prop_id_bytes[0],
+                nested_prop_id_bytes[1],
+                nested_prop_id_bytes[2],
+                nested_prop_id_bytes[3],
+                0x78,
+                0x56,
+                0x34,
+                0x12, // value
+            ]),
+        )
+        .unwrap();
+
+        match value {
+            PropertyValue::PropertyValues(id, values) => {
+                assert_eq!(id, nested_prop_id);
+                assert_eq!(values.len(), 1);
+
+                let inner = values[0].get(nested_prop_id).unwrap();
+                assert!(matches!(inner, PropertyValue::U32(0x1234_5678)));
+            }
+            _ => panic!("expected property values"),
+        }
+    }
+
+    #[test]
+    fn test_property_value_invalid_type() {
+        let value =
+            PropertyValue::parse(make_property_id(0x1F, 0x40, false), &mut Reader::new(&[]));
+        assert!(value.is_err());
     }
 }

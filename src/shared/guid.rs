@@ -70,3 +70,34 @@ impl fmt::Debug for Guid {
         write!(f, "Guid {}", self)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::Guid;
+    use crate::reader::Reader;
+    use uuid::Uuid;
+
+    #[test]
+    fn test_parse_mixed_endian() {
+        let bytes = [
+            0x33, 0x22, 0x11, 0x00, 0x55, 0x44, 0x77, 0x66, 0x88, 0x99, 0xAA, 0xBB, 0xCC, 0xDD,
+            0xEE, 0xFF,
+        ];
+
+        let guid = Guid::parse(&mut Reader::new(&bytes)).unwrap();
+        let expected = Uuid::parse_str("00112233-4455-6677-8899-aabbccddeeff").unwrap();
+
+        assert_eq!(guid.0, expected);
+        assert_eq!(
+            format!("{}", guid),
+            "{00112233-4455-6677-8899-AABBCCDDEEFF}"
+        );
+    }
+
+    #[test]
+    fn test_nil_guid() {
+        let guid = Guid::nil();
+        assert!(guid.is_nil());
+        assert_eq!(guid.0, Uuid::nil());
+    }
+}

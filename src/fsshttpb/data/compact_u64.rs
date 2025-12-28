@@ -129,67 +129,104 @@ mod test {
 
     #[test]
     fn test_7_bit() {
+        let value = 0x5Au64;
+        let encoded = ((value << 1) | 0x1) as u8;
         assert_eq!(
-            CompactU64::parse(&mut Reader::new(&[0u8])).unwrap().value(),
-            0
+            CompactU64::parse(&mut Reader::new(&[encoded]))
+                .unwrap()
+                .value(),
+            value
         );
     }
 
     #[test]
     fn test_14_bit() {
+        let value = 0x1234u64;
+        let encoded = (value << 2) | 0x2;
+        let bytes = (encoded as u16).to_le_bytes();
         assert_eq!(
-            CompactU64::parse(&mut Reader::new(&[0u8])).unwrap().value(),
-            0
+            CompactU64::parse(&mut Reader::new(&bytes)).unwrap().value(),
+            value
         );
     }
 
     #[test]
     fn test_21_bit() {
+        let value = 0x1ABCDu64;
+        let encoded = (value << 3) | 0x4;
+        let bytes = encoded.to_le_bytes();
+        let input = [bytes[0], bytes[1], bytes[2]];
+
         assert_eq!(
-            CompactU64::parse(&mut Reader::new(&[0xd4u8, 0x8b, 0x10]))
-                .unwrap()
-                .value(),
-            135546
+            CompactU64::parse(&mut Reader::new(&input)).unwrap().value(),
+            value
         );
     }
 
     #[test]
     fn test_28_bit() {
+        let value = 0x0ABC_DEF0u64;
+        let encoded = (value << 4) | 0x8;
+        let bytes = encoded.to_le_bytes();
+        let input = [bytes[0], bytes[1], bytes[2], bytes[3]];
+
         assert_eq!(
-            CompactU64::parse(&mut Reader::new(&[0u8])).unwrap().value(),
-            0
+            CompactU64::parse(&mut Reader::new(&input)).unwrap().value(),
+            value
         );
     }
 
     #[test]
     fn test_35_bit() {
+        let value = 0x1ABCD_EF01u64;
+        let encoded = (value << 5) | 0x10;
+        let bytes = encoded.to_le_bytes();
+        let input = [bytes[0], bytes[1], bytes[2], bytes[3], bytes[4]];
+
         assert_eq!(
-            CompactU64::parse(&mut Reader::new(&[0u8])).unwrap().value(),
-            0
+            CompactU64::parse(&mut Reader::new(&input)).unwrap().value(),
+            value
         );
     }
 
     #[test]
     fn test_42_bit() {
+        let value = 0x1234_5678_9Au64;
+        let encoded = (value << 6) | 0x20;
+        let bytes = encoded.to_le_bytes();
+        let input = [bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5]];
+
         assert_eq!(
-            CompactU64::parse(&mut Reader::new(&[0u8])).unwrap().value(),
-            0
+            CompactU64::parse(&mut Reader::new(&input)).unwrap().value(),
+            value
         );
     }
 
     #[test]
     fn test_49_bit() {
+        let value = 0x1234_5678_9ABu64;
+        let encoded = (value << 7) | 0x40;
+        let bytes = encoded.to_le_bytes();
+        let input = [
+            bytes[0], bytes[1], bytes[2], bytes[3], bytes[4], bytes[5], bytes[6],
+        ];
+
         assert_eq!(
-            CompactU64::parse(&mut Reader::new(&[0u8])).unwrap().value(),
-            0
+            CompactU64::parse(&mut Reader::new(&input)).unwrap().value(),
+            value
         );
     }
 
     #[test]
     fn test_64_bit() {
+        let value = 0x0123_4567_89AB_CDEFu64;
+        let mut input = Vec::with_capacity(9);
+        input.push(0x80);
+        input.extend_from_slice(&value.to_le_bytes());
+
         assert_eq!(
-            CompactU64::parse(&mut Reader::new(&[0u8])).unwrap().value(),
-            0
+            CompactU64::parse(&mut Reader::new(&input)).unwrap().value(),
+            value
         );
     }
 }
