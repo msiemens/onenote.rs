@@ -15,6 +15,7 @@ pub(crate) mod iframe;
 pub(crate) mod image;
 pub(crate) mod ink;
 pub(crate) mod list;
+pub(crate) mod math_inline_object;
 pub(crate) mod note_tag;
 pub(crate) mod notebook;
 pub(crate) mod outline;

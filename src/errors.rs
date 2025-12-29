@@ -3,7 +3,7 @@
 #[cfg(feature = "backtrace")]
 use std::backtrace::Backtrace;
 use std::borrow::Cow;
-use std::{io, string};
+use std::io;
 use thiserror::Error;
 
 /// The result of parsing a OneNote file.
@@ -45,8 +45,8 @@ impl From<std::io::Error> for Error {
     }
 }
 
-impl From<std::string::FromUtf16Error> for Error {
-    fn from(err: std::string::FromUtf16Error) -> Self {
+impl From<widestring::error::Utf16Error> for Error {
+    fn from(err: widestring::error::Utf16Error) -> Self {
         ErrorKind::from(err).into()
     }
 }
@@ -121,7 +121,7 @@ pub enum ErrorKind {
     #[error("Malformed UTF-16 string: {err}")]
     Utf16Error {
         #[from]
-        err: string::FromUtf16Error,
+        err: widestring::error::Utf16Error,
     },
 
     /// A UTF-16 string without a null terminator was encountered during parsing.

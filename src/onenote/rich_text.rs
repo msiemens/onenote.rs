@@ -4,8 +4,12 @@ use crate::one::property::charset::Charset;
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::paragraph_alignment::ParagraphAlignment;
-use crate::one::property_set::{embedded_ink_container, paragraph_style_object, rich_text_node};
+use crate::one::property_set::{
+    embedded_ink_container, math_inline_object, paragraph_style_object, rich_text_node,
+    text_run_data,
+};
 use crate::onenote::ink::{Ink, InkBoundingBox, parse_ink_data};
+use crate::onenote::math_inline_object::{MathInlineObject, parse_math_inline_object};
 use crate::onenote::note_tag::{NoteTag, parse_note_tags};
 use crate::onestore::object_space::ObjectSpace;
 use itertools::Itertools;
@@ -43,6 +47,7 @@ pub struct RichText {
 
     pub(crate) note_tags: Vec<NoteTag>,
     pub(crate) embedded_objects: Vec<EmbeddedObject>,
+    pub(crate) math_inline_objects: Vec<MathInlineObject>,
 }
 
 impl RichText {
@@ -136,6 +141,11 @@ impl RichText {
     /// Objects embedded in this paragraph.
     pub fn embedded_objects(&self) -> &[EmbeddedObject] {
         &self.embedded_objects
+    }
+
+    /// Math inline objects embedded in this paragraph.
+    pub fn math_inline_objects(&self) -> &[MathInlineObject] {
+        &self.math_inline_objects
     }
 }
 
@@ -376,7 +386,6 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result
     let paragraph_style = parse_style(paragraph_style_data);
 
     // Parse the styles text runs (part 1)
-    let text_run_data = embedded_ink_container::Data::parse(object)?.unwrap_or_default();
     let styles_data: Vec<paragraph_style_object::Data> = data
         .text_run_formatting
         .iter()
@@ -388,15 +397,43 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result
         .map(|style_object| style_object.and_then(|object| paragraph_style_object::parse(object)))
         .collect::<Result<Vec<_>>>()?;
 
+    // Parse text run data
+    let text_run_data = text_run_data::parse(object)?.unwrap_or_default();
+
+    // Parse math text runs
+    let math_inline_objects = text_run_data
+        .iter()
+        .zip(&styles_data)
+        .map(|(text_run_data, style_data)| {
+            if style_data.math_formatting {
+                let math_data = math_inline_object::Data::parse(text_run_data)?;
+                let math_inline_object = parse_math_inline_object(math_data)?;
+
+                return Ok(Some(math_inline_object));
+            }
+
+            Ok(None)
+        })
+        .collect::<Result<Vec<_>>>()?
+        .into_iter()
+        .flatten()
+        .collect_vec();
+
     // Parse the embedded objects
     let objects = text_run_data
         .into_iter()
         .zip(&styles_data)
-        .flat_map(|(object_data, style_data)| {
-            style_data
-                .text_run_is_embedded_object
-                .then_some((style_data.text_run_object_type, object_data))
+        .map(|(embedded_object, style_data)| {
+            if style_data.text_run_is_embedded_object {
+                let object_data = embedded_ink_container::Data::parse(embedded_object)?;
+                return Ok(Some((style_data.text_run_object_type, object_data)));
+            }
+
+            Ok(None)
         })
+        .collect::<Result<Vec<_>>>()?
+        .into_iter()
+        .flatten()
         .collect_vec();
 
     let mut objects_without_ref = 0;
@@ -458,6 +495,7 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result
         layout_alignment_in_parent: data.layout_alignment_in_parent,
         layout_alignment_self: data.layout_alignment_self,
         note_tags: parse_note_tags(data.note_tags, space)?,
+        math_inline_objects,
     };
 
     Ok(text)
