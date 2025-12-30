@@ -1,10 +1,13 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::exguid::ExGuid;
+use std::rc::Rc;
+
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::{image_node, picture_container};
 use crate::onenote::iframe::{IFrame, parse_iframe};
 use crate::onenote::note_tag::{NoteTag, parse_note_tags};
-use crate::onestore::object_space::ObjectSpace;
+use crate::onestore::object_space::ObjectSpaceRef;
+use crate::shared::exguid::ExGuid;
+use crate::shared::file_data_ref::FileBlob;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// An embedded image.
 ///
@@ -13,7 +16,7 @@ use crate::onestore::object_space::ObjectSpace;
 /// [\[MS-ONE\] 2.2.24]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/b7bb4d1a-2a57-4819-9eb4-5a2ce8cf210f
 #[derive(Clone, PartialEq, PartialOrd, Debug)]
 pub struct Image {
-    pub(crate) data: Option<Vec<u8>>,
+    pub(crate) data: Option<FileBlob>,
     pub(crate) extension: Option<String>,
 
     pub(crate) layout_max_width: Option<f32>,
@@ -51,8 +54,8 @@ impl Image {
     /// The image's binary data.
     ///
     /// If `None` this means that the image data hasn't been uploaded yet.
-    pub fn data(&self) -> Option<&[u8]> {
-        self.data.as_deref()
+    pub fn data(&self) -> Option<Rc<Vec<u8>>> {
+        self.data.as_ref().map(|data| data.0.clone())
     }
 
     /// The image's file extension.
@@ -196,11 +199,11 @@ impl Image {
     }
 }
 
-pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Result<Image> {
+pub(crate) fn parse_image(image_id: ExGuid, space: ObjectSpaceRef) -> Result<Image> {
     let node_object = space
         .get_object(image_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("image is missing".into()))?;
-    let node = image_node::parse(node_object)?;
+    let node = image_node::parse(&node_object)?;
 
     let container_data = node
         .picture_container
@@ -210,7 +213,7 @@ pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Result<Image
                 .ok_or_else(|| ErrorKind::MalformedOneNoteData("image container is missing".into()))
         })
         .transpose()?
-        .map(|container_object| picture_container::parse(container_object))
+        .map(|container_object| picture_container::parse(&container_object))
         .transpose()?;
 
     let (data, extension) = if let Some(data) = container_data {
@@ -222,24 +225,26 @@ pub(crate) fn parse_image(image_id: ExGuid, space: &ObjectSpace) -> Result<Image
     let embed = node
         .iframe
         .into_iter()
-        .map(|iframe_id| parse_iframe(iframe_id, space))
+        .map(|iframe_id| parse_iframe(iframe_id, space.clone()))
         .collect::<Result<_>>()?;
+
+    // TODO: Parse language code
 
     let image = Image {
         data,
         extension,
         layout_max_width: node.layout_max_width,
         layout_max_height: node.layout_max_height,
-        alt_text: node.alt_text,
+        alt_text: node.alt_text.map(String::from),
         layout_alignment_in_parent: node.layout_alignment_in_parent,
         layout_alignment_self: node.layout_alignment_self,
         image_filename: node.image_filename,
         displayed_page_number: node.displayed_page_number,
-        text: node.text,
+        text: node.text.map(String::from),
         text_language_code: node.text_language_code,
         picture_width: node.picture_width,
         picture_height: node.picture_height,
-        hyperlink_url: node.hyperlink_url,
+        hyperlink_url: node.hyperlink_url.map(String::from),
         offset_horizontal: node.offset_from_parent_horiz,
         offset_vertical: node.offset_from_parent_vert,
         is_background: node.is_background,

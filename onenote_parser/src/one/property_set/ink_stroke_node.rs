@@ -1,10 +1,11 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::{PropertyType, simple};
-use crate::one::property_set::{PropertySetId, assert_property_set};
+use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
+use crate::shared::exguid::ExGuid;
 use crate::shared::multi_byte;
+use crate::utils::errors::{ErrorKind, Result};
+use crate::utils::log_warn;
 
 /// An ink stroke.
 #[allow(dead_code)]
@@ -22,26 +23,29 @@ pub(crate) enum InkBias {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    assert_property_set(object, PropertySetId::InkStrokeNode)?;
+    if object.id() != PropertySetId::InkStrokeNode.as_jcid() {
+        return Err(unexpected_object_type_error!(object.id().0).into());
+    }
 
     let path = simple::parse_vec(PropertyType::InkPath, object)?
         .map(|data| multi_byte::decode_signed(&data))
         .ok_or_else(|| {
-            ErrorKind::MalformedOneNoteFileData("ink stroke node has no ink path".into())
-        })?;
+            log_warn!("ink stroke node has no ink path");
+            Vec::<i64>::new()
+            // ErrorKind::MalformedOneNoteFileData("ink stroke node has no ink path".into())
+        })
+        .unwrap();
     let bias = simple::parse_u8(PropertyType::InkBias, object)?
         .map(|bias| match bias {
-            0 => Ok(InkBias::Handwriting),
-            1 => Ok(InkBias::Drawing),
-            2 => Ok(InkBias::Both),
-            i => Err(ErrorKind::MalformedOneNoteFileData(
-                format!("invalid ink bias value: {}", i).into(),
-            )),
+            0 => InkBias::Handwriting,
+            1 => InkBias::Drawing,
+            2 => InkBias::Both,
+            _i => InkBias::Both,
         })
-        .transpose()?
-        .ok_or_else(|| {
-            ErrorKind::MalformedOneNoteFileData("ink stroke node has no ink bias".into())
-        })?;
+        .unwrap_or_else(|| {
+            log_warn!("No InkBias was set. Using default value 'Both'");
+            return InkBias::Both;
+        });
     let language_code = simple::parse_u32(PropertyType::LanguageId, object)?;
     let properties = ObjectReference::parse(PropertyType::InkStrokeProperties, object)?
         .ok_or_else(|| {

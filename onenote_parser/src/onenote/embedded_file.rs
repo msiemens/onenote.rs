@@ -1,9 +1,10 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::file_type::FileType;
 use crate::one::property_set::{embedded_file_container, embedded_file_node};
 use crate::onenote::note_tag::{NoteTag, parse_note_tags};
-use crate::onestore::object_space::ObjectSpace;
+use crate::onestore::object_space::ObjectSpaceRef;
+use crate::shared::exguid::ExGuid;
+use crate::shared::file_data_ref::FileBlob;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// An embedded file.
 ///
@@ -14,7 +15,7 @@ use crate::onestore::object_space::ObjectSpace;
 pub struct EmbeddedFile {
     pub(crate) filename: String,
     pub(crate) file_type: FileType,
-    pub(crate) data: Vec<u8>,
+    pub(crate) data: FileBlob,
 
     pub(crate) layout_max_width: Option<f32>,
     pub(crate) layout_max_height: Option<f32>,
@@ -46,7 +47,7 @@ impl EmbeddedFile {
 
     /// The file's binary data.
     pub fn data(&self) -> &[u8] {
-        &self.data
+        self.data.as_ref()
     }
 
     /// The max width of the embedded file's icon in half-inch increments.
@@ -91,20 +92,54 @@ impl EmbeddedFile {
     }
 }
 
-pub(crate) fn parse_embedded_file(file_id: ExGuid, space: &ObjectSpace) -> Result<EmbeddedFile> {
+pub(crate) fn parse_embedded_file(file_id: ExGuid, space: ObjectSpaceRef) -> Result<EmbeddedFile> {
     let node_object = space
         .get_object(file_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("embedded file is missing".into()))?;
-    let node = embedded_file_node::parse(node_object)?;
+    let node = embedded_file_node::parse(&node_object)?;
+    let fallback_value = ExGuid::fallback();
+
+    if node.embedded_file_name.is_none() {
+        return Err(ErrorKind::MalformedOneNoteData(
+            "embedded file name didn't return any value".into(),
+        )
+        .into());
+    }
+
+    if node.embedded_file_container.is_none() {
+        return Err(ErrorKind::MalformedOneNoteData(
+            "embedded file container didn't return any value".into(),
+        )
+        .into());
+    }
+
+    if node.embedded_file_container.unwrap() == fallback_value {
+        return Ok({
+            EmbeddedFile {
+                filename: node.embedded_file_name.unwrap(),
+                file_type: node.file_type,
+                data: FileBlob::default(),
+                layout_max_width: node.layout_max_width,
+                layout_max_height: node.layout_max_height,
+                offset_horizontal: node.offset_from_parent_horiz,
+                offset_vertical: node.offset_from_parent_vert,
+                note_tags: parse_note_tags(node.note_tags, space)?,
+            }
+        });
+    }
 
     let container_object_id = node.embedded_file_container;
-    let container_object = space.get_object(container_object_id).ok_or_else(|| {
-        ErrorKind::MalformedOneNoteData("embedded file container is missing".into())
-    })?;
-    let container = embedded_file_container::parse(container_object)?;
+    let container_object = space
+        .get_object(container_object_id.unwrap())
+        .ok_or_else(|| {
+            ErrorKind::MalformedOneNoteData("embedded file container is missing".into())
+        })?;
+    let container = embedded_file_container::parse(&container_object)?;
+
+    // TODO: Resolve picture container
 
     let file = EmbeddedFile {
-        filename: node.embedded_file_name,
+        filename: node.embedded_file_name.unwrap(),
         file_type: node.file_type,
         data: container.into_value(),
         layout_max_width: node.layout_max_width,

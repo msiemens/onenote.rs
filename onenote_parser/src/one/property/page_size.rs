@@ -1,15 +1,14 @@
-use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A page size declaration.
 ///
 /// See [\[MS-ONE\] 2.3.36].
 ///
 /// [\[MS-ONE\] 2.3.36]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/8866c05a-602d-4868-95de-2d8b1a0b9d2e
-#[derive(Debug, Default)]
+#[derive(Debug)]
 pub(crate) enum PageSize {
-    #[default]
     Auto,
     Us,
     AnsiLetter,
@@ -31,8 +30,11 @@ pub(crate) enum PageSize {
 impl PageSize {
     pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Result<Option<PageSize>> {
         let value = match object.props().get(prop_type) {
-            Some(value) => value.to_u8().ok_or_else(|| {
-                ErrorKind::MalformedOneNoteFileData("page size is not a u8".into())
+            Some(value) => value.try_to_u8().ok_or_else(|| {
+                ErrorKind::MalformedOneNoteIncorrectType(format!(
+                    "page size is not a u8 but {:?}",
+                    value
+                ))
             })?,
             None => return Ok(None),
         };
@@ -58,10 +60,16 @@ impl PageSize {
                 return Err(ErrorKind::MalformedOneNoteFileData(
                     format!("invalid page size: {}", value).into(),
                 )
-                .into());
+                .into())
             }
         };
 
         Ok(Some(page_size))
+    }
+}
+
+impl Default for PageSize {
+    fn default() -> Self {
+        PageSize::Auto
     }
 }

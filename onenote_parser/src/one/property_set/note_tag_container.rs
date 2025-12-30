@@ -1,16 +1,15 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::PropertyType;
-use crate::one::property::note_tag::ActionItemStatus;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::object_space_reference::ObjectSpaceReference;
 use crate::one::property::time::Time;
-use crate::onestore::object::Object;
-use crate::onestore::types::compact_id::CompactId;
-use crate::onestore::types::jcid::JcId;
-use crate::onestore::types::object_prop_set::ObjectPropSet;
-use crate::onestore::types::prop_set::PropertySet;
-use crate::onestore::types::property::PropertyId;
+use crate::shared::compact_id::CompactId;
+use crate::shared::exguid::ExGuid;
+use crate::shared::jcid::JcId;
+use crate::shared::object_prop_set::ObjectPropSet;
+use crate::shared::prop_set::PropertySet;
+use crate::shared::property::PropertyId;
+use crate::{one::property::note_tag::ActionItemStatus, onestore::object::Object};
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A note tag state container.
 ///
@@ -41,7 +40,7 @@ impl Data {
             .iter()
             .map(|props| {
                 let object = Self::parse_object(object, prop_id, props)?;
-                let data = Self::parse_data(object)?;
+                let data = Self::parse_data(&object)?;
 
                 Ok(data)
             })
@@ -50,7 +49,7 @@ impl Data {
         Ok(Some(data))
     }
 
-    fn parse_data(object: Object) -> Result<Data> {
+    fn parse_data(object: &Object) -> Result<Data> {
         let definition = ObjectReference::parse(PropertyType::NoteTagDefinitionOid, &object)?;
 
         let created_at = Time::parse(PropertyType::NoteTagCreated, &object)?.ok_or_else(|| {
@@ -71,11 +70,7 @@ impl Data {
         })
     }
 
-    fn parse_object<'a>(
-        object: &'a Object,
-        id: PropertyId,
-        props: &PropertySet,
-    ) -> Result<Object<'a>> {
+    fn parse_object(object: &Object, id: PropertyId, props: &PropertySet) -> Result<Object> {
         Ok(Object {
             context_id: object.context_id,
             jc_id: JcId(id.value()),

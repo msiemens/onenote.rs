@@ -1,12 +1,12 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::time::Time;
 use crate::one::property::{PropertyType, simple};
+use crate::one::property_set::PropertySetId;
 use crate::one::property_set::note_tag_container::Data as NoteTagData;
-use crate::one::property_set::{PropertySetId, assert_property_set};
 use crate::onestore::object::Object;
+use crate::shared::exguid::ExGuid;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A table.
 ///
@@ -29,7 +29,9 @@ pub(crate) struct Data {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    assert_property_set(object, PropertySetId::TableNode)?;
+    if object.id() != PropertySetId::TableNode.as_jcid() {
+        return Err(unexpected_object_type_error!(object.id().0).into());
+    }
 
     let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?.ok_or_else(|| {
         ErrorKind::MalformedOneNoteFileData("table has no last modified time".into())

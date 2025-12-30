@@ -3,7 +3,7 @@ name = "onenote_parser"
 version = "1.1.0"
 authors = ["Markus Siemens <markus@m-siemens.de>"]
 edition = "2024"
-rust-version = "1.85"
+rust-version = "1.92"
 license = "MPL-2.0"
 readme = "README.md"
 repository = "https://github.com/msiemens/onenote.rs"
@@ -24,6 +24,8 @@ pastey = "0.2"
 thiserror = "2.0"
 uuid = "1.19"
 widestring = "1.2"
+onenote_parser_derive = { path = "../onenote_parser_derive" }
+lazy_static = "1.4"
 
 [dev-dependencies]
 insta = "1.45"

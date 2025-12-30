@@ -1,10 +1,10 @@
-use crate::errors::Result;
-use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::object_reference::ObjectReference;
 use crate::one::property::{PropertyType, simple};
-use crate::one::property_set::{PropertySetId, assert_property_set};
+use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 use crate::property::common::Color;
+use crate::shared::exguid::ExGuid;
+use crate::utils::errors::Result;
 
 /// A section's table of contents.
 ///
@@ -12,7 +12,6 @@ use crate::property::common::Color;
 ///
 /// [\[MS-ONE\] 2.2.15]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/6c1dd264-850b-4e46-af62-50b4dba49b62
 #[derive(Debug)]
-#[allow(dead_code)]
 pub(crate) struct Data {
     pub(crate) children: Vec<ExGuid>,
     pub(crate) filename: Option<String>,
@@ -21,7 +20,9 @@ pub(crate) struct Data {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    assert_property_set(object, PropertySetId::TocContainer)?;
+    if object.id() != PropertySetId::TocContainer.as_jcid() {
+        return Err(unexpected_object_type_error!(object.id().0).into());
+    }
 
     let children =
         ObjectReference::parse_vec(PropertyType::TocChildren, object)?.unwrap_or_default();

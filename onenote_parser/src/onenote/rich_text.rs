@@ -1,18 +1,19 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::exguid::ExGuid;
+use std::rc::Rc;
+
 use crate::one::property::charset::Charset;
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::paragraph_alignment::ParagraphAlignment;
-use crate::one::property_set::{
-    embedded_ink_container, math_inline_object, paragraph_style_object, rich_text_node,
-    text_run_data,
-};
+use crate::one::property_set::{embedded_ink_container, paragraph_style_object, rich_text_node};
 use crate::onenote::ink::{Ink, InkBoundingBox, parse_ink_data};
-use crate::onenote::math_inline_object::{MathInlineObject, parse_math_inline_object};
 use crate::onenote::note_tag::{NoteTag, parse_note_tags};
-use crate::onestore::object_space::ObjectSpace;
+use crate::onenote::text_region::TextRegion;
+use crate::onestore::object::Object;
+use crate::onestore::object_space::ObjectSpaceRef;
+use crate::shared::exguid::ExGuid;
 use itertools::Itertools;
+use crate::utils::errors::{ErrorKind, Result};
+use crate::utils::log_warn;
 
 /// A rich text paragraph.
 ///
@@ -32,6 +33,7 @@ use itertools::Itertools;
 #[derive(Clone, Debug)]
 pub struct RichText {
     pub(crate) text: String,
+    pub(crate) text_regions: Vec<TextRegion>,
 
     pub(crate) text_run_formatting: Vec<ParagraphStyling>,
     pub(crate) text_run_indices: Vec<u32>,
@@ -47,13 +49,17 @@ pub struct RichText {
 
     pub(crate) note_tags: Vec<NoteTag>,
     pub(crate) embedded_objects: Vec<EmbeddedObject>,
-    pub(crate) math_inline_objects: Vec<MathInlineObject>,
 }
 
 impl RichText {
     /// The paragraph text content.
     pub fn text(&self) -> &str {
         &self.text
+    }
+
+    /// Computes which styles are associated with which text
+    pub fn text_segments(&self) -> &Vec<TextRegion> {
+        &self.text_regions
     }
 
     /// The formatting of each text run.
@@ -141,11 +147,6 @@ impl RichText {
     /// Objects embedded in this paragraph.
     pub fn embedded_objects(&self) -> &[EmbeddedObject] {
         &self.embedded_objects
-    }
-
-    /// Math inline objects embedded in this paragraph.
-    pub fn math_inline_objects(&self) -> &[MathInlineObject] {
-        &self.math_inline_objects
     }
 }
 
@@ -372,68 +373,49 @@ impl ParagraphStyling {
 const INK_SPACE_BLOB: u32 = 0x00020026;
 const INK_END_OF_LINE_BLOB: u32 = 0x00020027;
 
-pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result<RichText> {
+pub(crate) fn parse_rich_text(content_id: ExGuid, space: ObjectSpaceRef) -> Result<RichText> {
     let object = space
         .get_object(content_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("rich text content is missing".into()))?;
-    let data = rich_text_node::parse(object)?;
+    let data = rich_text_node::parse(&object)?;
 
     // Parse the base paragraph style
-    let paragraph_style_object = space
-        .get_object(data.paragraph_style)
-        .ok_or_else(|| ErrorKind::MalformedOneNoteData("paragraph styling is missing".into()))?;
-    let paragraph_style_data = paragraph_style_object::parse(paragraph_style_object)?;
+    let paragraph_style_object = space.get_object(data.paragraph_style).unwrap_or_else(|| {
+        log_warn!("paragraph styling is missing");
+        Rc::new(Object::fallback())
+    });
+    let paragraph_style_data = paragraph_style_object::parse(&paragraph_style_object)?;
     let paragraph_style = parse_style(paragraph_style_data);
 
     // Parse the styles text runs (part 1)
+    let text_run_data = embedded_ink_container::Data::parse(&object)?.unwrap_or_default();
     let styles_data: Vec<paragraph_style_object::Data> = data
         .text_run_formatting
         .iter()
-        .map(|style_id| {
-            space
-                .get_object(*style_id)
-                .ok_or_else(|| ErrorKind::MalformedOneNoteData("styling is missing".into()).into())
+        .filter_map(|style_id| {
+            space.get_object(*style_id).or_else(|| {
+                // Handle the case where styles are missing gracefully. It seems that style objects
+                // are sometimes missing, or can't be found:
+                // https://discourse.joplinapp.org/t/onenote-zip-file-import-not-working/47499/12
+                log_warn!(
+                    "Paragraph styling not found: Unable to locate object with ID {:?}.",
+                    style_id
+                );
+                None
+            })
         })
-        .map(|style_object| style_object.and_then(|object| paragraph_style_object::parse(object)))
+        .map(|style_object| paragraph_style_object::parse(&style_object))
         .collect::<Result<Vec<_>>>()?;
-
-    // Parse text run data
-    let text_run_data = text_run_data::parse(object)?.unwrap_or_default();
-
-    // Parse math text runs
-    let math_inline_objects = text_run_data
-        .iter()
-        .zip(&styles_data)
-        .map(|(text_run_data, style_data)| {
-            if style_data.math_formatting {
-                let math_data = math_inline_object::Data::parse(text_run_data)?;
-                let math_inline_object = parse_math_inline_object(math_data)?;
-
-                return Ok(Some(math_inline_object));
-            }
-
-            Ok(None)
-        })
-        .collect::<Result<Vec<_>>>()?
-        .into_iter()
-        .flatten()
-        .collect_vec();
 
     // Parse the embedded objects
     let objects = text_run_data
         .into_iter()
         .zip(&styles_data)
-        .map(|(embedded_object, style_data)| {
-            if style_data.text_run_is_embedded_object {
-                let object_data = embedded_ink_container::Data::parse(embedded_object)?;
-                return Ok(Some((style_data.text_run_object_type, object_data)));
-            }
-
-            Ok(None)
+        .flat_map(|(object_data, style_data)| {
+            style_data
+                .text_run_is_embedded_object
+                .then(|| (style_data.text_run_object_type, object_data))
         })
-        .collect::<Result<Vec<_>>>()?
-        .into_iter()
-        .flatten()
         .collect_vec();
 
     let mut objects_without_ref = 0;
@@ -455,7 +437,7 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result
                 if !data.text_run_data_object.is_empty() {
                     return parse_embedded_ink_data(
                         data.text_run_data_object[i - objects_without_ref],
-                        space,
+                        space.clone(),
                         embedded_data,
                     )
                     .map(|container| Some(EmbeddedObject::Ink(container)));
@@ -476,6 +458,9 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result
     // Parse the styles text runs (part 2)
     let styles = styles_data.into_iter().map(parse_style).collect_vec();
 
+    // TODO: Parse lang code into iso code
+    // dia-i18n = "0.8.0"
+
     let text = if !embedded_objects.is_empty() {
         "".to_string()
     } else {
@@ -483,6 +468,13 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result
     };
 
     let text = RichText {
+        text_regions: TextRegion::parse(
+            &data.text_utf_16.unwrap_or_default(),
+            &data.text_run_indices,
+            &styles,
+            &data.text_run_data_values,
+        )?,
+
         text,
         embedded_objects,
         text_run_formatting: styles,
@@ -495,7 +487,6 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result
         layout_alignment_in_parent: data.layout_alignment_in_parent,
         layout_alignment_self: data.layout_alignment_self,
         note_tags: parse_note_tags(data.note_tags, space)?,
-        math_inline_objects,
     };
 
     Ok(text)
@@ -503,7 +494,7 @@ pub(crate) fn parse_rich_text(content_id: ExGuid, space: &ObjectSpace) -> Result
 
 fn parse_embedded_ink_data(
     embedded_id: ExGuid,
-    space: &ObjectSpace,
+    space: ObjectSpaceRef,
     data: embedded_ink_container::Data,
 ) -> Result<EmbeddedInkContainer> {
     let (strokes, bb) = parse_ink_data(embedded_id, space, None, None)?;

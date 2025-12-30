@@ -1,4 +1,4 @@
-use crate::errors::ErrorKind;
+use crate::utils::errors::ErrorKind;
 use crate::one::property_set::math_inline_object::Data;
 use enum_primitive_derive::Primitive;
 use num_traits::FromPrimitive;
@@ -120,7 +120,7 @@ impl MathInlineObject {
     }
 }
 
-pub(crate) fn parse_math_inline_object(data: Data) -> crate::errors::Result<MathInlineObject> {
+pub(crate) fn parse_math_inline_object(data: Data) -> crate::utils::errors::Result<MathInlineObject> {
     let object_type = MathObjectType::from_u32(data.object_type.unwrap_or(0)).ok_or_else(|| {
         ErrorKind::MalformedOneNoteFileData(
             format!("MathInlineObject has invalid type: {:?}", data.object_type).into(),

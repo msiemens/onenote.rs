@@ -1,14 +1,14 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::color_ref::ColorRef;
 use crate::one::property_set::number_list_node;
-use crate::onestore::object_space::ObjectSpace;
+use crate::onestore::object_space::ObjectSpaceRef;
+use crate::shared::exguid::ExGuid;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A list definition.
 ///
 /// See [\[MS-ONE\] 2.2.25].
 ///
-/// [\[MS-ONE\] 2.2.25]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/1a141e7a-4455-4971-bf0b-1621e221984e
+/// [\[MS-ONE\]] 2.2.25: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/1a141e7a-4455-4971-bf0b-1621e221984e
 #[derive(Clone, Eq, PartialEq, Ord, PartialOrd, Hash, Debug)]
 pub struct List {
     pub(crate) list_font: Option<String>,
@@ -84,11 +84,13 @@ impl List {
     }
 }
 
-pub(crate) fn parse_list(list_id: ExGuid, space: &ObjectSpace) -> Result<List> {
+pub(crate) fn parse_list(list_id: ExGuid, space: ObjectSpaceRef) -> Result<List> {
     let object = space
         .get_object(list_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("rich text content is missing".into()))?;
-    let data = number_list_node::parse(object)?;
+    let data = number_list_node::parse(&object)?;
+
+    // TODO: Parse language code
 
     let list = List {
         list_font: data.list_font,

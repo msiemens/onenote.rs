@@ -1,7 +1,3 @@
-use crate::Reader;
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::compact_u64::CompactU64;
-use crate::fsshttpb::data::exguid::ExGuid;
 use crate::fsshttpb::data::object_types::ObjectType;
 use crate::fsshttpb::data::serial_number::SerialNumber;
 use crate::fsshttpb::data::stream_object::ObjectHeader;
@@ -11,6 +7,12 @@ use crate::fsshttpb::data_element::object_group::ObjectGroup;
 use crate::fsshttpb::data_element::revision_manifest::RevisionManifest;
 use crate::fsshttpb::data_element::storage_index::StorageIndex;
 use crate::fsshttpb::data_element::storage_manifest::StorageManifest;
+use crate::shared::compact_u64::CompactU64;
+use crate::shared::exguid::ExGuid;
+use crate::shared::file_data_ref::FileBlob;
+use crate::utils::Reader;
+use crate::utils::errors::{ErrorKind, Result};
+use crate::utils::parse::ParseHttpb;
 use std::collections::HashMap;
 use std::fmt::Debug;
 
@@ -75,19 +77,13 @@ impl DataElementPackage {
         cell: ExGuid,
         storage_index: &StorageIndex,
     ) -> Result<Vec<&ObjectGroup>> {
-        let revision_mapping_id = self
-            .resolve_cell_revision_manifest_id(storage_index, cell)
-            .or_else(|| {
-                storage_index
-                    .cell_mappings
-                    .values()
-                    .find(|mapping| mapping.id == cell)
-                    .and_then(|mapping| {
-                        storage_index.find_revision_mapping_by_serial(&mapping.serial)
-                    })
-            })
+        let revision_id = self
+            .find_cell_revision_id(cell)
+            .ok_or_else(|| ErrorKind::MalformedFssHttpBData("cell revision id not found".into()))?;
+        let revision_mapping_id = storage_index
+            .find_revision_mapping_id(revision_id)
             .ok_or_else(|| {
-                ErrorKind::MalformedFssHttpBData("revision manifest id not found".into())
+                ErrorKind::MalformedFssHttpBData("revision mapping id not found".into())
             })?;
         let revision_manifest = self
             .find_revision_manifest(revision_mapping_id)
@@ -107,7 +103,7 @@ impl DataElementPackage {
     }
 
     /// Look up a blob by its ID.
-    pub(crate) fn find_blob(&self, id: ExGuid) -> Option<&[u8]> {
+    pub(crate) fn find_blob(&self, id: ExGuid) -> Option<FileBlob> {
         self.object_data_blobs.get(&id).map(|blob| blob.value())
     }
 
@@ -116,41 +112,14 @@ impl DataElementPackage {
         self.storage_indexes.values().next()
     }
 
-    /// Look up a storage index by its ID.
-    pub(crate) fn find_storage_index_by_id(&self, id: ExGuid) -> Option<&StorageIndex> {
-        self.storage_indexes.get(&id)
-    }
-
     /// Find the first storage manifest.
     pub(crate) fn find_storage_manifest(&self) -> Option<&StorageManifest> {
         self.storage_manifests.values().next()
     }
 
-    /// Resolve a revision manifest ID, falling back when revision mappings are missing.
-    pub(crate) fn resolve_revision_manifest_id(
-        &self,
-        storage_index: &StorageIndex,
-        id: ExGuid,
-    ) -> Option<ExGuid> {
-        storage_index
-            .find_revision_mapping_id(id)
-            .or_else(|| self.revision_manifests.get(&id).map(|_| id))
-    }
-
     /// Look up a cell revision ID by the cell's manifest ID.
     pub(crate) fn find_cell_revision_id(&self, id: ExGuid) -> Option<ExGuid> {
         self.cell_manifests.get(&id).copied()
-    }
-
-    /// Resolve a cell's revision manifest ID, with a fallback for newer files.
-    pub(crate) fn resolve_cell_revision_manifest_id(
-        &self,
-        storage_index: &StorageIndex,
-        cell_manifest_id: ExGuid,
-    ) -> Option<ExGuid> {
-        self.find_cell_revision_id(cell_manifest_id)
-            .and_then(|revision_id| self.resolve_revision_manifest_id(storage_index, revision_id))
-            .or_else(|| self.resolve_revision_manifest_id(storage_index, cell_manifest_id))
     }
 
     /// Look up a revision manifest by its ID.
@@ -220,7 +189,7 @@ impl DataElement {
                 return Err(ErrorKind::MalformedFssHttpBData(
                     format!("invalid element type: 0x{:X}", x).into(),
                 )
-                .into());
+                .into())
             }
         }
 

@@ -1,150 +1,57 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::cell_id::CellId;
-use crate::fsshttpb::data_element::storage_index::StorageIndex;
-use crate::fsshttpb::data_element::storage_manifest::StorageManifest;
-use crate::fsshttpb::packaging::OneStorePackaging;
-use crate::onestore::header::StoreHeader;
-use crate::onestore::object_space::ObjectSpace;
-use crate::onestore::revision::Revision;
-use crate::shared::guid::Guid;
-use std::collections::{HashMap, HashSet};
+//! A compatibility layer for unifying data stored in FSSHTTPB/SOAP files and
+//! standard OneNote 2016 archives.
+//!
+//! Provides interfaces that are implemented by the different OneStore parsers.
 
-pub(crate) mod header;
-pub(crate) mod mapping_table;
-pub(crate) mod object;
-pub(crate) mod object_space;
-pub(crate) mod revision;
-mod revision_role;
-pub(crate) mod types;
+use std::rc::Rc;
 
-#[derive(Debug)]
-#[allow(dead_code)]
-pub(crate) struct OneStore<'a> {
-    schema: Guid,
-    header: StoreHeader,
-    data_root: ObjectSpace<'a>,
-    object_spaces: HashMap<CellId, ObjectSpace<'a>>,
+use crate::{
+    fsshttpb_onestore::{self, packaging::OneStorePackaging},
+    local_onestore::OneStoreFile,
+    onestore::object_space::ObjectSpaceRef,
+    shared::cell_id::CellId,
+};
+use crate::utils::{
+    errors::{Error, ErrorKind, Result},
+    parse::Parse,
+    reader::Reader,
+};
+
+pub mod mapping_table;
+pub mod object;
+pub mod object_space;
+
+pub trait OneStore {
+    fn get_type(&self) -> OneStoreType;
+    fn data_root(&self) -> ObjectSpaceRef;
+    /// Fetches the object space that is parent to the object identified by the
+    /// given `id` (if any).
+    fn object_space(&self, id: CellId) -> Option<ObjectSpaceRef>;
 }
 
-impl<'a> OneStore<'a> {
-    pub fn schema_guid(&self) -> Guid {
-        self.schema
-    }
-
-    pub(crate) fn data_root(&'a self) -> &'a ObjectSpace<'a> {
-        &self.data_root
-    }
-
-    pub(crate) fn object_space(&'a self, space_id: CellId) -> Option<&'a ObjectSpace<'a>> {
-        self.object_spaces.get(&space_id)
-    }
+#[derive(Eq, PartialEq)]
+pub enum OneStoreType {
+    TableOfContents, // .onetoc2
+    Section,         // .one
 }
 
-pub(crate) fn parse_store(package: &OneStorePackaging) -> Result<OneStore<'_>> {
-    let mut parsed_object_spaces = HashSet::new();
+pub fn parse_onestore<'a>(reader: &mut Reader<'a>) -> Result<Rc<dyn OneStore>> {
+    // Try parsing as the standard format first.
+    // Clone the reader to save the original offset. When retrying parsing with
+    // a different format, parsing should start from the same location.
+    let mut reader_1 = reader.clone();
+    let onestore_local = OneStoreFile::parse(&mut reader_1);
 
-    // [ONESTORE] 2.7.1: Parse storage manifest
-    let storage_index = package
-        .data_element_package
-        .find_storage_index_by_id(package.storage_index)
-        .or_else(|| package.data_element_package.find_storage_index())
-        .ok_or_else(|| ErrorKind::MalformedOneStoreData("storage index is missing".into()))?;
-    let storage_manifest = package
-        .data_element_package
-        .find_storage_manifest()
-        .ok_or_else(|| ErrorKind::MalformedOneStoreData("storage manifest is missing".into()))?;
-
-    let header_cell_id = find_header_cell_id(storage_manifest)?;
-
-    let header_cell_mapping_id = storage_index
-        .find_cell_mapping_id(header_cell_id)
-        .ok_or_else(|| {
-            ErrorKind::MalformedOneStoreData("header cell mapping id not found".into())
-        })?;
-
-    // [ONESTORE] 2.7.2: Parse header cell
-    let header_cell = package
-        .data_element_package
-        .find_objects(header_cell_mapping_id, storage_index)?
-        .into_iter()
-        .next()
-        .ok_or_else(|| {
-            ErrorKind::MalformedOneStoreData("no header object in header cell".into())
-        })?;
-
-    let header = StoreHeader::parse(header_cell)?;
-
-    parsed_object_spaces.insert(header_cell_id);
-
-    // Revision cache deduplicates already parsed revisions by cell id.
-    // Object spaces can reference revisions across cells; caching avoids re-parsing and
-    // preserves identity when multiple spaces share the same revision.
-    let mut revision_cache = HashMap::new();
-
-    // Parse data root
-
-    let data_root_cell_id = find_data_root_cell_id(storage_manifest)?;
-    let (_, data_root) = parse_object_space(
-        data_root_cell_id,
-        storage_index,
-        package,
-        &mut revision_cache,
-    )?;
-
-    parsed_object_spaces.insert(data_root_cell_id);
-
-    // Parse other object spaces
-
-    let mut object_spaces = HashMap::new();
-
-    for mapping in storage_index.cell_mappings.values() {
-        if mapping.id.is_nil() {
-            continue;
+    match onestore_local {
+        Ok(onestore) => Ok(Rc::new(onestore)),
+        Err(Error {
+            kind: ErrorKind::NotLocalOneStore(_),
+        }) => {
+            let mut reader_2 = reader.clone();
+            let packaging = OneStorePackaging::parse(&mut reader_2)?;
+            let store = fsshttpb_onestore::parse_store(&packaging)?;
+            Ok(Rc::new(store))
         }
-
-        if parsed_object_spaces.contains(&mapping.cell_id) {
-            continue;
-        }
-
-        let (id, group) =
-            parse_object_space(mapping.cell_id, storage_index, package, &mut revision_cache)?;
-        object_spaces.insert(id, group);
+        Err(error) => Err(error),
     }
-
-    Ok(OneStore {
-        schema: storage_manifest.id,
-        header,
-        data_root,
-        object_spaces,
-    })
-}
-
-fn parse_object_space<'a>(
-    cell_id: CellId,
-    storage_index: &'a StorageIndex,
-    package: &'a OneStorePackaging,
-    revision_cache: &mut HashMap<CellId, Revision<'a>>,
-) -> Result<(CellId, ObjectSpace<'a>)> {
-    let mapping = storage_index
-        .cell_mappings
-        .get(&cell_id)
-        .ok_or_else(|| ErrorKind::MalformedOneStoreData("cell mapping not found".into()))?;
-
-    ObjectSpace::parse(mapping, storage_index, package, revision_cache)
-}
-
-fn find_header_cell_id(manifest: &StorageManifest) -> Result<CellId> {
-    manifest
-        .roots
-        .get(&exguid!({{"1A5A319C-C26B-41AA-B9C5-9BD8C44E07D4"}, 1}))
-        .copied()
-        .ok_or_else(|| ErrorKind::MalformedOneStoreData("no header cell root".into()).into())
-}
-
-fn find_data_root_cell_id(manifest: &StorageManifest) -> Result<CellId> {
-    manifest
-        .roots
-        .get(&exguid!({{"84DEFAB9-AAA3-4A0D-A3A8-520C77AC7073"}, 2}))
-        .copied()
-        .ok_or_else(|| ErrorKind::MalformedOneStoreData("no header cell root".into()).into())
 }

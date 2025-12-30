@@ -1,13 +1,13 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::packaging::OneStorePackaging;
-use crate::onenote::notebook::Notebook;
-use crate::onenote::section::{Section, SectionEntry, SectionGroup};
-use crate::onestore::parse_store;
-use crate::reader::Reader;
 use std::ffi::OsStr;
 use std::fs::File;
-use std::io::{BufReader, Read};
 use std::path::Path;
+
+use crate::onenote::notebook::Notebook;
+use crate::onenote::section::{Section, SectionEntry, SectionGroup};
+use crate::onestore::{OneStoreType, parse_onestore};
+use crate::utils::errors::{ErrorKind, Result};
+use crate::utils::file_to_vec;
+use crate::utils::reader::Reader;
 
 pub(crate) mod content;
 pub(crate) mod embedded_file;
@@ -25,6 +25,7 @@ pub(crate) mod page_series;
 pub(crate) mod rich_text;
 pub(crate) mod section;
 pub(crate) mod table;
+pub(crate) mod text_region;
 
 /// The OneNote file parser.
 ///
@@ -57,11 +58,10 @@ impl Parser {
     /// contents.
     pub fn parse_notebook(&self, path: &Path) -> Result<Notebook> {
         let file = File::open(path)?;
-        let data = Parser::read(file)?;
-        let packaging = OneStorePackaging::parse(&mut Reader::new(data.as_slice()))?;
-        let store = parse_store(&packaging)?;
+        let data = file_to_vec(&file)?;
+        let store = parse_onestore(&mut Reader::new(&data))?;
 
-        if store.schema_guid() != guid!("E4DBFD38-E5C7-408B-A8A1-0E7B421E1F5F") {
+        if store.get_type() != OneStoreType::TableOfContents {
             return Err(ErrorKind::NotATocFile {
                 file: path.to_string_lossy().to_string(),
             }
@@ -106,17 +106,14 @@ impl Parser {
     /// Returns [`ErrorKind::NotASectionFile`] if the buffer does not contain a
     /// section file.
     pub fn parse_section_buffer(&self, data: &[u8], file_name: &Path) -> Result<Section> {
-        let packaging = OneStorePackaging::parse(&mut Reader::new(data))?;
-        let store = parse_store(&packaging)?;
+        let store = parse_onestore(&mut Reader::new(&data))?;
 
-        if store.schema_guid() != guid!("1F937CB4-B26F-445F-B9F8-17E20160E461") {
-            return Err(ErrorKind::NotASectionFile {
-                file: file_name.to_string_lossy().into_owned(),
-            }
-            .into());
-        }
-
-        section::parse_section(store, file_name.to_string_lossy().into_owned())
+        section::parse_section(
+            store,
+            file_name
+                .to_string_lossy()
+                .into(),
+        )
     }
 
     /// Parse a OneNote section file.
@@ -128,11 +125,11 @@ impl Parser {
     /// section.
     pub fn parse_section(&self, path: &Path) -> Result<Section> {
         let file = File::open(path)?;
-        let data = Parser::read(file)?;
-        let packaging = OneStorePackaging::parse(&mut Reader::new(data.as_slice()))?;
-        let store = parse_store(&packaging)?;
+        let data = file_to_vec(&file)?;
+        let store = parse_onestore(&mut Reader::new(&data))?;
 
-        if store.schema_guid() != guid!("1F937CB4-B26F-445F-B9F8-17E20160E461") {
+        if store.get_type() != OneStoreType::Section {
+            
             return Err(ErrorKind::NotASectionFile {
                 file: path.to_string_lossy().to_string(),
             }
@@ -181,16 +178,6 @@ impl Parser {
             dir: path.as_os_str().to_string_lossy().into_owned(),
         }
         .into())
-    }
-
-    fn read(file: File) -> Result<Vec<u8>> {
-        let size = file.metadata()?.len();
-        let mut data = Vec::with_capacity(size as usize);
-
-        let mut buf = BufReader::new(file);
-        buf.read_to_end(&mut data)?;
-
-        Ok(data)
     }
 }
 

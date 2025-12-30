@@ -1,10 +1,11 @@
-use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
-use crate::reader::Reader;
 use crate::shared::guid::Guid;
+use crate::utils::errors::{ErrorKind, Result};
+use crate::utils::parse::Parse;
+use crate::utils::reader::Reader;
 
-/// The dimensions (X or Y) for an ink stroke with lower and upper limits.
+/// The dimensions (X or Y) for an ink stoke with lower and upper limits.
 #[allow(dead_code)]
 pub(crate) struct InkDimension {
     pub(crate) id: Guid,

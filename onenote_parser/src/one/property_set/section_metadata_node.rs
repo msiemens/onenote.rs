@@ -1,8 +1,8 @@
-use crate::errors::{ErrorKind, Result};
 use crate::one::property::color::Color;
 use crate::one::property::{PropertyType, simple};
-use crate::one::property_set::{PropertySetId, assert_property_set};
+use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A section's metadata.
 ///
@@ -19,7 +19,9 @@ pub(crate) struct Data {
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    assert_property_set(object, PropertySetId::SectionMetadata)?;
+    if object.id() != PropertySetId::SectionMetadata.as_jcid() {
+        return Err(unexpected_object_type_error!(object.id().0).into());
+    }
 
     let schema_revision_in_order_to_read =
         simple::parse_u32(PropertyType::SchemaRevisionInOrderToRead, object)?.ok_or_else(|| {

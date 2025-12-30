@@ -1,8 +1,7 @@
-use crate::Reader;
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::compact_u64::CompactU64;
-use crate::fsshttpb::data::object_types::ObjectType;
+use crate::{fsshttpb::data::object_types::ObjectType, shared::compact_u64::CompactU64};
 use num_traits::{FromPrimitive, ToPrimitive};
+use crate::utils::Reader;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A FSSHTTPB stream object header.
 ///
@@ -24,7 +23,10 @@ impl ObjectHeader {
 
     /// Parse a 16-bit or 32-bit stream object header.
     pub(crate) fn parse(reader: Reader) -> Result<ObjectHeader> {
-        let header_type = reader.bytes().first().ok_or(ErrorKind::UnexpectedEof)?;
+        let header_type = reader
+            .bytes()
+            .first()
+            .ok_or(ErrorKind::UnexpectedEof("Reading ObjectHeader".into()))?;
 
         match header_type & 0b11 {
             0x0 => Self::parse_16(reader),
@@ -197,7 +199,9 @@ impl ObjectHeader {
     }
 
     pub(crate) fn has_end_8(reader: Reader, object_type: ObjectType) -> Result<bool> {
-        let data = reader.bytes().first().ok_or(ErrorKind::UnexpectedEof)?;
+        let data = reader.bytes().first().ok_or(ErrorKind::UnexpectedEof(
+            "Reading ObjectHeader.has_end_8".into(),
+        ))?;
         let expected = object_type.to_u8().ok_or_else(|| {
             ErrorKind::MalformedFssHttpBData(format!("invalid object type: {object_type:?}").into())
         })?;
@@ -213,7 +217,11 @@ impl ObjectHeader {
         match parse(reader) {
             Ok(header) if header.object_type == object_type => Ok(()),
             Ok(header) => Err(ErrorKind::MalformedFssHttpBData(
-                format!("unexpected object type: {:x}", header.object_type).into(),
+                format!(
+                    "unexpected object type (in stream_object): {:x}",
+                    header.object_type
+                )
+                .into(),
             )
             .into()),
             Err(e) => Err(e),
@@ -228,7 +236,7 @@ impl ObjectHeader {
         match parse(reader) {
             Ok(header) if header == object_type => Ok(()),
             Ok(header) => Err(ErrorKind::MalformedFssHttpBData(
-                format!("unexpected object type: {:x}", header).into(),
+                format!("unexpected object type (in stream_object): {:x}", header).into(),
             )
             .into()),
             Err(e) => Err(e),

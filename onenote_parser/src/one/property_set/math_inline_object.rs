@@ -1,4 +1,4 @@
-use crate::errors::Result;
+use crate::utils::errors::Result;
 use crate::one::property::{PropertyType, simple};
 use crate::onestore::object::Object;
 use widestring::U16String;
@@ -47,5 +47,6 @@ impl Data {
 }
 
 fn parse_utf16_char(c: u16) -> Result<Option<char>> {
-    Ok(U16String::from_vec([c]).to_string()?.chars().next())
+    let string_data = U16String::from_vec([c]).to_string()?;
+    Ok(string_data.chars().next())
 }

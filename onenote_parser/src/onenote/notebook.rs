@@ -1,10 +1,9 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::exguid::ExGuid;
-use crate::one::property_set::toc_container;
 use crate::onenote::section::SectionEntry;
-use crate::onestore::object_space::ObjectSpace;
 use crate::property::common::Color;
+use crate::shared::exguid::ExGuid;
+use crate::{one::property_set::toc_container, onestore::object_space::ObjectSpaceRef};
 use itertools::Itertools;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A OneNote notebook.
 #[derive(Clone, Debug)]
@@ -30,7 +29,7 @@ struct TocEntry {
     color: Option<Color>,
 }
 
-pub(crate) fn parse_toc(space: &ObjectSpace) -> Result<(Vec<String>, Option<Color>)> {
+pub(crate) fn parse_toc(space: ObjectSpaceRef) -> Result<(Vec<String>, Option<Color>)> {
     let content_id = space
         .content_root()
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("notebook has no content root".into()))?;
@@ -47,12 +46,12 @@ pub(crate) fn parse_toc(space: &ObjectSpace) -> Result<(Vec<String>, Option<Colo
     Ok((toc, entry.color))
 }
 
-fn parse_toc_entry(content_id: ExGuid, space: &ObjectSpace) -> Result<TocEntry> {
+fn parse_toc_entry(content_id: ExGuid, space: ObjectSpaceRef) -> Result<TocEntry> {
     let content = space.get_object(content_id).ok_or_else(|| {
         ErrorKind::MalformedOneNoteData("notebook content root is missing".into())
     })?;
 
-    let toc = toc_container::parse(content)?;
+    let toc = toc_container::parse(&content)?;
 
     if let Some(name) = toc.filename {
         let ordering_id = toc
@@ -67,7 +66,7 @@ fn parse_toc_entry(content_id: ExGuid, space: &ObjectSpace) -> Result<TocEntry> 
         let children = toc
             .children
             .into_iter()
-            .map(|content_id| parse_toc_entry(content_id, space))
+            .map(|content_id| parse_toc_entry(content_id, space.clone()))
             .collect::<Result<Vec<_>>>()?
             .into_iter()
             .flat_map(|entry| entry.entries)

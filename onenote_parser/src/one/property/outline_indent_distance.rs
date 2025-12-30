@@ -1,7 +1,7 @@
-use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
-use crate::reader::Reader;
+use crate::utils::errors::{ErrorKind, Result};
+use crate::utils::reader::Reader;
 
 #[derive(Debug, Clone)]
 pub struct OutlineIndentDistance(Vec<f32>);

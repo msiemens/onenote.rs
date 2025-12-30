@@ -1,10 +1,9 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::cell_id::CellId;
 use crate::one::property::PropertyType;
 use crate::one::property::references::References;
-use crate::onestore::object::Object;
-use crate::onestore::types::compact_id::CompactId;
-use crate::onestore::types::property::PropertyValue;
+use crate::shared::compact_id::CompactId;
+use crate::shared::property::PropertyValue;
+use crate::{onestore::object::Object, shared::cell_id::CellId};
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A generic object space reference.
 ///
@@ -68,8 +67,8 @@ impl ObjectSpaceReference {
 
     fn resolve_id(index: usize, id: &CompactId, object: &Object) -> Result<CellId> {
         object
-            .mapping()
-            .get_object_space(index, *id)
+            .mapping
+            .get_object_space(index, id)
             .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("id not defined in mapping".into()))
             .map_err(|e| e.into())
     }

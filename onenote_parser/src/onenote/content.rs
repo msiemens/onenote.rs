@@ -1,12 +1,12 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property_set::PropertySetId;
 use crate::onenote::embedded_file::{EmbeddedFile, parse_embedded_file};
 use crate::onenote::image::{Image, parse_image};
 use crate::onenote::ink::{Ink, parse_ink};
 use crate::onenote::rich_text::{RichText, parse_rich_text};
 use crate::onenote::table::{Table, parse_table};
-use crate::onestore::object_space::ObjectSpace;
+use crate::onestore::object_space::ObjectSpaceRef;
+use crate::shared::exguid::ExGuid;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// The content of an outline.
 #[derive(Clone, Debug)]
@@ -23,7 +23,7 @@ pub enum Content {
     /// An embedded file.
     EmbeddedFile(EmbeddedFile),
 
-    /// An ink drawing.
+    /// An ink drawing
     Ink(Ink),
 
     /// Content of unknown type.
@@ -49,7 +49,7 @@ impl Content {
         }
     }
 
-    /// Return the image data if it's an image content block.
+    /// Return the image data if it's a image content block.
     pub fn image(&self) -> Option<&Image> {
         if let Content::Image(image) = self {
             Some(image)
@@ -58,7 +58,7 @@ impl Content {
         }
     }
 
-    /// Return the embedded file data if it's an embedded file content block.
+    /// Return the embedded file data if it's a embedded file content block.
     pub fn embedded_file(&self) -> Option<&EmbeddedFile> {
         if let Content::EmbeddedFile(file) = self {
             Some(file)
@@ -77,7 +77,7 @@ impl Content {
     }
 }
 
-pub(crate) fn parse_content(content_id: ExGuid, space: &ObjectSpace) -> Result<Content> {
+pub(crate) fn parse_content(content_id: ExGuid, space: ObjectSpaceRef) -> Result<Content> {
     let content_type = space
         .get_object(content_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("page content is missing".into()))?

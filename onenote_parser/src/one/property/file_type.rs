@@ -1,6 +1,5 @@
-use crate::errors::{ErrorKind, Result};
-use crate::one::property::PropertyType;
-use crate::onestore::object::Object;
+use crate::{one::property::PropertyType, onestore::object::Object};
+use crate::utils::errors::{ErrorKind, Result};
 
 /// An embedded file's file type.
 ///
@@ -35,7 +34,7 @@ impl FileType {
                 return Err(ErrorKind::MalformedOneNoteFileData(
                     format!("invalid file type: {}", value).into(),
                 )
-                .into());
+                .into())
             }
         };
 

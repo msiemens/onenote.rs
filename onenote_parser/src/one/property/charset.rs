@@ -1,6 +1,6 @@
-use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A charset representation.
 ///

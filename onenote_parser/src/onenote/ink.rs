@@ -1,9 +1,9 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property_set::{
     ink_container, ink_data_node, ink_stroke_node, stroke_properties_node,
 };
-use crate::onestore::object_space::ObjectSpace;
+use crate::onestore::object_space::ObjectSpaceRef;
+use crate::shared::exguid::ExGuid;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// An ink object.
 #[derive(Clone, Debug)]
@@ -164,11 +164,11 @@ impl InkBoundingBox {
     }
 }
 
-pub(crate) fn parse_ink(ink_container_id: ExGuid, space: &ObjectSpace) -> Result<Ink> {
+pub(crate) fn parse_ink(ink_container_id: ExGuid, space: ObjectSpaceRef) -> Result<Ink> {
     let container_object = space
         .get_object(ink_container_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("ink container is missing".into()))?;
-    let container = ink_container::parse(container_object)?;
+    let container = ink_container::parse(&container_object)?;
 
     let ink_data_id = match container.ink_data {
         Some(id) => id,
@@ -178,7 +178,7 @@ pub(crate) fn parse_ink(ink_container_id: ExGuid, space: &ObjectSpace) -> Result
                 bounding_box: None,
                 offset_horizontal: container.offset_from_parent_horiz,
                 offset_vertical: container.offset_from_parent_vert,
-            });
+            })
         }
     };
 
@@ -199,20 +199,20 @@ pub(crate) fn parse_ink(ink_container_id: ExGuid, space: &ObjectSpace) -> Result
 
 pub(crate) fn parse_ink_data(
     ink_data_id: ExGuid,
-    space: &ObjectSpace,
+    space: ObjectSpaceRef,
     scale_x: Option<f32>,
     scale_y: Option<f32>,
 ) -> Result<(Vec<InkStroke>, Option<InkBoundingBox>)> {
     let ink_data_object = space
         .get_object(ink_data_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("ink data node is missing".into()))?;
-    let ink_data = ink_data_node::parse(ink_data_object)?;
+    let ink_data = ink_data_node::parse(&ink_data_object)?;
 
     let strokes = ink_data
         .strokes
         .iter()
         .copied()
-        .map(|ink_stroke_id| parse_ink_stroke(ink_stroke_id, space, scale_x, scale_y))
+        .map(|ink_stroke_id| parse_ink_stroke(ink_stroke_id, space.clone(), scale_x, scale_y))
         .collect::<Result<_>>()?;
 
     let scale_x = scale_x.unwrap_or(1.0);
@@ -232,19 +232,19 @@ pub(crate) fn parse_ink_data(
 
 fn parse_ink_stroke(
     ink_stroke_id: ExGuid,
-    space: &ObjectSpace,
+    space: ObjectSpaceRef,
     scale_x: Option<f32>,
     scale_y: Option<f32>,
 ) -> Result<InkStroke> {
     let object = space
         .get_object(ink_stroke_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("ink stroke node is missing".into()))?;
-    let data = ink_stroke_node::parse(object)?;
+    let data = ink_stroke_node::parse(&object)?;
 
     let props_object = space.get_object(data.properties).ok_or_else(|| {
         ErrorKind::MalformedOneNoteData("ink stroke properties node is missing".into())
     })?;
-    let props = stroke_properties_node::parse(props_object)?;
+    let props = stroke_properties_node::parse(&props_object)?;
 
     let path = parse_ink_path(data.path, &props, scale_x, scale_y)?;
 
@@ -268,14 +268,14 @@ fn parse_ink_path(
     let idx_x = props
         .dimensions
         .iter()
-        .position(|d| d.id == guid!("598a6a8f-52c0-4ba0-93af-af357411a561"))
+        .position(|d| d.id == guid!({ 598a6a8f - 52c0 - 4ba0 - 93af - af357411a561 }))
         .ok_or_else(|| {
             ErrorKind::MalformedOneNoteData("ink stroke properties has no x dimension".into())
         })?;
     let idx_y = props
         .dimensions
         .iter()
-        .position(|d| d.id == guid!("b53f9f75-04e0-4498-a7ee-c30dbb5a9011"))
+        .position(|d| d.id == guid!({ b53f9f75 - 04e0 - 4498 - a7ee - c30dbb5a9011 }))
         .ok_or_else(|| {
             ErrorKind::MalformedOneNoteData("ink stroke properties has no y dimension".into())
         })?;

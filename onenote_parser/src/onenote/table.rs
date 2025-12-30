@@ -1,12 +1,12 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::color::Color;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property::outline_indent_distance::OutlineIndentDistance;
 use crate::one::property_set::{table_cell_node, table_node, table_row_node};
 use crate::onenote::note_tag::{NoteTag, parse_note_tags};
 use crate::onenote::outline::{OutlineElement, parse_outline_element};
-use crate::onestore::object_space::ObjectSpace;
+use crate::onestore::object_space::ObjectSpaceRef;
+use crate::shared::exguid::ExGuid;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A table.
 ///
@@ -48,7 +48,7 @@ impl Table {
 
     /// Which columns have a locked width.
     ///
-    /// To determine if column `c` has a locked width, calculate:
+    /// To determine if column `c` has a locked with, calculate:
     ///
     /// ```ignore
     /// table.cols_locked()[c / 8] & (1 << (c % 8)) == 1;
@@ -164,16 +164,16 @@ impl TableCell {
     }
 }
 
-pub(crate) fn parse_table(table_id: ExGuid, space: &ObjectSpace) -> Result<Table> {
+pub(crate) fn parse_table(table_id: ExGuid, space: ObjectSpaceRef) -> Result<Table> {
     let table_object = space
         .get_object(table_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("table object is missing".into()))?;
-    let data = table_node::parse(table_object)?;
+    let data = table_node::parse(&table_object)?;
 
     let contents = data
         .rows
         .into_iter()
-        .map(|row_id| parse_row(row_id, space))
+        .map(|row_id| parse_row(row_id, space.clone()))
         .collect::<Result<_>>()?;
 
     let table = Table {
@@ -185,22 +185,22 @@ pub(crate) fn parse_table(table_id: ExGuid, space: &ObjectSpace) -> Result<Table
         borders_visible: data.borders_visible,
         layout_alignment_in_parent: data.layout_alignment_in_parent,
         layout_alignment_self: data.layout_alignment_self,
-        note_tags: parse_note_tags(data.note_tags, space)?,
+        note_tags: parse_note_tags(data.note_tags, space.clone())?,
     };
 
     Ok(table)
 }
 
-fn parse_row(row_id: ExGuid, space: &ObjectSpace) -> Result<TableRow> {
+fn parse_row(row_id: ExGuid, space: ObjectSpaceRef) -> Result<TableRow> {
     let row_object = space
         .get_object(row_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("row object is missing".into()))?;
-    let data = table_row_node::parse(row_object)?;
+    let data = table_row_node::parse(&row_object)?;
 
     let contents = data
         .cells
         .into_iter()
-        .map(|cell_id| parse_cell(cell_id, space))
+        .map(|cell_id| parse_cell(cell_id, space.clone()))
         .collect::<Result<_>>()?;
 
     let row = TableRow { contents };
@@ -208,16 +208,16 @@ fn parse_row(row_id: ExGuid, space: &ObjectSpace) -> Result<TableRow> {
     Ok(row)
 }
 
-fn parse_cell(cell_id: ExGuid, space: &ObjectSpace) -> Result<TableCell> {
+fn parse_cell(cell_id: ExGuid, space: ObjectSpaceRef) -> Result<TableCell> {
     let cell_object = space
         .get_object(cell_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("cell object is missing".into()))?;
-    let data = table_cell_node::parse(cell_object)?;
+    let data = table_cell_node::parse(&cell_object)?;
 
     let contents = data
         .contents
         .into_iter()
-        .map(|element_id| parse_outline_element(element_id, space))
+        .map(|element_id| parse_outline_element(element_id, space.clone()))
         .collect::<Result<_>>()?;
 
     let cell = TableCell {

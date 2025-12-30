@@ -1,14 +1,14 @@
-use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
-use crate::onestore::types::property::{PropertyId, PropertyValue};
+use crate::shared::property::{PropertyId, PropertyValue};
+use crate::utils::errors::{ErrorKind, Result};
 
 pub(crate) struct References;
 
 impl References {
     pub(crate) fn get_predecessors<'a>(
         prop_type: PropertyType,
-        object: &'a Object<'a>,
+        object: &'a Object,
     ) -> Result<impl Iterator<Item = &'a PropertyValue>> {
         let prop_index = object
             .props()

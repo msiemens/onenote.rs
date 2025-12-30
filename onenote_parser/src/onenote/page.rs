@@ -1,10 +1,11 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::{page_manifest_node, page_metadata, page_node, title_node};
 use crate::onenote::outline::{Outline, parse_outline};
 use crate::onenote::page_content::{PageContent, parse_page_content};
-use crate::onestore::object_space::ObjectSpace;
+use crate::onestore::object_space::ObjectSpaceRef;
+use crate::shared::exguid::ExGuid;
+use crate::shared::guid::Guid;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A page.
 ///
@@ -14,6 +15,7 @@ use crate::onestore::object_space::ObjectSpace;
 /// [\[MS-ONE\] 2.2.19]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/e381b7c7-b434-43a2-ba23-0d08bafd281a
 #[derive(Clone, Debug)]
 pub struct Page {
+    entity_id: Guid,
     title: Option<Title>,
     level: i32,
     author: Option<String>,
@@ -62,18 +64,31 @@ impl Page {
     /// The page's title text.
     ///
     /// This is calculated using a heuristic similar to the one OneNote uses.
-    pub fn title_text(&self) -> Option<&str> {
+    pub fn title_text(&self) -> Option<String> {
         self.title
             .as_ref()
             .and_then(|title| title.contents.first())
             .and_then(Self::outline_text)
+            .and_then(|t| Some(Self::remove_hyperlink(t.to_owned())))
             .or_else(|| {
                 self.contents
                     .iter()
                     .filter_map(|page_content| page_content.outline())
-                    .filter_map(Self::outline_text)
+                    .filter_map(|t| {
+                        let v = Self::outline_text(t);
+                        if v.is_none() {
+                            return None;
+                        }
+                        return Some(Self::remove_hyperlink(v.unwrap().to_owned()));
+                    })
                     .next()
             })
+    }
+
+    /// The page's GUID. May be referenced by internal links.
+    /// Ref: [ONESTORE 2.2.58](https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-one/34ea5601-f060-4a69-b5f9-5843a1f14098)
+    pub fn link_target_id(&self) -> String {
+        format!("{}", self.entity_id)
     }
 
     fn outline_text(outline: &Outline) -> Option<&str> {
@@ -84,6 +99,33 @@ impl Page {
             .and_then(|outline_element| outline_element.contents.first())
             .and_then(|content| content.rich_text())
             .and_then(|text| Some(&*text.text).filter(|s| !s.is_empty()))
+    }
+
+    fn remove_hyperlink(title: String) -> String {
+        const HYPERLINK_MARKER: &str = "\u{fddf}HYPERLINK \"";
+
+        let mut title_copy = title.clone();
+
+        loop {
+            // Find the first hyperlink mark
+            if let Some(marker_start) = title_copy.find(HYPERLINK_MARKER) {
+                let hyperlink_part = &title_copy[marker_start + HYPERLINK_MARKER.len()..];
+
+                // Find the closing double quote of the hyperlink
+                if let Some(quote_end) = hyperlink_part.find('"') {
+                    let before_hyperlink = &title_copy[..marker_start];
+                    let after_hyperlink = &hyperlink_part[quote_end + 1..];
+                    title_copy = format!("{}{}", before_hyperlink, after_hyperlink);
+                } else {
+                    // Sometimes links are broken, in these cases we only consider what is before the mark
+                    title_copy = title[..marker_start].to_string();
+                }
+            } else {
+                break;
+            }
+        }
+
+        title_copy
     }
 }
 
@@ -145,25 +187,27 @@ impl Title {
     }
 }
 
-pub(crate) fn parse_page(page_space: &ObjectSpace) -> Result<Page> {
-    let metadata = parse_metadata(page_space)?;
-    let manifest = parse_manifest(page_space)?;
+pub(crate) fn parse_page(page_space: ObjectSpaceRef) -> Result<Page> {
+    let metadata = parse_metadata(page_space.clone())?;
+    let manifest = parse_manifest(page_space.clone())?;
 
-    let data = parse_data(manifest, page_space)?;
+    let data = parse_data(manifest, page_space.clone())?;
 
     let title = data
         .title
-        .map(|id| parse_title(id, page_space))
+        .map(|id| parse_title(id, page_space.clone()))
         .transpose()?;
+
     let level = metadata.page_level;
 
     let contents = data
         .content
         .into_iter()
-        .map(|content_id| parse_page_content(content_id, page_space))
+        .map(|content_id| parse_page_content(content_id, page_space.clone()))
         .collect::<Result<_>>()?;
 
     Ok(Page {
+        entity_id: metadata.entity_guid,
         title,
         level,
         author: data.author.map(|author| author.into_value()),
@@ -172,15 +216,15 @@ pub(crate) fn parse_page(page_space: &ObjectSpace) -> Result<Page> {
     })
 }
 
-fn parse_title(title_id: ExGuid, space: &ObjectSpace) -> Result<Title> {
+fn parse_title(title_id: ExGuid, space: ObjectSpaceRef) -> Result<Title> {
     let title_object = space
         .get_object(title_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("title object is missing".into()))?;
-    let title = title_node::parse(title_object)?;
+    let title = title_node::parse(&title_object)?;
     let contents = title
         .children
         .into_iter()
-        .map(|outline_id| parse_outline(outline_id, space))
+        .map(|outline_id| parse_outline(outline_id, space.clone()))
         .collect::<Result<_>>()?;
 
     Ok(Title {
@@ -192,16 +236,19 @@ fn parse_title(title_id: ExGuid, space: &ObjectSpace) -> Result<Title> {
     })
 }
 
-fn parse_data(manifest: page_manifest_node::Data, space: &ObjectSpace) -> Result<page_node::Data> {
+fn parse_data(
+    manifest: page_manifest_node::Data,
+    space: ObjectSpaceRef,
+) -> Result<page_node::Data> {
     let page_id = manifest.page;
     let page_object = space
         .get_object(page_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("page object is missing".into()))?;
 
-    page_node::parse(page_object)
+    page_node::parse(&page_object)
 }
 
-fn parse_manifest(space: &ObjectSpace) -> Result<page_manifest_node::Data> {
+fn parse_manifest(space: ObjectSpaceRef) -> Result<page_manifest_node::Data> {
     let page_manifest_id = space
         .content_root()
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("page content id is missing".into()))?;
@@ -209,10 +256,10 @@ fn parse_manifest(space: &ObjectSpace) -> Result<page_manifest_node::Data> {
         .get_object(page_manifest_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("page object is missing".into()))?;
 
-    page_manifest_node::parse(page_manifest_object)
+    page_manifest_node::parse(&page_manifest_object)
 }
 
-fn parse_metadata(space: &ObjectSpace) -> Result<page_metadata::Data> {
+fn parse_metadata(space: ObjectSpaceRef) -> Result<page_metadata::Data> {
     let metadata_id = space
         .metadata_root()
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("page metadata id is missing".into()))?;
@@ -220,5 +267,6 @@ fn parse_metadata(space: &ObjectSpace) -> Result<page_metadata::Data> {
         .get_object(metadata_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("page metadata object is missing".into()))?;
 
-    page_metadata::parse(metadata_object)
+    page_metadata::parse(&metadata_object)
 }
+

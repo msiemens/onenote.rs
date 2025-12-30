@@ -1,11 +1,12 @@
-use crate::Reader;
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::cell_id::CellId;
-use crate::fsshttpb::data::exguid::ExGuid;
 use crate::fsshttpb::data::object_types::ObjectType;
 use crate::fsshttpb::data::serial_number::SerialNumber;
 use crate::fsshttpb::data::stream_object::ObjectHeader;
 use crate::fsshttpb::data_element::DataElement;
+use crate::shared::cell_id::CellId;
+use crate::shared::exguid::ExGuid;
+use crate::utils::Reader;
+use crate::utils::errors::{ErrorKind, Result};
+use crate::utils::parse::ParseHttpb;
 use std::collections::HashMap;
 
 /// A storage index.
@@ -29,15 +30,6 @@ impl StorageIndex {
     pub(crate) fn find_revision_mapping_id(&self, id: ExGuid) -> Option<ExGuid> {
         self.revision_mappings
             .get(&id)
-            .map(|mapping| mapping.revision_mapping)
-    }
-
-    pub(crate) fn find_revision_mapping_by_serial(&self, serial: &SerialNumber) -> Option<ExGuid> {
-        self.revision_mappings
-            .values()
-            .find(|mapping| {
-                mapping.serial.guid == serial.guid && mapping.serial.serial == serial.serial
-            })
             .map(|mapping| mapping.revision_mapping)
     }
 }
@@ -95,7 +87,11 @@ impl DataElement {
                 }
                 _ => {
                     return Err(ErrorKind::MalformedFssHttpBData(
-                        format!("unexpected object type: {:x}", object_header.object_type).into(),
+                        format!(
+                            "unexpected object type (in storage_index): {:x}",
+                            object_header.object_type
+                        )
+                        .into(),
                     )
                     .into());
                 }

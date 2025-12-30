@@ -26,8 +26,8 @@ pub fn parseable_derive(input: proc_macro::TokenStream) -> proc_macro::TokenStre
 
     let parse_impl = process_fields(&ast.data, &ast.attrs);
     let generated = quote! {
-        impl #impl_generics parser_utils::parse::Parse for #name #ty_generics #where_clause {
-            fn parse(reader: parser_utils::Reader) -> parser_utils::errors::Result<Self> {
+        impl #impl_generics crate::utils::parse::Parse for #name #ty_generics #where_clause {
+            fn parse(reader: crate::utils::Reader) -> crate::utils::errors::Result<Self> {
                 #parse_impl
             }
         }
@@ -48,7 +48,7 @@ fn process_fields(data: &syn::Data, attrs: &Vec<syn::Attribute>) -> TokenStream 
             Some(quote_spanned! {validation.span() =>
                 #[allow(clippy::nonminimal_bool)]
                 if ! (#validation) {
-                    return Err(parser_utils::errors::ErrorKind::ParseValidationFailed(
+                    return Err(crate::utils::errors::ErrorKind::ParseValidationFailed(
                         ( #validation_str ).into()
                     ).into());
                 }

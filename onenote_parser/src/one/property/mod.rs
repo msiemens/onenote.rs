@@ -23,10 +23,8 @@ mod references;
 pub(crate) mod simple;
 pub(crate) mod time;
 
-#[repr(u32)]
 #[derive(Debug, Copy, Clone, PartialEq)]
 #[allow(dead_code)]
-#[allow(clippy::enum_clike_unportable_variant)]
 pub(crate) enum PropertyType {
     ActionItemSchemaVersion = 0x0C003473,
     ActionItemStatus = 0x10003470,
@@ -183,8 +181,9 @@ pub(crate) enum PropertyType {
     InkPath = 0x1C00340B,
     InkStrokeProperties = 0x20003409,
     InkStrokes = 0x24003416,
-    InkAntialised = 0x8000340E,
-    InkFitToCurve = 0x80003410,
+    // TODO: Fix values not being accepted as valid enum values
+    // InkAntialised = 0x8000340E,
+    // InkFitToCurve = 0x80003410,
     InkIgnorePressure = 0x08003411,
     InkPenTip = 0x0C003412,
     InkRasterOperation = 0x0C003413,
@@ -206,6 +205,7 @@ pub(crate) enum PropertyType {
     EmbeddedInkSpaceHeight = 0x14001C28,
     ImageEmbedType = 0x140035F2,
     ImageEmbeddedUrl = 0x1C0035F3,
+
     MathInlineObjectType = 0x1400344F,
     MathInlineObjectCount = 0x14003450,
     MathInlineObjectCol = 0x0C003451,

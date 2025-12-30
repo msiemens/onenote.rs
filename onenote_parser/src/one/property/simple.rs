@@ -1,10 +1,12 @@
-use crate::errors::{ErrorKind, Result};
 use crate::one::property::PropertyType;
 use crate::onestore::object::Object;
-use crate::reader::Reader;
 use crate::shared::guid::Guid;
-use crate::utils::Utf16ToString;
+use crate::shared::prop_set::PropertySet;
 use encoding_rs::mem::decode_latin1;
+use crate::utils::Utf16ToString;
+use crate::utils::errors::{ErrorKind, Result};
+use crate::utils::parse::Parse;
+use crate::utils::reader::Reader;
 
 pub(crate) fn parse_bool(prop_type: PropertyType, object: &Object) -> Result<Option<bool>> {
     let value = match object.props().get(prop_type) {
@@ -156,4 +158,25 @@ pub(crate) fn parse_guid(prop_type: PropertyType, object: &Object) -> Result<Opt
     };
 
     Ok(Some(Guid::parse(&mut Reader::new(data))?))
+}
+
+pub(crate) fn parse_property_values(
+    prop_type: PropertyType,
+    object: &Object,
+) -> Result<Option<&[PropertySet]>> {
+    let value = match object.props().get(prop_type) {
+        Some(value) => Some(
+            value
+                .to_property_values()
+                .ok_or_else(|| {
+                    parser_error!(
+                        MalformedOneNoteFileData,
+                        "PropertyValue value is not a PropertyValue"
+                    )
+                })?
+                .1,
+        ),
+        None => None,
+    };
+    Ok(value)
 }

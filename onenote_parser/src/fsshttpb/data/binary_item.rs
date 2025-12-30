@@ -1,6 +1,7 @@
-use crate::Reader;
-use crate::errors::Result;
-use crate::fsshttpb::data::compact_u64::CompactU64;
+use crate::shared::compact_u64::CompactU64;
+use crate::shared::file_data_ref::FileBlob;
+use crate::utils::Reader;
+use crate::utils::errors::Result;
 
 /// A byte array with the length determined by a `CompactU64`.
 ///
@@ -19,5 +20,11 @@ impl BinaryItem {
 
     pub(crate) fn value(self) -> Vec<u8> {
         self.0
+    }
+}
+
+impl From<BinaryItem> for FileBlob {
+    fn from(value: BinaryItem) -> Self {
+        value.0.into()
     }
 }

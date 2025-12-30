@@ -1,10 +1,9 @@
-use crate::errors::{ErrorKind, Result};
-use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::PropertyType;
-use crate::one::property::references::References;
-use crate::onestore::object::Object;
-use crate::onestore::types::compact_id::CompactId;
-use crate::onestore::types::property::PropertyValue;
+use crate::shared::compact_id::CompactId;
+use crate::shared::exguid::ExGuid;
+use crate::shared::property::PropertyValue;
+use crate::{one::property::references::References, onestore::object::Object};
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A generic object reference.
 ///
@@ -25,10 +24,12 @@ impl ObjectReference {
         // Find the correct object reference
         let index = Self::get_offset(prop_type, object)?;
 
-        let id =
-            object.props().object_ids().get(index).ok_or_else(|| {
-                ErrorKind::MalformedOneNoteFileData("object id index corrupt".into())
-            })?;
+        let id = object
+            .props()
+            .object_ids()
+            .iter()
+            .nth(index)
+            .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("object id index corrupt".into()))?;
 
         Ok(Self::resolve_id(index, id, object))
     }
@@ -86,6 +87,6 @@ impl ObjectReference {
     }
 
     fn resolve_id(index: usize, id: &CompactId, object: &Object) -> Option<ExGuid> {
-        object.mapping().get_object(index, *id)
+        object.mapping.resolve_id(index, id)
     }
 }

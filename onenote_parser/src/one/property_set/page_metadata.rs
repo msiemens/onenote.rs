@@ -1,9 +1,9 @@
-use crate::errors::{ErrorKind, Result};
 use crate::one::property::time::Timestamp;
 use crate::one::property::{PropertyType, simple};
-use crate::one::property_set::{PropertySetId, assert_property_set};
+use crate::one::property_set::PropertySetId;
 use crate::onestore::object::Object;
 use crate::shared::guid::Guid;
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A page's metadata.
 ///
@@ -15,22 +15,27 @@ use crate::shared::guid::Guid;
 pub(crate) struct Data {
     pub(crate) entity_guid: Guid,
     pub(crate) cached_title: String,
-    pub(crate) schema_revision_in_order_to_read: Option<u32>,
-    pub(crate) schema_revision_in_order_to_write: Option<u32>,
+    pub(crate) schema_revision_in_order_to_read: Option<u32>, // FIXME: Force this?
+    pub(crate) schema_revision_in_order_to_write: Option<u32>, // FIXME: Force this?
     pub(crate) page_level: i32,
     pub(crate) created_at: Timestamp,
     pub(crate) is_deleted: bool,
 }
 
 pub(crate) fn parse(object: &Object) -> Result<Data> {
-    assert_property_set(object, PropertySetId::PageMetadata)?;
+    if object.id() != PropertySetId::PageMetadata.as_jcid() {
+        return Err(unexpected_object_type_error!(object.id().0).into());
+    }
 
     let entity_guid = simple::parse_guid(PropertyType::NotebookManagementEntityGuid, object)?
         .ok_or_else(|| ErrorKind::MalformedOneNoteFileData("page metadata has no guid".into()))?;
-    let cached_title =
-        simple::parse_string(PropertyType::CachedTitleString, object)?.ok_or_else(|| {
-            ErrorKind::MalformedOneNoteFileData("page metadata has no cached title".into())
-        })?;
+    // The page might not have a title but we can use the first Section outline from the body as the fallback later
+    let cached_title = simple::parse_string(PropertyType::CachedTitleString, object)?
+        .ok_or_else(|| {
+            let guid = simple::parse_guid(PropertyType::NotebookManagementEntityGuid, object);
+            return guid.map(|g| g.unwrap().to_string());
+        })
+        .unwrap_or("Untitled Page".to_string());
     let schema_revision_in_order_to_read =
         simple::parse_u32(PropertyType::SchemaRevisionInOrderToRead, object)?;
     let schema_revision_in_order_to_write =

@@ -1,6 +1,5 @@
-use crate::errors::{ErrorKind, Result};
-use crate::one::property::PropertyType;
-use crate::onestore::object::Object;
+use crate::{one::property::PropertyType, onestore::object::Object};
+use crate::utils::errors::{ErrorKind, Result};
 
 /// A 32 bit date/time timestamp.
 ///
@@ -32,7 +31,7 @@ impl Time {
 /// See [\[MS-DTYP\] 2.3.3]
 ///
 /// [\[MS-DTYP\] 2.3.3]: https://docs.microsoft.com/en-us/openspecs/windows_protocols/ms-dtyp/2c57429b-fdd4-488f-b5fc-9e4cf020fcdf
-#[derive(Debug)]
+#[derive(Debug, Clone)]
 #[allow(dead_code)]
 pub(crate) struct Timestamp(u64);
 
