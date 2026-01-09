@@ -4,10 +4,11 @@ use crate::onenote::notebook::Notebook;
 use crate::onenote::section::{Section, SectionEntry, SectionGroup};
 use crate::onestore::parse_store;
 use crate::reader::Reader;
+use sanitise_file_name::sanitise;
 use std::ffi::OsStr;
 use std::fs::File;
 use std::io::{BufReader, Read};
-use std::path::Path;
+use std::path::{Component, Path, PathBuf};
 
 pub(crate) mod content;
 pub(crate) mod embedded_file;
@@ -72,14 +73,12 @@ impl Parser {
             message: "path has no parent directory".into(),
         })?;
         let (entries, color) = notebook::parse_toc(store.data_root())?;
-        let sections = entries
+        let entries = entries
             .iter()
-            .map(|name| {
-                let mut file = base_dir.to_path_buf();
-                file.push(name);
-
-                file
-            })
+            .map(|name| resolve_entry_path(base_dir, name))
+            .collect::<Result<Vec<_>>>()?;
+        let sections = entries
+            .into_iter()
             .filter(|p| p.exists())
             .filter(|p| !p.ends_with("OneNote_RecycleBin"))
             .map(|path| {
@@ -194,8 +193,109 @@ impl Parser {
     }
 }
 
+fn resolve_entry_path(base_dir: &Path, entry: &str) -> Result<PathBuf> {
+    let entry_path = Path::new(entry);
+    if entry_path.is_absolute() {
+        return Err(ErrorKind::InvalidPath {
+            message: "section entry must be a relative path".into(),
+        }
+        .into());
+    }
+
+    let mut sanitized = PathBuf::new();
+    for component in entry_path.components() {
+        match component {
+            Component::Normal(name) => {
+                let name = name.to_str().ok_or_else(|| ErrorKind::InvalidPath {
+                    message: "section entry contains non-utf8 characters".into(),
+                })?;
+                let clean = sanitise(name);
+                if clean != name {
+                    return Err(ErrorKind::InvalidPath {
+                        message: format!("section entry contains invalid characters: {name}").into(),
+                    }
+                    .into());
+                }
+                sanitized.push(name);
+            }
+            Component::CurDir => {}
+            Component::ParentDir | Component::RootDir | Component::Prefix(_) => {
+                return Err(ErrorKind::InvalidPath {
+                    message: "section entry contains invalid path components".into(),
+                }
+                .into());
+            }
+        }
+    }
+
+    if sanitized.as_os_str().is_empty() {
+        return Err(ErrorKind::InvalidPath {
+            message: "section entry is empty".into(),
+        }
+        .into());
+    }
+
+    let candidate = base_dir.join(&sanitized);
+    if candidate.exists() {
+        let base_canon = base_dir.canonicalize().map_err(|err| ErrorKind::InvalidPath {
+            message: format!("failed to resolve base directory: {err}").into(),
+        })?;
+        let candidate_canon =
+            candidate
+                .canonicalize()
+                .map_err(|err| ErrorKind::InvalidPath {
+                    message: format!("failed to resolve entry path: {err}").into(),
+                })?;
+        if !candidate_canon.starts_with(&base_canon) {
+            return Err(ErrorKind::InvalidPath {
+                message: "section entry escapes base directory".into(),
+            }
+            .into());
+        }
+    }
+
+    Ok(candidate)
+}
+
 impl Default for Parser {
     fn default() -> Self {
         Self::new()
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::resolve_entry_path;
+    use std::path::Path;
+    use tempfile::tempdir;
+
+    #[test]
+    fn test_resolve_entry_path_rejects_traversal() {
+        let dir = tempdir().unwrap();
+        let base = dir.path();
+
+        let err = resolve_entry_path(base, "../secret.one").unwrap_err();
+        let err = format!("{err}");
+        assert!(err.contains("invalid path components"));
+    }
+
+    #[test]
+    fn test_resolve_entry_path_rejects_absolute() {
+        let dir = tempdir().unwrap();
+        let base = dir.path();
+
+        let candidate = if cfg!(windows) { r"C:\secret.one" } else { "/etc/passwd" };
+        let err = resolve_entry_path(base, candidate).unwrap_err();
+        let err = format!("{err}");
+        assert!(err.contains("relative path"));
+    }
+
+    #[test]
+    fn test_resolve_entry_path_accepts_relative() {
+        let dir = tempdir().unwrap();
+        let base = dir.path();
+
+        let resolved = resolve_entry_path(base, "Section 1.one").unwrap();
+        assert_eq!(resolved, Path::new(base).join("Section 1.one"));
     }
 }

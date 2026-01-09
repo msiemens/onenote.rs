@@ -21,9 +21,11 @@ enum-primitive-derive = "0.3"
 itertools = "0.14"
 num-traits = "0.2"
 pastey = "0.2"
+sanitise-file-name = "1.0"
 thiserror = "2.0"
 uuid = "1.19"
 widestring = "1.2"
 
 [dev-dependencies]
 insta = "1.45"
+tempfile = "3.15"
