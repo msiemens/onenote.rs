@@ -113,7 +113,15 @@ impl OneStorePackaging {
         let transaction_log = Self::parse_fcr64x32(reader)?;
 
         let read = start - reader.remaining() as u64;
-        let offset = transaction_log.end()? - (read);
+        let offset = transaction_log.end()?.checked_sub(read).ok_or_else(|| {
+            ErrorKind::MalformedOneStoreData("transaction log offset underflow".into())
+        })?;
+        if offset > usize::MAX as u64 {
+            return Err(ErrorKind::MalformedOneStoreData(
+                "transaction log offset exceeds addressable space".into(),
+            )
+            .into());
+        }
         reader.advance(offset as usize)?;
 
         let file_type = Guid::parse(reader)?;
