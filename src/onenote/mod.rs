@@ -212,7 +212,8 @@ fn resolve_entry_path(base_dir: &Path, entry: &str) -> Result<PathBuf> {
                 let clean = sanitise(name);
                 if clean != name {
                     return Err(ErrorKind::InvalidPath {
-                        message: format!("section entry contains invalid characters: {name}").into(),
+                        message: format!("section entry contains invalid characters: {name}")
+                            .into(),
                     }
                     .into());
                 }
@@ -237,15 +238,16 @@ fn resolve_entry_path(base_dir: &Path, entry: &str) -> Result<PathBuf> {
 
     let candidate = base_dir.join(&sanitized);
     if candidate.exists() {
-        let base_canon = base_dir.canonicalize().map_err(|err| ErrorKind::InvalidPath {
-            message: format!("failed to resolve base directory: {err}").into(),
-        })?;
-        let candidate_canon =
-            candidate
-                .canonicalize()
-                .map_err(|err| ErrorKind::InvalidPath {
-                    message: format!("failed to resolve entry path: {err}").into(),
-                })?;
+        let base_canon = base_dir
+            .canonicalize()
+            .map_err(|err| ErrorKind::InvalidPath {
+                message: format!("failed to resolve base directory: {err}").into(),
+            })?;
+        let candidate_canon = candidate
+            .canonicalize()
+            .map_err(|err| ErrorKind::InvalidPath {
+                message: format!("failed to resolve entry path: {err}").into(),
+            })?;
         if !candidate_canon.starts_with(&base_canon) {
             return Err(ErrorKind::InvalidPath {
                 message: "section entry escapes base directory".into(),
@@ -284,7 +286,11 @@ mod tests {
         let dir = tempdir().unwrap();
         let base = dir.path();
 
-        let candidate = if cfg!(windows) { r"C:\secret.one" } else { "/etc/passwd" };
+        let candidate = if cfg!(windows) {
+            r"C:\secret.one"
+        } else {
+            "/etc/passwd"
+        };
         let err = resolve_entry_path(base, candidate).unwrap_err();
         let err = format!("{err}");
         assert!(err.contains("relative path"));
