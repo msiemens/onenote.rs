@@ -4,8 +4,9 @@
 
 The project supports reading OneNote files in the FSSHTTP packaging format
 ([\[MS-ONESTORE\] 2.3] and [\[MS-ONESTORE\] 2.8]) as used by OneDrive and the
-modern OneNote apps. Feature contributions are welcome, but otherwise the
-project focuses on bugfixes and compatibility.
+modern OneNote apps, plus legacy OneNote 2016 desktop files (.one). Feature
+contributions are welcome, but otherwise the project focuses on bugfixes and
+compatibility.
 
 In addition to the publicly documented contents, this project also allows
 reading ink/handwriting content as well as math/equation content.
@@ -13,13 +14,13 @@ reading ink/handwriting content as well as math/equation content.
 ## Goals
 
 - Read OneNote notebooks and sections obtained via OneDrive download
+- Read OneNote 2016 desktop files (.one)
 - Provide a Rust API for inspecting notebook, section, and page data
 - Support HTML conversion via the [one2html] project
 
 ## Non-Goals
 
 - The ability to write OneNote files
-- Support for legacy OneNote 2016 desktop files
 
 ## Usage
 
