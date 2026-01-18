@@ -1,5 +1,10 @@
+#[cfg(feature = "native-fs")]
 use std::fs;
+#[cfg(feature = "native-fs")]
 use std::fs::File;
+#[cfg(not(feature = "native-fs"))]
+use std::io::Error;
+#[cfg(feature = "native-fs")]
 use std::io::{BufReader, Error, Read};
 use std::path::{Path, PathBuf};
 
@@ -99,8 +104,10 @@ pub trait FileSystem: Send + Sync {
 ///
 /// This is the default implementation of [`FileSystem`] that performs actual
 /// file system operations using Rust's standard library.
+#[cfg(feature = "native-fs")]
 pub struct NativeFs {}
 
+#[cfg(feature = "native-fs")]
 impl FileSystem for NativeFs {
     fn is_directory(&self, path: &Path) -> Result<bool, Error> {
         Ok(fs::metadata(path)?.is_dir())

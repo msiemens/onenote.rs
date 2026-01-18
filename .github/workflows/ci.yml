@@ -27,6 +27,7 @@ jobs:
       - uses: dtolnay/rust-toolchain@master
         with:
           toolchain: ${{ matrix.rust }}
+          targets: wasm32-unknown-unknown
           components: rustfmt, clippy
 
       - uses: Swatinem/rust-cache@v2
@@ -43,6 +44,9 @@ jobs:
 
       - name: cargo test
         run: cargo test
+
+      - name: cargo build (wasm32, no default features, lib only)
+        run: cargo build -p onenote_parser --target wasm32-unknown-unknown --no-default-features --lib
 
       - name: cargo fmt
         if: ${{ matrix.rust == 'stable' }}

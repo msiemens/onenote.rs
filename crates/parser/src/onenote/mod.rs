@@ -1,5 +1,6 @@
 use crate::FileSystem;
 use crate::errors::{ErrorKind, Result};
+#[cfg(feature = "native-fs")]
 use crate::fs::NativeFs;
 use crate::fsshttpb::packaging::{OneStorePackaging, embedded_packaging_offset};
 use crate::onenote::notebook::Notebook;
@@ -46,6 +47,16 @@ pub struct Parser<FS: FileSystem = NativeFs> {
     fs: FS,
 }
 
+/// The OneNote file parser.
+///
+/// Use [`Parser::parse_notebook`] to load a notebook from a `.onetoc2` file or
+/// [`Parser::parse_section`] to load a single `.one` section. These methods
+/// auto-detect OneNote 2016 (legacy) and OneDrive (FSSHTTP) formats and will
+/// return an error if the input is not the expected file type.
+///
+/// # Thread safety
+///
+/// The parser is stateless and can be shared across threads.
 #[cfg(not(feature = "native-fs"))]
 pub struct Parser<FS: FileSystem> {
     fs: FS,
