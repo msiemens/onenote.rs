@@ -26,7 +26,7 @@ impl ObjectHeader {
         let header_type = reader
             .bytes()
             .first()
-            .ok_or(ErrorKind::UnexpectedEof("Reading ObjectHeader".into()))?;
+            .ok_or(ErrorKind::UnexpectedEof)?;
 
         match header_type & 0b11 {
             0x0 => Self::parse_16(reader),
@@ -199,9 +199,7 @@ impl ObjectHeader {
     }
 
     pub(crate) fn has_end_8(reader: Reader, object_type: ObjectType) -> Result<bool> {
-        let data = reader.bytes().first().ok_or(ErrorKind::UnexpectedEof(
-            "Reading ObjectHeader.has_end_8".into(),
-        ))?;
+        let data = reader.bytes().first().ok_or(ErrorKind::UnexpectedEof)?;
         let expected = object_type.to_u8().ok_or_else(|| {
             ErrorKind::MalformedFssHttpBData(format!("invalid object type: {object_type:?}").into())
         })?;

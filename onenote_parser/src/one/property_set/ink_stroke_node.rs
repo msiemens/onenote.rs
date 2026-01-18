@@ -29,6 +29,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
 
     let path = simple::parse_vec(PropertyType::InkPath, object)?
         .map(|data| multi_byte::decode_signed(&data))
+        .transpose()?
         .ok_or_else(|| {
             log_warn!("ink stroke node has no ink path");
             Vec::<i64>::new()

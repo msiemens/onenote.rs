@@ -23,9 +23,7 @@ impl CompactU64 {
     pub(crate) fn parse(reader: Reader) -> Result<CompactU64> {
         let bytes = reader.bytes();
 
-        let first_byte = bytes.first().copied().ok_or(ErrorKind::UnexpectedEof(
-            "Reading CompactU64 (first byte)".into(),
-        ))?;
+        let first_byte = bytes.first().copied().ok_or(ErrorKind::UnexpectedEof)?;
 
         if first_byte == 0 {
             reader.advance(1)?;
@@ -43,7 +41,7 @@ impl CompactU64 {
 
         if first_byte & 4 != 0 {
             if reader.remaining() < 3 {
-                return Err(ErrorKind::UnexpectedEof("Reading CompactU64".into()).into());
+                return Err(ErrorKind::UnexpectedEof.into());
             }
 
             let value = u32::from_le_bytes([bytes[0], bytes[1], bytes[2], 0]);
@@ -55,7 +53,7 @@ impl CompactU64 {
 
         if first_byte & 8 != 0 {
             if reader.remaining() < 4 {
-                return Err(ErrorKind::UnexpectedEof("CompactU64".into()).into());
+                return Err(ErrorKind::UnexpectedEof.into());
             }
 
             let value = u32::from_le_bytes([bytes[0], bytes[1], bytes[2], bytes[3]]);
@@ -67,7 +65,7 @@ impl CompactU64 {
 
         if first_byte & 16 != 0 {
             if reader.remaining() < 5 {
-                return Err(ErrorKind::UnexpectedEof("CompactU64".into()).into());
+                return Err(ErrorKind::UnexpectedEof.into());
             }
 
             let value =
@@ -80,7 +78,7 @@ impl CompactU64 {
 
         if first_byte & 32 != 0 {
             if reader.remaining() < 6 {
-                return Err(ErrorKind::UnexpectedEof("CompactU64".into()).into());
+                return Err(ErrorKind::UnexpectedEof.into());
             }
 
             let value = u64::from_le_bytes([
@@ -94,7 +92,7 @@ impl CompactU64 {
 
         if first_byte & 64 != 0 {
             if reader.remaining() < 7 {
-                return Err(ErrorKind::UnexpectedEof("CompactU64".into()).into());
+                return Err(ErrorKind::UnexpectedEof.into());
             }
 
             let value = u64::from_le_bytes([
