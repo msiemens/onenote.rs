@@ -236,8 +236,8 @@ impl FileNode {
             ),
             0x0FF => FileNodeData::ChunkTerminatorFND,
             0 => FileNodeData::Null,
-            _other => {
-                log_warn!("Unknown node type: {:#0x}, size {}", other, size);
+            other => {
+                log::warn!("Unknown node type: {:#0x}, size {}", other, size);
                 let size_used = remaining_0 - remaining_1;
                 assert!(size_used <= size);
                 let remaining_size = size - size_used;

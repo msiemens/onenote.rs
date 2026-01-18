@@ -56,7 +56,7 @@ impl GlobalIdTable {
                     todo!("Not implemented");
                 }
                 FileNodeData::UnknownNode(_node) => {
-                    log_warn!(
+                    log::warn!(
                         "Unknown node {:?} skipped while parsing global ID table.",
                         node
                     );

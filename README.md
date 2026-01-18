@@ -44,6 +44,13 @@ fn main() -> Result<(), Box<dyn std::error::Error>> {
 }
 ```
 
+## Logging
+
+The parser uses the `log` crate for diagnostics. By default, log output is
+disabled unless the consuming application installs a logger. This keeps the
+library quiet while allowing callers to enable logging using any compatible
+logger (for example `env_logger`, `tracing` via `tracing-log`, or similar).
+
 ## Backtraces
 
 Enable the `backtrace` feature to capture a `std::backtrace::Backtrace` on

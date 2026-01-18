@@ -57,7 +57,7 @@ impl<'a> RevisionManifestList {
                     if revisions_seen.contains(&base_rid) {
                         iterator.next();
                         // TODO: Find a test .one file that uses this and implement:
-                        log_warn!("TO-DO: Apply the new role and context to the revision");
+                        log::warn!("TO-DO: Apply the new role and context to the revision");
                     } else {
                         return Err(
                             ErrorKind::MalformedOneStoreData("RevisionRoleAndContextDeclarationFND points to a non-existent revision".into()).into()

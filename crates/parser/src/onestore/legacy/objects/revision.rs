@@ -129,7 +129,7 @@ impl<'a> Revision {
 
                 let root_role: RootRole = object_reference.root_role.try_into()?;
                 if roots.contains_key(&root_role) {
-                    log_warn!("An item with role {:?} is already present", root_role);
+                    log::warn!("An item with role {:?} is already present", root_role);
                 }
 
                 roots
@@ -151,7 +151,8 @@ impl<'a> Revision {
                     .or_insert(oid_root);
             } else if let FileNodeData::DataSignatureGroupDefinitionFND(_) = current {
                 // .onetoc2
-                log!("Ignoring DataSignatureGroupDefinitionFND");
+                log::debug!("Ignoring DataSignatureGroupDefinitionFND");
+
                 iterator.next();
             } else {
                 return Err(onestore_parse_error!(

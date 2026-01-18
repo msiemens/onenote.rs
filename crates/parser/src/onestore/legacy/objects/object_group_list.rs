@@ -72,8 +72,9 @@ impl ObjectGroupList {
             if matches!(item, FileNodeData::ObjectGroupEndFND) {
                 break;
             } else if let FileNodeData::DataSignatureGroupDefinitionFND(_) = item {
+                log::debug!("Ignoring DataSignatureGroupDefinitionFND");
+
                 iterator.next();
-                log!("Ignoring DataSignatureGroupDefinitionFND");
             } else if let Some(object) = Object::try_parse(iterator, &parse_context)? {
                 let id = id_table.resolve_id(&object.compact_id)?;
                 objects.entry(id).or_insert(object.data);

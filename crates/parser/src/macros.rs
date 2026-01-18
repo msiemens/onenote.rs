@@ -27,16 +27,6 @@ macro_rules! onestore_parse_error {
     };
 }
 
-// TODO: Remove?
-macro_rules! log {
-    ( $( $t:tt )* ) => {};
-}
-
-// TODO: Remove?
-macro_rules! log_warn {
-    ( $( $t:tt )* ) => {};
-}
-
 #[cfg(test)]
 mod test {
     use crate::fsshttpb::data::exguid::ExGuid;
