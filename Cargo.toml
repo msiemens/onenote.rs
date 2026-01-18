@@ -3,4 +3,4 @@ resolver = "3"
 members = ["crates/*"]
 
 [workspace.dependencies]
-parser-macros = { path = "crates/parser-macros" }
+parser-macros = { path = "crates/parser-macros", version = "0.0.0" }
