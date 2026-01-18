@@ -71,6 +71,7 @@
 mod macros;
 
 pub mod errors;
+pub(crate) mod fs;
 mod fsshttpb;
 mod one;
 mod onenote;
@@ -81,74 +82,8 @@ mod utils;
 
 pub(crate) type Reader<'a, 'b> = &'b mut reader::Reader<'a>;
 
+pub use crate::fs::FileSystem;
 pub use crate::onenote::Parser;
-use std::path::Path;
-
-pub trait FileSystem: Send + Sync {
-    fn is_directory(&self, path: &Path) -> Result<bool, std::io::Error>;
-
-    fn read_dir(&self, path: &Path) -> Result<Vec<String>, std::io::Error>;
-
-    fn read_file(&self, path: &Path) -> Result<Vec<u8>, std::io::Error>;
-
-    fn write_file(&self, path: &Path, data: &[u8]) -> Result<(), std::io::Error>;
-
-    fn make_dir(&self, path: &Path) -> Result<(), std::io::Error>;
-
-    fn exists(&self, path: &Path) -> Result<bool, std::io::Error>;
-
-    // TODO: Compat layer!?
-    // These functions correspond to the similarly-named
-    // NodeJS path functions and should behave like the NodeJS
-    // functions (rather than the corresponding Rust functions).
-    fn get_file_name(&self, path: &Path) -> Option<String>;
-
-    fn get_file_extension(&self, path: &Path) -> String;
-
-    fn get_dir_name(&self, path: &Path) -> String;
-
-    /// This function should behave like NodeJS's `path.join` function.
-    /// As a result, unlike Rust's `Path::join`, if `path_2` starts with "/",
-    /// `path_2` is still appended to `path_1`.
-    fn join(&self, a: &Path, b: &Path) -> String;
-
-    /// Splits filename into (base, extension).
-    fn split_file_name(&self, _filename: &Path) -> (String, String) {
-        unimplemented!()
-
-        // let ext = self.get_file_extension(filename);
-        // let base = filename.strip_suffix(&ext).unwrap_or(filename);
-
-        // (base.into(), ext)
-    }
-
-    fn remove_prefix<'a>(&self, _full_path: &Path, _prefix: &Path) -> &'a str {
-        unimplemented!()
-
-        // if let Some(without_prefix) = full_path.strip_prefix(prefix) {
-        //     without_prefix
-        // } else {
-        //     full_path
-        // }
-    }
-
-    fn get_output_path(&self, _input_dir: &Path, _output_dir: &Path, _file_path: &Path) -> String {
-        unimplemented!()
-
-        // let base_path = self.remove_prefix(file_path, input_dir);
-        // let rebased_output = self.join(output_dir, base_path);
-        // self.get_dir_name(&rebased_output)
-    }
-
-    fn get_parent_dir(&self, _path: &Path) -> Option<String> {
-        unimplemented!()
-
-        // let dir_name = self.get_dir_name(path);
-        // let result = self.get_file_name(&dir_name);
-
-        // result.filter(|value| !value.is_empty())
-    }
-}
 
 /// The data that represents a OneNote notebook.
 pub mod notebook {

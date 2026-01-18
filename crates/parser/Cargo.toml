@@ -12,7 +12,9 @@ keywords = ["onenote", "parser"]
 categories = ["parser-implementations"]
 
 [features]
+default = ["native-fs"]
 backtrace = []
+native-fs = []
 
 [dependencies]
 bytes = "1.11"

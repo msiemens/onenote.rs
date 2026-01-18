@@ -1,4 +1,6 @@
+use crate::FileSystem;
 use crate::errors::{ErrorKind, Result};
+use crate::fs::NativeFs;
 use crate::fsshttpb::packaging::{OneStorePackaging, embedded_packaging_offset};
 use crate::onenote::notebook::Notebook;
 use crate::onenote::section::{Section, SectionEntry, SectionGroup};
@@ -10,8 +12,6 @@ use crate::reader::Reader;
 use crate::shared::guid::Guid;
 use sanitise_file_name::sanitise;
 use std::ffi::OsStr;
-use std::fs::File;
-use std::io::{BufReader, Read};
 use std::path::{Component, Path, PathBuf};
 
 pub(crate) mod content;
@@ -41,15 +41,35 @@ pub(crate) mod table;
 /// # Thread safety
 ///
 /// The parser is stateless and can be shared across threads.
-pub struct Parser;
+#[cfg(feature = "native-fs")]
+pub struct Parser<FS: FileSystem = NativeFs> {
+    fs: FS,
+}
 
-impl Parser {
+#[cfg(not(feature = "native-fs"))]
+pub struct Parser<FS: FileSystem> {
+    fs: FS,
+}
+
+#[cfg(feature = "native-fs")]
+impl Parser<NativeFs> {
     /// Create a new OneNote file parser.
     ///
     /// The parser holds no state; reuse a single instance across multiple
     /// parses if desired.
-    pub fn new() -> Parser {
-        Parser {}
+    pub fn new() -> Parser<NativeFs> {
+        Parser { fs: NativeFs {} }
+    }
+}
+
+impl<FS: FileSystem> Parser<FS> {
+    /// Create a new instance of the `Parser` struct using the provided file system.
+    ///
+    /// # Parameters
+    /// - `fs`: An instance of an object implementing the `FileSystem` trait.
+    ///   This parameter provides the necessary file system operations for the `Parser`.
+    pub fn new_with_fs(fs: FS) -> Parser<FS> {
+        Parser { fs }
     }
 
     /// Parse a OneNote notebook.
@@ -61,8 +81,7 @@ impl Parser {
     /// Returns [`ErrorKind::NotATocFile`] if the file is not a notebook table of
     /// contents.
     pub fn parse_notebook(&self, path: &Path) -> Result<Notebook> {
-        let file = File::open(path)?;
-        let data = Parser::read(file)?;
+        let data = self.fs.read_file(path)?;
         let store = parse_store_auto(&data)?;
 
         if store.get_type() != OneStoreType::TableOfContents {
@@ -82,14 +101,14 @@ impl Parser {
             .collect::<Result<Vec<_>>>()?;
         let sections = entries
             .into_iter()
-            .filter(|p| p.exists())
+            .filter(|p| self.fs.exists(p).unwrap_or(false))
             .filter(|p| !p.ends_with("OneNote_RecycleBin"))
             .map(|path| {
-                if path.is_file() {
-                    self.parse_section(&path).map(SectionEntry::Section)
-                } else {
+                if self.fs.is_directory(&path)? {
                     self.parse_section_group(&path)
                         .map(SectionEntry::SectionGroup)
+                } else {
+                    self.parse_section(&path).map(SectionEntry::Section)
                 }
             })
             .collect::<Result<_>>()?;
@@ -131,8 +150,7 @@ impl Parser {
     /// Returns [`ErrorKind::NotASectionFile`] if the file does not contain a
     /// section.
     pub fn parse_section(&self, path: &Path) -> Result<Section> {
-        let file = File::open(path)?;
-        let data = Parser::read(file)?;
+        let data = self.fs.read_file(path)?;
         let store = parse_store_auto(&data)?;
 
         if store.get_type() != OneStoreType::Section {
@@ -162,21 +180,17 @@ impl Parser {
             .to_string_lossy()
             .to_string();
 
-        for entry in path.read_dir()? {
-            let entry = entry?;
+        for entry in self.fs.read_dir(path)? {
             let is_toc = entry
-                .path()
                 .extension()
                 .map(|ext| ext == OsStr::new("onetoc2"))
                 .unwrap_or_default();
 
             if is_toc {
-                return self
-                    .parse_notebook(&entry.path())
-                    .map(|group| SectionGroup {
-                        display_name,
-                        entries: group.entries,
-                    });
+                return self.parse_notebook(&entry).map(|group| SectionGroup {
+                    display_name,
+                    entries: group.entries,
+                });
             }
         }
 
@@ -184,16 +198,6 @@ impl Parser {
             dir: path.as_os_str().to_string_lossy().into_owned(),
         }
         .into())
-    }
-
-    fn read(file: File) -> Result<Vec<u8>> {
-        let size = file.metadata()?.len();
-        let mut data = Vec::with_capacity(size as usize);
-
-        let mut buf = BufReader::new(file);
-        buf.read_to_end(&mut data)?;
-
-        Ok(data)
     }
 }
 
@@ -373,7 +377,8 @@ fn resolve_entry_path(base_dir: &Path, entry: &str) -> Result<PathBuf> {
     Ok(candidate)
 }
 
-impl Default for Parser {
+#[cfg(feature = "native-fs")]
+impl Default for Parser<NativeFs> {
     fn default() -> Self {
         Self::new()
     }
