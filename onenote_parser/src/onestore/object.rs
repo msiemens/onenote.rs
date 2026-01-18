@@ -1,10 +1,8 @@
 use super::mapping_table::MappingTable;
 use crate::{
     one::property_set::PropertySetId,
-    onestore::mapping_table::mapping_table_fallback,
     shared::{
         exguid::ExGuid, file_data_ref::FileBlob, jcid::JcId, object_prop_set::ObjectPropSet,
-        prop_set::PropertySet,
     },
 };
 use crate::utils::Result;
@@ -57,20 +55,5 @@ impl Object {
 
     pub fn props(&self) -> &ObjectPropSet {
         &self.props
-    }
-
-    pub(crate) fn fallback() -> Object {
-        Self {
-            jc_id: JcId { 0: 0 },
-            context_id: ExGuid::fallback(),
-            file_data: None,
-            mapping: mapping_table_fallback(),
-            props: ObjectPropSet {
-                object_ids: Vec::from([]),
-                object_space_ids: Vec::from([]),
-                context_ids: Vec::from([]),
-                properties: PropertySet::fallback(),
-            },
-        }
     }
 }

@@ -38,6 +38,7 @@ pub(crate) mod table_node;
 pub(crate) mod table_row_node;
 pub(crate) mod title_node;
 pub(crate) mod toc_container;
+pub(crate) mod text_run_data;
 
 #[derive(Debug, Copy, Clone, Primitive)]
 pub(crate) enum PropertySetId {
