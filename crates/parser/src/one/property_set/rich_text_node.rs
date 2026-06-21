@@ -22,7 +22,7 @@ pub(crate) struct Data {
     pub(crate) text_run_formatting: Vec<ExGuid>,
     pub(crate) text_run_indices: Vec<u32>,
     pub(crate) text_run_data_object: Vec<ExGuid>,
-    pub(crate) paragraph_style: ExGuid,
+    pub(crate) paragraph_style: Option<ExGuid>,
     pub(crate) paragraph_space_before: f32,
     pub(crate) paragraph_space_after: f32,
     pub(crate) paragraph_line_spacing_exact: Option<f32>,
@@ -54,10 +54,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
         simple::parse_vec_u32(PropertyType::TextRunIndex, object)?.unwrap_or_default();
     let text_run_data_object =
         ObjectReference::parse_vec(PropertyType::TextRunDataObject, object)?.unwrap_or_default();
-    let paragraph_style = ObjectReference::parse(PropertyType::ParagraphStyle, object)?
-        .ok_or_else(|| {
-            ErrorKind::MalformedOneNoteFileData("rich text has no paragraph style".into())
-        })?;
+    let paragraph_style = ObjectReference::parse(PropertyType::ParagraphStyle, object)?;
     let paragraph_space_before =
         simple::parse_f32(PropertyType::ParagraphSpaceBefore, object)?.unwrap_or_default();
     let paragraph_space_after =

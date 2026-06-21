@@ -207,7 +207,7 @@ impl EmbeddedInkSpace {
 ///
 /// [\[MS-ONE\] 2.2.43]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/38eb9b74-cfaf-4df7-b061-a83968c7ff5b
 /// [\[MS-ONE\] 2.2.44]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/f0baabae-f42a-42e0-8cb2-869d420e865f
-#[derive(Clone, Debug)]
+#[derive(Clone, Debug, Default)]
 pub struct ParagraphStyling {
     pub(crate) charset: Option<Charset>,
     pub(crate) bold: bool,
@@ -413,11 +413,16 @@ pub(crate) fn parse_rich_text(
     let data = rich_text_node::parse(object)?;
 
     // Parse the base paragraph style
-    let paragraph_style_object = space
-        .get_object(data.paragraph_style)
-        .ok_or_else(|| ErrorKind::MalformedOneNoteData("paragraph styling is missing".into()))?;
-    let paragraph_style_data = paragraph_style_object::parse(paragraph_style_object, ctx)?;
-    let paragraph_style = parse_style(paragraph_style_data);
+    let paragraph_style = if let Some(paragraph_style_id) = data.paragraph_style {
+        let paragraph_style_object = space
+            .get_object(paragraph_style_id)
+            .ok_or_else(|| ErrorKind::MalformedOneNoteData("paragraph styling is missing".into()))?;
+        let paragraph_style_data = paragraph_style_object::parse(paragraph_style_object, ctx)?;
+        parse_style(paragraph_style_data)
+    } else {
+        warn!(ctx, "rich text has no paragraph style; using defaults");
+        ParagraphStyling::default()
+    };
 
     // Parse the styles text runs (part 1)
     let style_objects: Vec<_> = data
