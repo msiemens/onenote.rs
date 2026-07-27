@@ -41,6 +41,16 @@ impl PropertyValue {
         }
     }
 
+    pub(crate) fn to_u8_lossless(&self) -> Option<u8> {
+        match self {
+            Self::U8(value) => Some(*value),
+            Self::U16(value) => (*value).try_into().ok(),
+            Self::U32(value) => (*value).try_into().ok(),
+            Self::U64(value) => (*value).try_into().ok(),
+            _ => None,
+        }
+    }
+
     pub(crate) fn to_u16(&self) -> Option<u16> {
         if let Self::U16(v) = self {
             Some(*v)
@@ -271,6 +281,19 @@ mod test {
         )
         .unwrap();
         assert!(matches!(value, PropertyValue::U64(0x0123_4567_89AB_CDEF)));
+    }
+
+    #[test]
+    fn test_property_value_to_u8_lossless() {
+        assert_eq!(PropertyValue::U8(42).to_u8_lossless(), Some(42));
+        assert_eq!(PropertyValue::U16(42).to_u8_lossless(), Some(42));
+        assert_eq!(PropertyValue::U32(42).to_u8_lossless(), Some(42));
+        assert_eq!(PropertyValue::U64(42).to_u8_lossless(), Some(42));
+
+        assert_eq!(PropertyValue::U16(256).to_u8_lossless(), None);
+        assert_eq!(PropertyValue::U32(256).to_u8_lossless(), None);
+        assert_eq!(PropertyValue::U64(256).to_u8_lossless(), None);
+        assert_eq!(PropertyValue::Bool(true).to_u8_lossless(), None);
     }
 
     #[test]
