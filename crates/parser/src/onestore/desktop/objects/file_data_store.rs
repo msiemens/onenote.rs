@@ -1,6 +1,5 @@
 use crate::errors::{Error, Result};
 use crate::onestore::desktop::file_node::FileNodeData;
-use crate::onestore::desktop::file_node::shared::AttachmentInfo;
 use crate::onestore::desktop::file_node::shared::FileData;
 use crate::onestore::desktop::file_node::shared::FileDataStoreListReferenceFND;
 use crate::onestore::desktop::file_structure::FileNodeDataIterator;
@@ -50,18 +49,16 @@ impl FileDataStore {
         Ok(Self { files })
     }
 
-    pub(crate) fn find_file(&self, info: &AttachmentInfo) -> Result<FileBlob> {
-        info.load_data(|id| -> Result<FileBlob> {
-            let guid = Guid::from_str(id)?;
-            let file = self
-                .files
-                .iter()
-                .find(|file| file.id == guid)
-                .ok_or_else(|| -> Error {
-                    parser_error!(ResolutionFailed, "File not found with ID {}", id).into()
-                })?;
+    pub(crate) fn find_file(&self, id: &str) -> Result<FileBlob> {
+        let guid = Guid::from_str(id)?;
+        let file = self
+            .files
+            .iter()
+            .find(|file| file.id == guid)
+            .ok_or_else(|| -> Error {
+                parser_error!(ResolutionFailed, "File not found with ID {}", id).into()
+            })?;
 
-            Ok(file.file_data.0.clone())
-        })
+        Ok(file.file_data.0.clone())
     }
 }

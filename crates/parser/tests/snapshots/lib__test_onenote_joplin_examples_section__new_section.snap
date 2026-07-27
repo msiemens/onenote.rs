@@ -212,7 +212,7 @@ Section {
                                                     EmbeddedFile {
                                                         filename: "Untitled",
                                                         file_type: Unknown,
-                                                        data: FileBlob [  ... ; 0 KiB ],
+                                                        data: FileBlob [ Missing; 0 KiB ],
                                                         layout_max_width: None,
                                                         layout_max_height: None,
                                                         offset_horizontal: None,
@@ -234,7 +234,7 @@ Section {
                                                     EmbeddedFile {
                                                         filename: "Untitled",
                                                         file_type: Unknown,
-                                                        data: FileBlob [  ... ; 0 KiB ],
+                                                        data: FileBlob [ Missing; 0 KiB ],
                                                         layout_max_width: None,
                                                         layout_max_height: None,
                                                         offset_horizontal: None,
@@ -392,6 +392,25 @@ Section {
         },
     ),
     report: Report {
-        warnings: [],
+        warnings: [
+            Warning {
+                page: Some(
+                    (
+                        b8eacefb-ca13-42d8-aeca-5f277ce28041,
+                        "title",
+                    ),
+                ),
+                message: "embedded file has no data container; preserving file metadata",
+            },
+            Warning {
+                page: Some(
+                    (
+                        b8eacefb-ca13-42d8-aeca-5f277ce28041,
+                        "title",
+                    ),
+                ),
+                message: "embedded file has no data container; preserving file metadata",
+            },
+        ],
     },
 }

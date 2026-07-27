@@ -201,6 +201,7 @@ pub mod contents {
         EmbeddedInkContainer, EmbeddedInkSpace, EmbeddedObject, ParagraphStyling, RichText,
     };
     pub use crate::onenote::table::{Table, TableCell, TableRow};
+    pub use crate::onestore::shared::file_blob::FileDataStatus;
 }
 
 /// Collection of properties used by the OneNote file format.

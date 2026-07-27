@@ -2,9 +2,10 @@ use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::file_type::FileType;
 use crate::one::property_set::{embedded_file_container, embedded_file_node};
+use crate::onenote::ParserContext;
 use crate::onenote::note_tag::{NoteTag, parse_note_tags};
 use crate::onestore::ObjectSpace;
-use crate::onestore::shared::file_blob::FileBlob;
+use crate::onestore::shared::file_blob::{FileBlob, FileDataStatus};
 
 /// An embedded file.
 ///
@@ -64,6 +65,10 @@ impl EmbeddedFile {
     /// the reader. With a memory-mapped backing the read is zero-copy; with
     /// a lazy backing each call to `read` triggers a fetch sized by the
     /// caller's buffer.
+    ///
+    /// For compatibility, unavailable data produces an empty reader. Call
+    /// [`data_status`](Self::data_status) first to distinguish it from a
+    /// valid zero-byte file.
     pub fn read(&self) -> Box<dyn std::io::Read> {
         self.data.read()
     }
@@ -71,6 +76,14 @@ impl EmbeddedFile {
     /// The size of the embedded file in bytes.
     pub fn size(&self) -> u64 {
         self.data.size()
+    }
+
+    /// Availability of the embedded file's binary data.
+    ///
+    /// Consumers should render a broken-content indicator when this is not
+    /// [`FileDataStatus::Available`].
+    pub fn data_status(&self) -> FileDataStatus {
+        self.data.status()
     }
 
     /// The max width of the embedded file's icon in half-inch increments.
@@ -118,6 +131,7 @@ impl EmbeddedFile {
 pub(crate) fn parse_embedded_file(
     file_id: ExGuid,
     space: &(impl ObjectSpace + ?Sized),
+    ctx: &mut ParserContext,
 ) -> Result<EmbeddedFile> {
     let node_object = space
         .get_object(file_id)
@@ -129,7 +143,7 @@ pub(crate) fn parse_embedded_file(
         Ok(EmbeddedFile {
             filename,
             file_type: node.file_type,
-            data: FileBlob::default(),
+            data: FileBlob::missing(),
             layout_max_width: node.layout_max_width,
             layout_max_height: node.layout_max_height,
             offset_horizontal: node.offset_from_parent_horiz,
@@ -141,12 +155,24 @@ pub(crate) fn parse_embedded_file(
     // Check if we have the required fields to parse a valid embedded file
     let embedded_filename = match node.embedded_file_name {
         Some(name) => name,
-        None => return create_fallback(String::new()),
+        None => {
+            warn!(
+                ctx,
+                "embedded file has no filename; preserving it as unavailable"
+            );
+            return create_fallback(String::new());
+        }
     };
 
     let container_object_id = match node.embedded_file_container {
         Some(id) => id,
-        None => return create_fallback(embedded_filename),
+        None => {
+            warn!(
+                ctx,
+                "embedded file has no data container; preserving file metadata"
+            );
+            return create_fallback(embedded_filename);
+        }
     };
 
     let container_object = space.get_object(container_object_id).ok_or_else(|| {
@@ -164,6 +190,13 @@ pub(crate) fn parse_embedded_file(
         offset_vertical: node.offset_from_parent_vert,
         note_tags: parse_note_tags(&node.note_tags, space)?,
     };
+
+    if file.data_status() == FileDataStatus::Invalid {
+        warn!(
+            ctx,
+            "embedded file payload is marked invalid; preserving file metadata"
+        );
+    }
 
     Ok(file)
 }

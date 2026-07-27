@@ -2,10 +2,11 @@ use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property::layout_alignment::LayoutAlignment;
 use crate::one::property_set::{image_node, picture_container};
+use crate::onenote::ParserContext;
 use crate::onenote::iframe::{IFrame, parse_iframe};
 use crate::onenote::note_tag::{NoteTag, parse_note_tags};
 use crate::onestore::ObjectSpace;
-use crate::onestore::shared::file_blob::FileBlob;
+use crate::onestore::shared::file_blob::{FileBlob, FileDataStatus};
 
 /// An embedded image.
 ///
@@ -52,7 +53,9 @@ impl Image {
     /// A [`Read`] over the image's binary data.
     ///
     /// Bytes are pulled lazily from the underlying [`crate::fs::FileSource`].
-    /// Returns `None` if the image data hasn't been uploaded yet.
+    /// Returns `None` if the image data hasn't been uploaded yet. Call
+    /// [`data_status`](Self::data_status) before reading to distinguish
+    /// invalid data from a valid zero-byte payload.
     pub fn read(&self) -> Option<Box<dyn std::io::Read>> {
         self.data.as_ref().map(|blob| blob.read())
     }
@@ -60,6 +63,17 @@ impl Image {
     /// The size of the image in bytes, or `None` if not yet uploaded.
     pub fn size(&self) -> Option<u64> {
         self.data.as_ref().map(|blob| blob.size())
+    }
+
+    /// Availability of the image's binary data.
+    ///
+    /// Consumers should render a broken-content indicator for
+    /// [`FileDataStatus::Invalid`] instead of treating it as a valid
+    /// zero-byte image.
+    pub fn data_status(&self) -> FileDataStatus {
+        self.data
+            .as_ref()
+            .map_or(FileDataStatus::Missing, FileBlob::status)
     }
 
     /// The image's file extension.
@@ -203,7 +217,11 @@ impl Image {
     }
 }
 
-pub(crate) fn parse_image(image_id: ExGuid, space: &(impl ObjectSpace + ?Sized)) -> Result<Image> {
+pub(crate) fn parse_image(
+    image_id: ExGuid,
+    space: &(impl ObjectSpace + ?Sized),
+    ctx: &mut ParserContext,
+) -> Result<Image> {
     let node_object = space
         .get_object(image_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("image is missing".into()))?;
@@ -253,6 +271,13 @@ pub(crate) fn parse_image(image_id: ExGuid, space: &(impl ObjectSpace + ?Sized))
         note_tags: parse_note_tags(&node.note_tags, space)?,
         embeds: embed,
     };
+
+    if image.data_status() == FileDataStatus::Invalid {
+        warn!(
+            ctx,
+            "image payload is marked invalid; preserving image metadata"
+        );
+    }
 
     Ok(image)
 }

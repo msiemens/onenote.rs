@@ -5,6 +5,18 @@ use std::fmt::Debug;
 use std::io::{Cursor, Read};
 use std::sync::Arc;
 
+/// Availability of binary data referenced by a OneNote object.
+#[non_exhaustive]
+#[derive(Clone, Copy, Debug, Eq, PartialEq)]
+pub enum FileDataStatus {
+    /// The binary payload is available.
+    Available,
+    /// The OneNote object does not reference a binary payload.
+    Missing,
+    /// The OneNote object explicitly marks the binary payload as invalid.
+    Invalid,
+}
+
 /// A reference to a contiguous run of bytes within a parser-managed
 /// [`FileSource`].
 ///
@@ -21,6 +33,7 @@ pub(crate) struct FileBlob {
     source: Arc<dyn FileSource>,
     offset: u64,
     size: u64,
+    status: FileDataStatus,
 }
 
 impl FileBlob {
@@ -30,6 +43,7 @@ impl FileBlob {
             source,
             offset,
             size,
+            status: FileDataStatus::Available,
         }
     }
 
@@ -41,7 +55,26 @@ impl FileBlob {
             source: Arc::new(BytesSource::new(Bytes::new())),
             offset: 0,
             size: 0,
+            status: FileDataStatus::Available,
         }
+    }
+
+    pub(crate) fn missing() -> Self {
+        Self {
+            status: FileDataStatus::Missing,
+            ..Self::empty()
+        }
+    }
+
+    pub(crate) fn invalid() -> Self {
+        Self {
+            status: FileDataStatus::Invalid,
+            ..Self::empty()
+        }
+    }
+
+    pub(crate) fn status(&self) -> FileDataStatus {
+        self.status
     }
 
     /// The size of the blob in bytes.
@@ -70,6 +103,10 @@ impl FileBlob {
 
 impl Debug for FileBlob {
     fn fmt(&self, f: &mut std::fmt::Formatter<'_>) -> std::fmt::Result {
+        if self.status != FileDataStatus::Available {
+            return write!(f, "FileBlob [ {:?}; 0 KiB ]", self.status);
+        }
+
         // Read up to 32 bytes from each end via `read_at` so the preview is
         // identical regardless of whether the source is in-memory or
         // lazy-backed. Errors fall back to a size-only line.
@@ -108,6 +145,7 @@ impl PartialEq for FileBlob {
         Arc::ptr_eq(&self.source, &other.source)
             && self.offset == other.offset
             && self.size == other.size
+            && self.status == other.status
     }
 }
 
