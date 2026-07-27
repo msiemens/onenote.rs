@@ -58,11 +58,52 @@ impl<'a> ParseContext<'a> {
     }
 
     pub(crate) fn find_file_data(&self, data_info: &AttachmentInfo) -> Result<FileBlob> {
-        let file_data_store = self.file_data_store.ok_or_else(|| -> Error {
-            parser_error!(ResolutionFailed, "file_data reference has not been loaded").into()
-        })?;
+        data_info.load_data(|id| {
+            let file_data_store = self.file_data_store.ok_or_else(|| -> Error {
+                parser_error!(ResolutionFailed, "file_data reference has not been loaded").into()
+            })?;
+            file_data_store.find_file(id)
+        })
+    }
+}
 
-        file_data_store.find_file(data_info)
+#[cfg(test)]
+mod tests {
+    use super::ParseContext;
+    use crate::onestore::desktop::file_node::shared::AttachmentInfo;
+    use crate::onestore::shared::file_blob::FileDataStatus;
+
+    #[test]
+    fn invalid_file_reference_does_not_require_a_file_data_store() {
+        let info = AttachmentInfo {
+            extension: "bin".to_owned(),
+            data_ref: "<invfdo>".to_owned(),
+        };
+
+        let blob = ParseContext::new()
+            .find_file_data(&info)
+            .expect("invalid file references should remain non-fatal");
+
+        assert_eq!(blob.status(), FileDataStatus::Invalid);
+        assert_eq!(blob.size(), 0);
+    }
+
+    #[test]
+    fn internal_file_reference_still_requires_a_file_data_store() {
+        let info = AttachmentInfo {
+            extension: "bin".to_owned(),
+            data_ref: "<ifndf>{00000000-0000-0000-0000-000000000000}".to_owned(),
+        };
+
+        let error = ParseContext::new()
+            .find_file_data(&info)
+            .expect_err("internal references require the file data store");
+
+        assert!(
+            error
+                .to_string()
+                .contains("file_data reference has not been loaded")
+        );
     }
 }
 

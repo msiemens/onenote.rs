@@ -95,9 +95,9 @@ pub(crate) fn parse_content(
     })?;
 
     let content = match id {
-        PropertySetId::ImageNode => Content::Image(parse_image(content_id, space)?),
+        PropertySetId::ImageNode => Content::Image(parse_image(content_id, space, ctx)?),
         PropertySetId::EmbeddedFileNode => {
-            Content::EmbeddedFile(parse_embedded_file(content_id, space)?)
+            Content::EmbeddedFile(parse_embedded_file(content_id, space, ctx)?)
         }
         PropertySetId::RichTextNode => Content::RichText(parse_rich_text(content_id, space, ctx)?),
         PropertySetId::TableNode => Content::Table(parse_table(content_id, space, ctx)?),

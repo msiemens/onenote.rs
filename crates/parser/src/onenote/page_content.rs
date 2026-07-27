@@ -77,9 +77,9 @@ pub(crate) fn parse_page_content(
     })?;
 
     let content = match id {
-        PropertySetId::ImageNode => PageContent::Image(parse_image(content_id, space)?),
+        PropertySetId::ImageNode => PageContent::Image(parse_image(content_id, space, ctx)?),
         PropertySetId::EmbeddedFileNode => {
-            PageContent::EmbeddedFile(parse_embedded_file(content_id, space)?)
+            PageContent::EmbeddedFile(parse_embedded_file(content_id, space, ctx)?)
         }
         PropertySetId::OutlineNode => PageContent::Outline(parse_outline(content_id, space, ctx)?),
         PropertySetId::InkContainer => PageContent::Ink(parse_ink(content_id, space, ctx)?),
