@@ -334,6 +334,12 @@ fn parse_outline_group(
         .get_object(group_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("outline group is missing".into()))?;
     let data = outline_group::parse(group_object)?;
+    if data.last_modified.is_none() {
+        warn!(
+            ctx,
+            "outline group has no last modified time; preserving its contents"
+        );
+    }
 
     let outlines = data
         .children
@@ -358,6 +364,12 @@ pub(crate) fn parse_outline_element(
         .get_object(element_id)
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("outline element is missing".into()))?;
     let data = outline_element_node::parse(element_object)?;
+    if data.created_at.is_none() {
+        warn!(
+            ctx,
+            "outline element has no creation timestamp; preserving its contents"
+        );
+    }
 
     let children = data
         .children
