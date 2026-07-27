@@ -20,8 +20,8 @@ pub enum ParagraphAlignment {
 impl ParagraphAlignment {
     pub(crate) fn parse(object: &Object) -> Result<Option<ParagraphAlignment>> {
         let value = match object.props.get(PropertyType::ParagraphAlignment) {
-            Some(value) => value.to_u8().ok_or_else(|| {
-                ErrorKind::MalformedOneNoteFileData("page size is not a u8".into())
+            Some(value) => value.to_u8_lossless().ok_or_else(|| {
+                ErrorKind::MalformedOneNoteFileData("paragraph alignment is not a u8".into())
             })?,
             None => return Ok(None),
         };

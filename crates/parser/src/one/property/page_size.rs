@@ -31,7 +31,7 @@ pub(crate) enum PageSize {
 impl PageSize {
     pub(crate) fn parse(prop_type: PropertyType, object: &Object) -> Result<Option<PageSize>> {
         let value = match object.props.get(prop_type) {
-            Some(value) => value.to_u8().ok_or_else(|| {
+            Some(value) => value.to_u8_lossless().ok_or_else(|| {
                 ErrorKind::MalformedOneNoteFileData("page size is not a u8".into())
             })?,
             None => return Ok(None),
