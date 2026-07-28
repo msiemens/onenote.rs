@@ -24,7 +24,7 @@ pub(crate) struct GlobalIdTableEntry2FNDX {
 #[derive(Debug, Clone, Parse)]
 #[allow(dead_code)]
 pub(crate) struct GlobalIdTableEntry3FNDX {
-    i_index_copy_from_start: u32,
-    c_entries_to_copy: u32,
-    i_index_copy_to_start: u32,
+    pub(crate) i_index_copy_from_start: u32,
+    pub(crate) c_entries_to_copy: u32,
+    pub(crate) i_index_copy_to_start: u32,
 }
