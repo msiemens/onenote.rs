@@ -5,7 +5,7 @@ use crate::onenote::section::SectionEntry;
 use crate::onestore::ObjectSpace;
 use crate::property::common::Color;
 use crate::warn::Report;
-use itertools::Itertools;
+use std::collections::HashSet;
 
 /// A OneNote notebook.
 #[derive(Clone, Debug)]
@@ -49,15 +49,23 @@ pub(crate) fn parse_toc(
         .ok_or_else(|| ErrorKind::MalformedOneNoteData("notebook has no content root".into()))?;
 
     let entry = parse_toc_entry(content_id, space)?;
-    let toc = entry
-        .entries
-        .into_iter()
-        .sorted_by_key(|(ordering_id, _)| *ordering_id)
-        .dedup_by(|(_, a), (_, b)| a == b)
-        .map(|(_, name)| name)
-        .collect();
+    let toc = ordered_toc_entries(entry.entries);
 
     Ok((toc, entry.color))
+}
+
+fn ordered_toc_entries(entries: Vec<(u32, String)>) -> Vec<String> {
+    // OneNote can retain older ordering snapshots in the same TOC. Later
+    // references to a filename are authoritative.
+    let mut seen = HashSet::new();
+    let mut latest = entries
+        .into_iter()
+        .enumerate()
+        .rev()
+        .filter(|(_, (_, name))| seen.insert(name.clone()))
+        .collect::<Vec<_>>();
+    latest.sort_by_key(|(source_index, (ordering_id, _))| (*ordering_id, *source_index));
+    latest.into_iter().map(|(_, (_, name))| name).collect()
 }
 
 fn parse_toc_entry(content_id: ExGuid, space: &(impl ObjectSpace + ?Sized)) -> Result<TocEntry> {
@@ -90,5 +98,27 @@ fn parse_toc_entry(content_id: ExGuid, space: &(impl ObjectSpace + ?Sized)) -> R
             entries: children,
             color: toc.color,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::ordered_toc_entries;
+
+    #[test]
+    fn later_toc_snapshot_entries_override_earlier_ordering() {
+        let entries = vec![
+            (1, "Notes.one".to_owned()),
+            (5, "Training".to_owned()),
+            (10, "Datasets.one".to_owned()),
+            (1, "Notes.one".to_owned()),
+            (2, "Datasets.one".to_owned()),
+            (3, "Training".to_owned()),
+        ];
+
+        assert_eq!(
+            ordered_toc_entries(entries),
+            ["Notes.one", "Datasets.one", "Training"]
+        );
     }
 }
