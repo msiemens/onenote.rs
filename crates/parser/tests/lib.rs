@@ -1,6 +1,7 @@
 use bytes::Bytes;
 use insta::assert_debug_snapshot;
 use onenote_parser::Parser;
+use onenote_parser::contents::{Content, OutlineElement, OutlineItem, TextHyperlink};
 use onenote_parser::fs::native_fs::NativeFs;
 use onenote_parser::fs::{FileSource, FileSystem};
 use std::io;
@@ -111,6 +112,60 @@ fn test_onenote_joplin_examples_notebook(path: &str) {
     let parser = Parser::new();
     let full = format!("tests/samples/joplin/{path}");
     assert_debug_snapshot!(parser.parse_notebook(tp(&full)).unwrap());
+}
+
+#[test]
+fn test_structured_hyperlinks_from_public_fixture() {
+    let section = Parser::new()
+        .parse_section(tp(
+            "tests/samples/joplin/notebook_with_chinese_char_on_link/Quick Notes.one",
+        ))
+        .unwrap();
+    let mut links = Vec::new();
+    for page in section
+        .page_series()
+        .iter()
+        .flat_map(|series| series.pages())
+    {
+        for outline in page
+            .contents()
+            .iter()
+            .filter_map(|content| content.outline())
+        {
+            collect_outline_links(outline.items(), &mut links);
+        }
+    }
+
+    assert!(links.len() >= 2);
+    assert!(
+        links
+            .iter()
+            .any(|link| link.target().starts_with("onenote:"))
+    );
+    assert!(
+        links
+            .iter()
+            .any(|link| link.target().starts_with("https://"))
+    );
+    assert!(links.iter().all(|link| link.start() < link.end()));
+}
+
+fn collect_outline_links(items: &[OutlineItem], output: &mut Vec<TextHyperlink>) {
+    for item in items {
+        match item {
+            OutlineItem::Element(element) => collect_element_links(element, output),
+            OutlineItem::Group(group) => collect_outline_links(group.outlines(), output),
+        }
+    }
+}
+
+fn collect_element_links(element: &OutlineElement, output: &mut Vec<TextHyperlink>) {
+    for content in element.contents() {
+        if let Content::RichText(text) = content {
+            output.extend(text.hyperlinks());
+        }
+    }
+    collect_outline_links(element.children(), output);
 }
 
 // ---------------------------------------------------------------------------

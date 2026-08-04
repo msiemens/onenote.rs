@@ -51,6 +51,35 @@ pub struct RichText {
     pub(crate) math_inline_objects: Vec<MathInlineObject>,
 }
 
+/// A hyperlink attached to a visible range of rich text.
+///
+/// OneNote stores the destination in a hidden `HYPERLINK` marker immediately
+/// before one or more visible hyperlink-formatted runs. The range uses the
+/// same UTF-16 code-unit offsets as [`RichText::text_run_indices`].
+#[derive(Clone, Debug, Eq, PartialEq)]
+pub struct TextHyperlink {
+    target: String,
+    start: u32,
+    end: u32,
+}
+
+impl TextHyperlink {
+    /// The destination exactly as stored by OneNote.
+    pub fn target(&self) -> &str {
+        &self.target
+    }
+
+    /// Inclusive UTF-16 start offset of the visible link text.
+    pub fn start(&self) -> u32 {
+        self.start
+    }
+
+    /// Exclusive UTF-16 end offset of the visible link text.
+    pub fn end(&self) -> u32 {
+        self.end
+    }
+}
+
 impl RichText {
     /// The paragraph text content.
     pub fn text(&self) -> &str {
@@ -73,6 +102,18 @@ impl RichText {
     /// [\[MS-ONE\] 2.3.76]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/f5ae3d7a-09dd-4904-a8bd-7a529d8067c3
     pub fn text_run_indices(&self) -> &[u32] {
         &self.text_run_indices
+    }
+
+    /// Return hyperlinks associated with visible text ranges.
+    ///
+    /// Malformed or unassociated hidden markers are ignored. Their source text
+    /// and formatting remain available through the ordinary rich-text APIs.
+    pub fn hyperlinks(&self) -> Vec<TextHyperlink> {
+        extract_hyperlinks(
+            &self.text,
+            &self.text_run_indices,
+            &self.text_run_formatting,
+        )
     }
 
     /// The base paragraph style.
@@ -656,6 +697,107 @@ fn fix_leading_vt_misalignment(
     }
 }
 
+const HYPERLINK_MARKER: &str = "\u{fddf}HYPERLINK \"";
+
+fn extract_hyperlinks(
+    text: &str,
+    indices: &[u32],
+    styles: &[ParagraphStyling],
+) -> Vec<TextHyperlink> {
+    let total = u32::try_from(text.encode_utf16().count()).unwrap_or(u32::MAX);
+    let runs = text_runs(total, indices, styles);
+    let mut links = Vec::new();
+    let mut search_from = 0;
+
+    while let Some(relative_start) = text[search_from..].find(HYPERLINK_MARKER) {
+        let marker_start = search_from + relative_start;
+        let target_start = marker_start + HYPERLINK_MARKER.len();
+        let Some(relative_end) = text[target_start..].find('"') else {
+            break;
+        };
+        let target_end = target_start + relative_end;
+        let marker_end = target_end + '"'.len_utf8();
+        search_from = marker_end;
+
+        let marker_start_utf16 = byte_to_utf16(text, marker_start);
+        let marker_end_utf16 = byte_to_utf16(text, marker_end);
+        let overlapping = runs
+            .iter()
+            .filter(|run| run.end > marker_start_utf16 && run.start < marker_end_utf16)
+            .collect::<Vec<_>>();
+        let marker_is_hidden_link = !overlapping.is_empty()
+            && overlapping
+                .iter()
+                .all(|run| run.style.hyperlink && run.style.hidden);
+        if !marker_is_hidden_link {
+            continue;
+        }
+
+        let mut first = None;
+        for (index, run) in runs.iter().enumerate() {
+            if run.end <= marker_end_utf16 {
+                continue;
+            }
+            if run.style.hidden && run.style.hyperlink {
+                continue;
+            }
+            if run.style.hyperlink && !run.style.hidden {
+                first = Some(index);
+            }
+            break;
+        }
+        let Some(first) = first else {
+            continue;
+        };
+        let start = runs[first].start.max(marker_end_utf16);
+        let mut end = runs[first].end;
+        for run in &runs[first + 1..] {
+            if run.start != end || !run.style.hyperlink || run.style.hidden {
+                break;
+            }
+            end = run.end;
+        }
+        if start < end && target_start < target_end {
+            links.push(TextHyperlink {
+                target: text[target_start..target_end].to_owned(),
+                start,
+                end,
+            });
+        }
+    }
+
+    links
+}
+
+struct TextRun<'a> {
+    start: u32,
+    end: u32,
+    style: &'a ParagraphStyling,
+}
+
+fn text_runs<'a>(total: u32, indices: &[u32], styles: &'a [ParagraphStyling]) -> Vec<TextRun<'a>> {
+    let mut start = 0;
+    styles
+        .iter()
+        .enumerate()
+        .map(|(index, style)| {
+            let end = indices
+                .get(index)
+                .copied()
+                .unwrap_or(total)
+                .min(total)
+                .max(start);
+            let run = TextRun { start, end, style };
+            start = end;
+            run
+        })
+        .collect()
+}
+
+fn byte_to_utf16(text: &str, byte: usize) -> u32 {
+    u32::try_from(text[..byte].encode_utf16().count()).unwrap_or(u32::MAX)
+}
+
 fn parse_style(data: paragraph_style_object::Data) -> ParagraphStyling {
     ParagraphStyling {
         charset: data.charset,
@@ -680,5 +822,84 @@ fn parse_style(data: paragraph_style_object::Data) -> ParagraphStyling {
         hyperlink: data.hyperlink,
         hyperlink_protected: data.hyperlink_protected,
         hidden: data.hidden,
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::{HYPERLINK_MARKER, ParagraphStyling, extract_hyperlinks};
+
+    fn style(hyperlink: bool, hidden: bool) -> ParagraphStyling {
+        ParagraphStyling {
+            hyperlink,
+            hyperlink_protected: hyperlink,
+            hidden,
+            ..ParagraphStyling::default()
+        }
+    }
+
+    #[test]
+    fn extracts_multiple_visible_hyperlink_ranges() {
+        let first_marker = format!("{HYPERLINK_MARKER}https://example.test/one\"");
+        let second_marker = format!("{HYPERLINK_MARKER}mailto:user@example.test\"");
+        let text = format!("{first_marker}first and {second_marker}second");
+        let first_marker_end = u32::try_from(first_marker.encode_utf16().count()).unwrap();
+        let first_text_end = first_marker_end + 5;
+        let plain_end = first_text_end + 5;
+        let second_marker_end =
+            plain_end + u32::try_from(second_marker.encode_utf16().count()).unwrap();
+        let total = u32::try_from(text.encode_utf16().count()).unwrap();
+        let indices = vec![
+            first_marker_end,
+            first_text_end,
+            plain_end,
+            second_marker_end,
+        ];
+        let styles = vec![
+            style(true, true),
+            style(true, false),
+            style(false, false),
+            style(true, true),
+            style(true, false),
+        ];
+
+        let links = extract_hyperlinks(&text, &indices, &styles);
+
+        assert_eq!(links.len(), 2);
+        assert_eq!(links[0].target(), "https://example.test/one");
+        assert_eq!(
+            (links[0].start(), links[0].end()),
+            (first_marker_end, first_text_end)
+        );
+        assert_eq!(links[1].target(), "mailto:user@example.test");
+        assert_eq!(
+            (links[1].start(), links[1].end()),
+            (second_marker_end, total)
+        );
+    }
+
+    #[test]
+    fn supports_markers_split_across_hidden_runs_and_unicode_display_text() {
+        let marker = format!("{HYPERLINK_MARKER}onenote:#page-id={{abc}}\"");
+        let text = format!("{marker}風景");
+        let marker_end = u32::try_from(marker.encode_utf16().count()).unwrap();
+        let total = u32::try_from(text.encode_utf16().count()).unwrap();
+        let indices = vec![1, marker_end];
+        let styles = vec![style(true, true), style(true, true), style(true, false)];
+
+        let links = extract_hyperlinks(&text, &indices, &styles);
+
+        assert_eq!(links.len(), 1);
+        assert_eq!(links[0].target(), "onenote:#page-id={abc}");
+        assert_eq!((links[0].start(), links[0].end()), (marker_end, total));
+    }
+
+    #[test]
+    fn ignores_malformed_and_unstyled_markers() {
+        let malformed = format!("{HYPERLINK_MARKER}https://example.test");
+        assert!(extract_hyperlinks(&malformed, &[], &[]).is_empty());
+
+        let complete = format!("{HYPERLINK_MARKER}https://example.test\"label");
+        assert!(extract_hyperlinks(&complete, &[], &[style(false, false)]).is_empty());
     }
 }
