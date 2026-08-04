@@ -47,5 +47,5 @@ pub(crate) struct RevisionManifestStart6FND {
 #[allow(dead_code)]
 pub(crate) struct RevisionManifestStart7FND {
     pub(crate) base: RevisionManifestStart6FND,
-    gctxid: ExGuid,
+    pub(crate) gctxid: ExGuid,
 }
