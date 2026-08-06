@@ -199,6 +199,7 @@ pub mod contents {
     pub use crate::onenote::outline::{Outline, OutlineElement, OutlineGroup, OutlineItem};
     pub use crate::onenote::rich_text::{
         EmbeddedInkContainer, EmbeddedInkSpace, EmbeddedObject, ParagraphStyling, RichText,
+        TextHyperlink,
     };
     pub use crate::onenote::table::{Table, TableCell, TableRow};
     pub use crate::onestore::shared::file_blob::FileDataStatus;
