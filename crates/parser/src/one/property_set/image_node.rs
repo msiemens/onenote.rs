@@ -18,6 +18,7 @@ use crate::onestore::Object;
 pub(crate) struct Data {
     pub(crate) last_modified: Option<Time>,
     pub(crate) picture_container: Option<ExGuid>,
+    pub(crate) web_picture_container: Option<ExGuid>,
     pub(crate) layout_max_width: Option<f32>,
     pub(crate) layout_max_height: Option<f32>,
     pub(crate) is_layout_size_set_by_user: bool,
@@ -44,6 +45,8 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
 
     let last_modified = Time::parse(PropertyType::LastModifiedTime, object)?;
     let picture_container = ObjectReference::parse(PropertyType::PictureContainer, object)?;
+    let web_picture_container =
+        ObjectReference::parse(PropertyType::WebPictureContainer14, object)?;
     let layout_max_width = simple::parse_f32(PropertyType::LayoutMaxWidth, object)?;
     let layout_max_height = simple::parse_f32(PropertyType::LayoutMaxHeight, object)?;
     let is_layout_size_set_by_user =
@@ -73,6 +76,7 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
     let data = Data {
         last_modified,
         picture_container,
+        web_picture_container,
         layout_max_width,
         layout_max_height,
         is_layout_size_set_by_user,
@@ -95,4 +99,74 @@ pub(crate) fn parse(object: &Object) -> Result<Data> {
     };
 
     Ok(data)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::parse;
+    use crate::fsshttpb::data::cell_id::CellId;
+    use crate::fsshttpb::data::exguid::ExGuid;
+    use crate::one::property::PropertyType;
+    use crate::one::property_set::PropertySetId;
+    use crate::onestore::shared::compact_id::CompactId;
+    use crate::onestore::shared::object_prop_set::ObjectPropSet;
+    use crate::onestore::shared::prop_set::PropertySet;
+    use crate::onestore::{MappingTable, Object};
+    use crate::reader::Reader;
+    use std::rc::Rc;
+
+    struct TestMapping;
+
+    impl MappingTable for TestMapping {
+        fn resolve_id(&self, index: usize, _cid: &CompactId) -> Option<ExGuid> {
+            Some(ExGuid {
+                value: index as u32 + 1,
+                ..Default::default()
+            })
+        }
+
+        fn get_object_space(&self, _index: usize, _cid: &CompactId) -> Option<CellId> {
+            None
+        }
+    }
+
+    #[test]
+    fn parses_primary_and_web_picture_references() {
+        let property_ids = [
+            PropertyType::PictureContainer,
+            PropertyType::WebPictureContainer14,
+        ];
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&(property_ids.len() as u16).to_le_bytes());
+        for property_id in property_ids {
+            bytes.extend_from_slice(&(property_id as u32).to_le_bytes());
+        }
+
+        let mut reader = Reader::new(&bytes);
+        let object = Object {
+            context_id: Default::default(),
+            jc_id: PropertySetId::ImageNode.as_jcid(),
+            props: ObjectPropSet {
+                object_ids: vec![
+                    CompactId {
+                        n: 0,
+                        guid_index: 0,
+                    },
+                    CompactId {
+                        n: 1,
+                        guid_index: 0,
+                    },
+                ],
+                properties: PropertySet::parse(&mut reader).unwrap(),
+                ..Default::default()
+            },
+            file_data: None,
+            mapping: Rc::new(TestMapping),
+        };
+
+        let data = parse(&object).unwrap();
+
+        assert_eq!(data.picture_container.unwrap().value, 1);
+        assert_eq!(data.web_picture_container.unwrap().value, 2);
+    }
 }

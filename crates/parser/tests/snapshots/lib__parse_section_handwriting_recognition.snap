@@ -5928,6 +5928,7 @@ Section {
                                                             FileBlob [ ffd8ffe000104a46494600010101004800480000ffdb00430003020203020203 ... f43c7f77dde2727c5dff0041dbc3cd9cfe99cdce2f4ce2f57c4feafb3e0fffd9; 88 KiB ],
                                                         ),
                                                         extension: None,
+                                                        web_picture: None,
                                                         layout_max_width: Some(
                                                             12.5,
                                                         ),

@@ -1,6 +1,6 @@
 ---
 source: crates/parser/tests/lib.rs
-assertion_line: 70
+assertion_line: 84
 expression: parser.parse_section(path).unwrap()
 ---
 Section {
@@ -639,6 +639,12 @@ Section {
                                                         filename: "testing.docx",
                                                         file_type: Unknown,
                                                         data: FileBlob [ 504b030414000600080000002100cd625ce778010000a5060000130008025b43 ... 637573746f6d2e786d6c504b0506000000000e000e0081030000ad3500000000; 14 KiB ],
+                                                        icon: Some(
+                                                            Picture {
+                                                                data: FileBlob [ 89504e470d0a1a0a0000000d4948445200000020000000200806000000737a7a ... 978e886a15139b10a9a10e00fadb902d8aa71aea0000000049454e44ae426082; 0 KiB ],
+                                                                extension: None,
+                                                            },
+                                                        ),
                                                         layout_max_width: None,
                                                         layout_max_height: None,
                                                         offset_horizontal: None,

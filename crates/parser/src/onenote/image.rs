@@ -5,6 +5,7 @@ use crate::one::property_set::{image_node, picture_container};
 use crate::onenote::ParserContext;
 use crate::onenote::iframe::{IFrame, parse_iframe};
 use crate::onenote::note_tag::{NoteTag, parse_note_tags};
+use crate::onenote::picture::Picture;
 use crate::onestore::ObjectSpace;
 use crate::onestore::shared::file_blob::{FileBlob, FileDataStatus};
 
@@ -17,6 +18,7 @@ use crate::onestore::shared::file_blob::{FileBlob, FileDataStatus};
 pub struct Image {
     pub(crate) data: Option<FileBlob>,
     pub(crate) extension: Option<String>,
+    pub(crate) web_picture: Option<Picture>,
 
     pub(crate) layout_max_width: Option<f32>,
     pub(crate) layout_max_height: Option<f32>,
@@ -57,12 +59,12 @@ impl Image {
     /// [`data_status`](Self::data_status) before reading to distinguish
     /// invalid data from a valid zero-byte payload.
     pub fn read(&self) -> Option<Box<dyn std::io::Read>> {
-        self.data.as_ref().map(|blob| blob.read())
+        self.data.as_ref().map(FileBlob::read)
     }
 
     /// The size of the image in bytes, or `None` if not yet uploaded.
     pub fn size(&self) -> Option<u64> {
-        self.data.as_ref().map(|blob| blob.size())
+        self.data.as_ref().map(FileBlob::size)
     }
 
     /// Availability of the image's binary data.
@@ -79,6 +81,14 @@ impl Image {
     /// The image's file extension.
     pub fn extension(&self) -> Option<&str> {
         self.extension.as_deref()
+    }
+
+    /// A browser-compatible picture stored as a fallback for the primary image.
+    ///
+    /// OneNote may provide this when the primary representation uses a format
+    /// that browsers and other consumers cannot display directly.
+    pub fn web_picture(&self) -> Option<&Picture> {
+        self.web_picture.as_ref()
     }
 
     /// The maximum width to display the image in half-inch increments.
@@ -256,6 +266,23 @@ pub(crate) fn parse_image(
         (None, None)
     };
 
+    let web_picture = node.web_picture_container.and_then(|container_id| {
+        let result = space
+            .get_object(container_id)
+            .ok_or_else(|| {
+                ErrorKind::MalformedOneNoteData("web picture container is missing".into()).into()
+            })
+            .and_then(picture_container::parse);
+
+        match result {
+            Ok(data) => Some(Picture::new(data.data, data.extension)),
+            Err(err) => {
+                warn!(ctx, "could not parse web picture fallback: {err}");
+                None
+            }
+        }
+    });
+
     let embed = node
         .iframe
         .into_iter()
@@ -265,6 +292,7 @@ pub(crate) fn parse_image(
     let image = Image {
         data,
         extension,
+        web_picture,
         layout_max_width: node.layout_max_width,
         layout_max_height: node.layout_max_height,
         alt_text: node.alt_text,

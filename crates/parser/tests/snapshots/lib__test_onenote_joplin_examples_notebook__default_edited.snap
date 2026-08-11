@@ -603,6 +603,7 @@ Notebook {
                                                                     extension: Some(
                                                                         ".jpeg",
                                                                     ),
+                                                                    web_picture: None,
                                                                     layout_max_width: Some(
                                                                         -1.0,
                                                                     ),
@@ -1776,6 +1777,7 @@ Notebook {
                                                                                                         extension: Some(
                                                                                                             ".png",
                                                                                                         ),
+                                                                                                        web_picture: None,
                                                                                                         layout_max_width: Some(
                                                                                                             1.0416666,
                                                                                                         ),
