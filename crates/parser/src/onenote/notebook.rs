@@ -1,6 +1,7 @@
 use crate::errors::{ErrorKind, Result};
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property_set::toc_container;
+use crate::onenote::file_identity::FileIdentity;
 use crate::onenote::section::SectionEntry;
 use crate::onestore::ObjectSpace;
 use crate::property::common::Color;
@@ -10,12 +11,18 @@ use std::collections::HashSet;
 /// A OneNote notebook.
 #[derive(Clone, Debug)]
 pub struct Notebook {
+    pub(crate) file_identity: FileIdentity,
     pub(crate) entries: Vec<SectionEntry>,
     pub(crate) color: Option<Color>,
     pub(crate) report: Report,
 }
 
 impl Notebook {
+    /// The identity stored in the notebook table-of-contents file.
+    pub fn file_identity(&self) -> FileIdentity {
+        self.file_identity
+    }
+
     /// The section entries of this notebook.
     pub fn entries(&self) -> &[SectionEntry] {
         &self.entries

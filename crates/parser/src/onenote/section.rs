@@ -2,6 +2,7 @@ use crate::errors::{ErrorKind, Result};
 use crate::one::property::color::Color;
 use crate::one::property_set::{section_metadata_node, section_node};
 use crate::onenote::ParserContext;
+use crate::onenote::file_identity::FileIdentity;
 use crate::onenote::page_series::{PageSeries, parse_page_series};
 use crate::onestore::{ObjectSpace, OneStore};
 use crate::warn::Report;
@@ -22,6 +23,7 @@ pub enum SectionEntry {
 /// [\[MS-ONE\] 2.2.17]: https://docs.microsoft.com/en-us/openspecs/office_file_formats/ms-one/6913913f-b7d1-4b29-ab09-231ea3835ac2
 #[derive(Clone, Debug)]
 pub struct Section {
+    file_identity: FileIdentity,
     display_name: String,
     page_series: Vec<PageSeries>,
     color: Option<Color>,
@@ -29,6 +31,11 @@ pub struct Section {
 }
 
 impl Section {
+    /// The identity stored in the section file.
+    pub fn file_identity(&self) -> FileIdentity {
+        self.file_identity
+    }
+
     /// The section name.
     pub fn display_name(&self) -> &str {
         &self.display_name
@@ -53,11 +60,17 @@ impl Section {
 /// A group of sections.
 #[derive(Clone, Debug)]
 pub struct SectionGroup {
+    pub(crate) file_identity: FileIdentity,
     pub(crate) display_name: String,
     pub(crate) entries: Vec<SectionEntry>,
 }
 
 impl SectionGroup {
+    /// The identity stored in the section group's table-of-contents file.
+    pub fn file_identity(&self) -> FileIdentity {
+        self.file_identity
+    }
+
     /// The group name.
     pub fn display_name(&self) -> &str {
         &self.display_name
@@ -92,6 +105,7 @@ pub(crate) fn parse_section(store: &(impl OneStore + ?Sized), filename: String) 
         .collect::<Result<_>>()?;
 
     Ok(Section {
+        file_identity: FileIdentity::new(store.file_identity()),
         display_name,
         page_series,
         color: metadata.color,

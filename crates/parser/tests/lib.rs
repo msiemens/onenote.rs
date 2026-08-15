@@ -4,6 +4,7 @@ use onenote_parser::Parser;
 use onenote_parser::contents::{Content, OutlineElement, OutlineItem, TextHyperlink};
 use onenote_parser::fs::native_fs::NativeFs;
 use onenote_parser::fs::{FileSource, FileSystem};
+use onenote_parser::section::SectionEntry;
 use std::io;
 use std::sync::Arc;
 use typed_path::{TypedPath, TypedPathBuf};
@@ -66,6 +67,45 @@ fn test_readme_example_parse_notebook() {
         .unwrap();
 
     assert!(!notebook.entries().is_empty());
+}
+
+#[test]
+fn file_identity_survives_section_rename() {
+    let original = "tests/samples/New Section 1.one";
+    let temp = tempfile::tempdir().unwrap();
+    let renamed = temp.path().join("Renamed Section.one");
+    std::fs::copy(original, &renamed).unwrap();
+
+    let parser = Parser::new();
+    let original = parser.parse_section(tp(original)).unwrap();
+    let renamed = parser.parse_section(tp(renamed.to_str().unwrap())).unwrap();
+
+    assert_eq!(original.file_identity(), renamed.file_identity());
+    assert_eq!(original.file_identity().to_string().len(), 36);
+}
+
+#[test]
+fn notebook_entries_expose_distinct_file_identities() {
+    let notebook = Parser::new()
+        .parse_notebook(tp(
+            "tests/samples/joplin/Notebook created on OneNote App/Abrir Bloco de Anotações.onetoc2",
+        ))
+        .unwrap();
+
+    let group = notebook
+        .entries()
+        .iter()
+        .find_map(|entry| match entry {
+            SectionEntry::SectionGroup(group) => Some(group),
+            SectionEntry::Section(_) => None,
+        })
+        .expect("public fixture should contain a section group");
+
+    assert_ne!(notebook.file_identity(), group.file_identity());
+    assert!(group.entries().iter().all(|entry| match entry {
+        SectionEntry::Section(section) => section.file_identity() != group.file_identity(),
+        SectionEntry::SectionGroup(child) => child.file_identity() != group.file_identity(),
+    }));
 }
 
 #[test]

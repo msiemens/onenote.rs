@@ -42,6 +42,10 @@ impl PackagingStore {
 }
 
 impl OneStore for PackagingStore {
+    fn file_identity(&self) -> Guid {
+        self.header.file_identity()
+    }
+
     fn get_type(&self) -> Result<OneStoreType> {
         if self.is_onestore() {
             Ok(OneStoreType::Section)

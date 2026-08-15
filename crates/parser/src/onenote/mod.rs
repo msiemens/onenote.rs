@@ -8,6 +8,7 @@ use crate::fs::file_source::BytesSource;
 use crate::fs::native_fs::NativeFs;
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::fsshttpb::packaging::{OneStorePackaging, embedded_packaging_offset};
+use crate::onenote::file_identity::FileIdentity;
 use crate::onenote::ink_recognition::InkRecognizedWord;
 use crate::onenote::notebook::Notebook;
 use crate::onenote::section::{Section, SectionEntry, SectionGroup};
@@ -28,6 +29,7 @@ use uuid::Uuid;
 
 pub(crate) mod content;
 pub(crate) mod embedded_file;
+pub(crate) mod file_identity;
 pub(crate) mod iframe;
 pub(crate) mod image;
 pub(crate) mod ink;
@@ -175,6 +177,7 @@ impl<FS: FileSystem> Parser<FS> {
         }
 
         Ok(Notebook {
+            file_identity: FileIdentity::new(store.as_onestore().file_identity()),
             entries: sections,
             color,
             report,
@@ -269,6 +272,7 @@ impl<FS: FileSystem> Parser<FS> {
                 return self
                     .parse_notebook(entry.to_path())
                     .map(|group| SectionGroup {
+                        file_identity: group.file_identity,
                         display_name,
                         entries: group.entries,
                     });

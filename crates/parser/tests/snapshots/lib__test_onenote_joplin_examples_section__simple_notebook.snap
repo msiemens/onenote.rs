@@ -1,9 +1,11 @@
 ---
 source: crates/parser/tests/lib.rs
-assertion_line: 90
 expression: parser.parse_section(tp(&full)).unwrap()
 ---
 Section {
+    file_identity: FileIdentity(
+        Guid {85D60EA8-0222-4087-8987-216706BC4F44},
+    ),
     display_name: "Section title",
     page_series: [
         PageSeries {

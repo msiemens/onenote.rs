@@ -1,12 +1,17 @@
 ---
 source: crates/parser/tests/lib.rs
-assertion_line: 100
 expression: parser.parse_notebook(tp(&full)).unwrap()
 ---
 Notebook {
+    file_identity: FileIdentity(
+        Guid {D890422D-763F-4156-BBD9-0760ED3342CD},
+    ),
     entries: [
         Section(
             Section {
+                file_identity: FileIdentity(
+                    Guid {C9243001-FB54-4C90-B917-5BB4B43186AF},
+                ),
                 display_name: "Section",
                 page_series: [
                     PageSeries {
@@ -473,10 +478,16 @@ Notebook {
         ),
         SectionGroup(
             SectionGroup {
+                file_identity: FileIdentity(
+                    Guid {C05CB2A8-95F3-4D35-A76E-E03AAA742805},
+                ),
                 display_name: "Section A",
                 entries: [
                     Section(
                         Section {
+                            file_identity: FileIdentity(
+                                Guid {585242E1-06E9-46BB-89D5-DC2E10660EB9},
+                            ),
                             display_name: "Section A1",
                             page_series: [
                                 PageSeries {
@@ -1391,10 +1402,16 @@ Notebook {
                     ),
                     SectionGroup(
                         SectionGroup {
+                            file_identity: FileIdentity(
+                                Guid {C73051E9-B4D3-455A-AA82-ED3533837C2C},
+                            ),
                             display_name: "Section B",
                             entries: [
                                 Section(
                                     Section {
+                                        file_identity: FileIdentity(
+                                            Guid {C81591F9-2B86-42F4-B9F0-FAA9A9091387},
+                                        ),
                                         display_name: "Section B1",
                                         page_series: [
                                             PageSeries {
@@ -2315,10 +2332,16 @@ Notebook {
         ),
         SectionGroup(
             SectionGroup {
+                file_identity: FileIdentity(
+                    Guid {8204E358-083F-44BD-BC65-EBE91579877F},
+                ),
                 display_name: "Section D",
                 entries: [
                     Section(
                         Section {
+                            file_identity: FileIdentity(
+                                Guid {D65D2508-39C4-41A8-B519-EB4A4A723DF1},
+                            ),
                             display_name: "Section D1",
                             page_series: [
                                 PageSeries {

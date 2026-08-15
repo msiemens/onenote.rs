@@ -1,9 +1,11 @@
 ---
 source: crates/parser/tests/lib.rs
-assertion_line: 44
 expression: parser.parse_section(path).unwrap()
 ---
 Section {
+    file_identity: FileIdentity(
+        Guid {4979BEBE-EEAA-4BD1-AB0D-75EF7CF59533},
+    ),
     display_name: "Scribbles",
     page_series: [
         PageSeries {
