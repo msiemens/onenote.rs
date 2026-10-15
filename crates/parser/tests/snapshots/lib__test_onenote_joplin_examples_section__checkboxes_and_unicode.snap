@@ -1,9 +1,11 @@
 ---
 source: crates/parser/tests/lib.rs
-assertion_line: 90
 expression: parser.parse_section(tp(&full)).unwrap()
 ---
 Section {
+    file_identity: FileIdentity(
+        Guid {203C2193-D88D-46FD-994D-124EC928B99B},
+    ),
     display_name: "checkboxes_and_unicode",
     page_series: [
         PageSeries {

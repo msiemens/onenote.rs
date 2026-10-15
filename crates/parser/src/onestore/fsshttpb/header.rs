@@ -21,6 +21,10 @@ pub(crate) struct StoreHeader {
 }
 
 impl StoreHeader {
+    pub(crate) fn file_identity(&self) -> Guid {
+        self.file_identity
+    }
+
     pub(crate) fn parse(data: &ObjectGroup) -> Result<StoreHeader> {
         let (_, object_data) = data
             .declarations

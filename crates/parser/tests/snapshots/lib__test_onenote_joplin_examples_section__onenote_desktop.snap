@@ -1,9 +1,11 @@
 ---
 source: crates/parser/tests/lib.rs
-assertion_line: 90
 expression: parser.parse_section(tp(&full)).unwrap()
 ---
 Section {
+    file_identity: FileIdentity(
+        Guid {DD5D3D82-4DB1-45C3-AF8B-14D439CF225A},
+    ),
     display_name: "onenote_desktop",
     page_series: [
         PageSeries {

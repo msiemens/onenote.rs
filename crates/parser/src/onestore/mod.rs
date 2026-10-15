@@ -4,6 +4,7 @@ use crate::errors::Result;
 use crate::fsshttpb::data::cell_id::CellId;
 use crate::fsshttpb::data::exguid::ExGuid;
 use crate::one::property_set::PropertySetId;
+use crate::shared::guid::Guid;
 use shared::compact_id::CompactId;
 use shared::file_blob::FileBlob;
 use shared::jcid::JcId;
@@ -16,6 +17,8 @@ pub mod fsshttpb;
 pub mod shared;
 
 pub(crate) trait OneStore: fmt::Debug {
+    fn file_identity(&self) -> Guid;
+
     fn get_type(&self) -> Result<OneStoreType>;
 
     fn data_root(&self) -> &dyn ObjectSpace;

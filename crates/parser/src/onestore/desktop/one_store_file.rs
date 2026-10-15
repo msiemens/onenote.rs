@@ -40,6 +40,10 @@ impl fmt::Debug for RevisionStore {
 }
 
 impl OneStore for RevisionStore {
+    fn file_identity(&self) -> crate::shared::guid::Guid {
+        self.header.guid_file
+    }
+
     fn get_type(&self) -> Result<OneStoreType> {
         if self.header.file_type == guid!("{7B5C52E4-D88C-4DA7-AEB1-5378D02996D3}") {
             Ok(OneStoreType::Section)

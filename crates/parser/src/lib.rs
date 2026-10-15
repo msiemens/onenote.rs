@@ -166,6 +166,7 @@ pub(crate) type Reader<'b> = &'b mut reader::Reader;
 
 pub use crate::fs::FileSystem;
 pub use crate::onenote::Parser;
+pub use crate::onenote::file_identity::FileIdentity;
 
 /// The data that represents a OneNote notebook.
 pub mod notebook {
