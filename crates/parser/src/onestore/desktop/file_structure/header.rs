@@ -21,7 +21,7 @@ use onenote_parser_macros::Parse;
 })]
 pub(crate) struct OneStoreHeader {
     pub(crate) file_type: Guid,
-    _guid_file: Guid,
+    pub(crate) guid_file: Guid,
     pub(crate) legacy_file_version: Guid,
     pub(crate) file_format: OneStoreFormatGuid,
     pub(crate) ffv_last_code_that_wrote_to_this_file: u32,

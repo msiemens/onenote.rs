@@ -1,12 +1,17 @@
 ---
 source: crates/parser/tests/lib.rs
-assertion_line: 28
 expression: parser.parse_notebook(path).unwrap()
 ---
 Notebook {
+    file_identity: FileIdentity(
+        Guid {F1DA443F-A65F-4513-B200-78D8A9910B8D},
+    ),
     entries: [
         Section(
             Section {
+                file_identity: FileIdentity(
+                    Guid {0575DD0A-5612-D746-B82B-983F7A80B282},
+                ),
                 display_name: "New Section 1",
                 page_series: [
                     PageSeries {

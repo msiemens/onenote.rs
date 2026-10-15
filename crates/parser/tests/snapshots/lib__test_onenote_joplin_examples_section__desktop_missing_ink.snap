@@ -1,9 +1,11 @@
 ---
 source: crates/parser/tests/lib.rs
-assertion_line: 90
 expression: parser.parse_section(tp(&full)).unwrap()
 ---
 Section {
+    file_identity: FileIdentity(
+        Guid {602D9213-3B80-47DA-B8B7-BB4218DBFA22},
+    ),
     display_name: "desktop_missing_ink",
     page_series: [
         PageSeries {
