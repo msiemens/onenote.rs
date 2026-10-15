@@ -114,6 +114,18 @@ pub(crate) enum FileNodeData {
 }
 
 impl FileNode {
+    #[cfg(test)]
+    pub(crate) fn from_data(fnd: FileNodeData) -> Self {
+        Self {
+            node_type_id: 0,
+            stp_format: 0,
+            cb_format: 0,
+            base_type: 0,
+            size: 0,
+            fnd,
+        }
+    }
+
     pub(crate) fn parse(reader: Reader, context: &mut ParseContext) -> crate::errors::Result<Self> {
         let remaining_0 = reader.remaining();
         let first_line = reader.get_u32()?;

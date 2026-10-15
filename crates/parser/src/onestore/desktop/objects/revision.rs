@@ -203,6 +203,11 @@ fn parse<'a>(
             roots.insert(object_reference.root_role.try_into()?, oid_root);
         } else if let FileNodeData::DataSignatureGroupDefinitionFND(_) = current {
             iterator.next();
+        } else if let FileNodeData::ObjectInfoDependencyOverridesFND(_) = current {
+            // MS-ONESTORE 2.1.9 also permits reference-count overrides in the
+            // revision's general node sequence. Reference counts are not used
+            // while materializing the revision's object state.
+            iterator.next();
         } else {
             return Err(
                 onestore_parse_error!("Unexpected node (parsing Revision): {:?}", current).into(),
@@ -279,4 +284,61 @@ fn find_dependency_object(
         revision_id = revision.parent_id;
     }
     None
+}
+
+#[cfg(test)]
+mod tests {
+    use super::try_parse;
+    use crate::onestore::desktop::file_node::file_node_chunk_reference::FileNodeChunkReference;
+    use crate::onestore::desktop::file_node::revision_manifest::RevisionManifestStart6FND;
+    use crate::onestore::desktop::file_node::shared::{
+        ObjectInfoDependencyOverridesFND, ParseWithRef,
+    };
+    use crate::onestore::desktop::file_node::{FileNode, FileNodeData, FileNodeDataRef};
+    use crate::onestore::desktop::file_structure::FileNodeList;
+    use crate::onestore::desktop::objects::parse_context::ParseContext;
+    use crate::onestore::desktop::parse::Parse;
+    use crate::reader::Reader;
+    use std::collections::HashMap;
+
+    #[test]
+    fn accepts_dependency_overrides_in_revision_node_sequence() {
+        let mut start_data = [0; 46];
+        start_data[40] = 1; // RevisionRole: default content
+        let mut start_bytes = Reader::new(&start_data);
+        let start = RevisionManifestStart6FND::parse(&mut start_bytes).unwrap();
+
+        let mut reference_bytes = Reader::new(&[
+            0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, 0xff, // stp: nil
+            0, 0, 0, 0, // cb: zero
+        ]);
+        let data_ref = FileNodeDataRef::SingleElement(
+            FileNodeChunkReference::parse(&mut reference_bytes, 0, 0).unwrap(),
+        );
+        let mut override_bytes = Reader::new(&[
+            0, 0, 0, 0, // c8OverrideCount
+            0, 0, 0, 0, // c32OverrideCount
+            0, 0, 0, 0, // crc
+        ]);
+        let overrides =
+            ObjectInfoDependencyOverridesFND::parse(&mut override_bytes, &data_ref).unwrap();
+
+        let list = FileNodeList {
+            file_node_sequence: vec![
+                FileNode::from_data(FileNodeData::RevisionManifestStart6FND(start)),
+                FileNode::from_data(FileNodeData::ObjectInfoDependencyOverridesFND(overrides)),
+                FileNode::from_data(FileNodeData::RevisionManifestEndFND),
+            ],
+        };
+        let mut iterator = list.iter_data();
+        let context = ParseContext::new();
+        let revisions = HashMap::new();
+
+        let revision = try_parse(&mut iterator, &context, &revisions)
+            .unwrap()
+            .expect("revision should be recognized");
+
+        assert!(revision.objects.is_empty());
+        assert!(iterator.next().is_none());
+    }
 }
