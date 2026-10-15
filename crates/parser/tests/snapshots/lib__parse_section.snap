@@ -5930,6 +5930,7 @@ Section {
                                                         extension: Some(
                                                             ".jpg",
                                                         ),
+                                                        web_picture: None,
                                                         layout_max_width: Some(
                                                             12.5,
                                                         ),

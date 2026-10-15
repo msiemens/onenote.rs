@@ -1,6 +1,6 @@
 ---
 source: crates/parser/tests/lib.rs
-assertion_line: 90
+assertion_line: 104
 expression: parser.parse_section(tp(&full)).unwrap()
 ---
 Section {
@@ -435,6 +435,14 @@ Section {
                                                         filename: "Audio Recording.wav",
                                                         file_type: Audio,
                                                         data: FileBlob [ 5249464624a0070057415645666d7420100000000100010080bb000000770100 ... b7002a00c9ff4a014afef701b9fe2a005c0023ffe2fff6ff25ff59016bfe2201; 488 KiB ],
+                                                        icon: Some(
+                                                            Picture {
+                                                                data: FileBlob [ 89504e470d0a1a0a0000000d49484452000000300000003008060000005702f9 ... 8da905fa502a8ea34778de2f38229e3baac344e50000000049454e44ae426082; 0 KiB ],
+                                                                extension: Some(
+                                                                    ".png",
+                                                                ),
+                                                            },
+                                                        ),
                                                         layout_max_width: None,
                                                         layout_max_height: None,
                                                         offset_horizontal: None,

@@ -9804,6 +9804,7 @@ Section {
                                                             FileBlob [ 89504e470d0a1a0a0000000d49484452000000fa000000fa080600000088ec5a ... 305430393a31373a30312b30303a30305a362aca0000000049454e44ae426082; 7 KiB ],
                                                         ),
                                                         extension: None,
+                                                        web_picture: None,
                                                         layout_max_width: Some(
                                                             2.9166667,
                                                         ),
@@ -9948,6 +9949,7 @@ Section {
                                                             FileBlob [ 89504e470d0a1a0a0000000d49484452000000fa000000960806000000f7da95 ... 345432303a31373a30342b30303a3030bac487af0000000049454e44ae426082; 36 KiB ],
                                                         ),
                                                         extension: None,
+                                                        web_picture: None,
                                                         layout_max_width: Some(
                                                             5.2083335,
                                                         ),

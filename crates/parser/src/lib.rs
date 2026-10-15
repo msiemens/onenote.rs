@@ -197,6 +197,7 @@ pub mod contents {
     pub use crate::onenote::math_inline_object::{MathInlineObject, MathObjectType};
     pub use crate::onenote::note_tag::NoteTag;
     pub use crate::onenote::outline::{Outline, OutlineElement, OutlineGroup, OutlineItem};
+    pub use crate::onenote::picture::Picture;
     pub use crate::onenote::rich_text::{
         EmbeddedInkContainer, EmbeddedInkSpace, EmbeddedObject, ParagraphStyling, RichText,
         TextHyperlink,

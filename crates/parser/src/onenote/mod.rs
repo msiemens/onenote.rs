@@ -40,6 +40,7 @@ pub(crate) mod outline;
 pub(crate) mod page;
 pub(crate) mod page_content;
 pub(crate) mod page_series;
+pub(crate) mod picture;
 pub(crate) mod rich_text;
 pub(crate) mod section;
 pub(crate) mod table;

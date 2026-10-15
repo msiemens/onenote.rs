@@ -8438,6 +8438,7 @@ Section {
                                                         extension: Some(
                                                             ".png",
                                                         ),
+                                                        web_picture: None,
                                                         layout_max_width: Some(
                                                             10.0,
                                                         ),
