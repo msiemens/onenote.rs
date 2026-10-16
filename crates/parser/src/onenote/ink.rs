@@ -87,9 +87,48 @@ pub struct InkStroke {
 }
 
 impl InkStroke {
-    /// The ink stroke's path.
+    /// The ink stroke's path, returned intentionally as the values are
+    /// stored in the file.
+    ///
+    /// The underlying `InkStrokePath` data is delta-encoded and
+    /// dimension-major: all X values come first, then all Y values, and
+    /// each dimension's stream contains the absolute start point followed
+    /// by deltas relative to the previous point (the same model as an SVG
+    /// path made of an `M` command followed by `l` commands). This
+    /// accessor deliberately keeps the stored encoding so callers relying
+    /// on the raw representation are not broken.
+    ///
+    /// Values are in ink units (see [`InkPoint`]), already scaled by the
+    /// ink's `InkScalingX`/`InkScalingY` factors when present.
+    ///
+    /// To obtain the absolute coordinate sequence instead, use the
+    /// opt-in [`InkStroke::absolute_path`].
     pub fn path(&self) -> &[InkPoint] {
         &self.path
+    }
+
+    /// The stroke's path as a sequence of absolute coordinates,
+    /// reconstructed from the delta-encoded storage values returned by
+    /// [`InkStroke::path`].
+    ///
+    /// This is an opt-in helper: it takes the per-dimension running sum
+    /// of the stored values (accumulators starting at `0.0`, so the
+    /// first value passes through unchanged). Coordinates are in ink
+    /// units (see [`InkPoint`]); the conversion to any layout unit
+    /// (half-inch etc.) remains the caller's responsibility.
+    ///
+    /// [`InkStroke::path`] itself keeps the stored encoding; this method
+    /// does not change what it returns.
+    pub fn absolute_path(&self) -> Vec<InkPoint> {
+        let mut absolute = Vec::with_capacity(self.path.len());
+        let mut x = 0.0_f32;
+        let mut y = 0.0_f32;
+        for point in &self.path {
+            x += point.x();
+            y += point.y();
+            absolute.push(InkPoint { x, y });
+        }
+        absolute
     }
 
     /// The pen tip used for the ink path.
@@ -140,6 +179,10 @@ impl InkStroke {
 }
 
 /// A point in an ink path.
+///
+/// Coordinates are in ink units: `1 unit = 0.01 mm`, which is `0.0378 px`
+/// at 96 DPI. They are **not** expressed in any page/outline layout unit
+/// (e.g. half-inch); that conversion is the caller's responsibility.
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct InkPoint {
     pub(crate) x: f32,
@@ -147,12 +190,12 @@ pub struct InkPoint {
 }
 
 impl InkPoint {
-    /// The point's X coordinates.
+    /// The point's X coordinate in ink units (`0.01 mm` each).
     pub fn x(&self) -> f32 {
         self.x
     }
 
-    /// The point's Y coordinates.
+    /// The point's Y coordinate in ink units (`0.01 mm` each).
     pub fn y(&self) -> f32 {
         self.y
     }
@@ -425,4 +468,99 @@ fn parse_ink_path(
         .collect();
 
     Ok(path)
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::one::property::ink_dimensions::InkDimension;
+    use crate::one::property_set::stroke_properties_node::Data;
+
+    /// A synthetic stroke-properties node carrying exactly the two well-known
+    /// ISF dimension records the parser looks up (X first, then Y).
+    fn dimensions() -> Vec<InkDimension> {
+        vec![
+            InkDimension {
+                id: guid!("598a6a8f-52c0-4ba0-93af-af357411a561"),
+                limit_lower: 0,
+                limit_upper: 0,
+            },
+            InkDimension {
+                id: guid!("b53f9f75-04e0-4498-a7ee-c30dbb5a9011"),
+                limit_lower: 0,
+                limit_upper: 0,
+            },
+        ]
+    }
+
+    #[test]
+    fn parse_ink_path_keeps_the_stored_delta_encoding() {
+        // Dimension-first storage: all X values then all Y values
+        // (x = [500, 12, 15], y = [300, -3, 2]).
+        let data = vec![500, 12, 15, 300, -3, 2];
+        let props = Data {
+            aliased: false,
+            fit_to_curve: false,
+            ignore_pressure: false,
+            pen_tip: None,
+            raster_operation: None,
+            transparency: None,
+            ink_height: 0.0,
+            ink_width: 0.0,
+            color: None,
+            dimensions: dimensions(),
+        };
+        let path = parse_ink_path(data, &props, None, None).expect("parses");
+
+        // Contract: `path` (and therefore `InkStroke::path`) is returned in
+        // the stored, delta-encoded form — NOT accumulated.
+        let expected = vec![
+            InkPoint { x: 500.0, y: 300.0 },
+            InkPoint { x: 12.0, y: -3.0 },
+            InkPoint { x: 15.0, y: 2.0 },
+        ];
+        assert_eq!(
+            path.iter().map(|p| (p.x(), p.y())).collect::<Vec<_>>(),
+            expected.iter().map(|p| (p.x(), p.y())).collect::<Vec<_>>()
+        );
+    }
+
+    #[test]
+    fn absolute_path_accumulates_the_stored_deltas() {
+        let data = vec![500, 12, 15, 300, -3, 2];
+        let props = Data {
+            aliased: false,
+            fit_to_curve: false,
+            ignore_pressure: false,
+            pen_tip: None,
+            raster_operation: None,
+            transparency: None,
+            ink_height: 0.0,
+            ink_width: 0.0,
+            color: None,
+            dimensions: dimensions(),
+        };
+        let stored = parse_ink_path(data.clone(), &props, None, None).expect("parses");
+        let stroke = InkStroke {
+            path: stored,
+            pen_tip: None,
+            transparency: None,
+            height: 0.0,
+            width: 0.0,
+            color: None,
+            recognized_word: None,
+        };
+        // Running sums of the stored values:
+        // x: 500, 500+12, 500+12+15 ; y: 300, 300-3, 300-3+2
+        let absolute = stroke.absolute_path();
+        let expected = vec![
+            InkPoint { x: 500.0, y: 300.0 },
+            InkPoint { x: 512.0, y: 297.0 },
+            InkPoint { x: 527.0, y: 299.0 },
+        ];
+        assert_eq!(
+            absolute.iter().map(|p| (p.x(), p.y())).collect::<Vec<_>>(),
+            expected.iter().map(|p| (p.x(), p.y())).collect::<Vec<_>>()
+        );
+    }
 }
