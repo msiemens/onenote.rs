@@ -10,6 +10,10 @@ use std::fmt;
 ///
 /// Treat the value as opaque. OneNote may assign a new identity when it creates
 /// a replacement file, even if that file represents the same logical content.
+///
+/// The [`Display`](fmt::Display) output is a lowercase, hyphenated UUID (for
+/// example `af6de84b-d817-4f07-8baf-fb6629cb7c2c`). This format is stable, so
+/// it is safe to persist.
 #[derive(Clone, Copy, Debug, Eq, Hash, PartialEq)]
 pub struct FileIdentity(Guid);
 
