@@ -5,6 +5,34 @@ All notable changes to this project will be documented in this file.
 The format is based on [Keep a Changelog](https://keepachangelog.com/en/1.0.0/),
 and this project adheres to [Semantic Versioning](https://semver.org/spec/v2.0.0.html).
 
+## [2.1.0] - 2026-10-19
+
+### Added
+
+- `Image::web_picture()` and `EmbeddedFile::icon()` expose supplemental pictures
+  through the new `Picture` type. `Picture::extension()` is attacker-controlled
+  and must be sanitised before use in file names. See PR [#44], issue [#43].
+- `file_identity()` on `Notebook`, `SectionGroup` and `Section` returns an
+  opaque `FileIdentity` that stays the same when a file is renamed or moved.
+  See PR [#45].
+- `InkStroke::absolute_path()` returns absolute stroke coordinates; the stored
+  delta encoding returned by `InkStroke::path()` is now documented. See PR
+  [#47], issue [#4].
+
+### Fixed
+
+- Accept a standalone `ObjectInfoDependencyOverridesFND` in a revision manifest
+  instead of rejecting the whole section. See PR [#46].
+- `NativeFs` on Windows no longer rejects paths with a drive letter, so
+  absolute paths can be parsed.
+
+[#4]: https://github.com/msiemens/onenote.rs/issues/4
+[#43]: https://github.com/msiemens/onenote.rs/issues/43
+[#44]: https://github.com/msiemens/onenote.rs/pull/44
+[#45]: https://github.com/msiemens/onenote.rs/pull/45
+[#46]: https://github.com/msiemens/onenote.rs/pull/46
+[#47]: https://github.com/msiemens/onenote.rs/pull/47
+
 ## [2.0.0] - 2026-08-06
 
 Headline release: the parser now reads **OneNote desktop files** in addition to
