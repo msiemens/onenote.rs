@@ -15,6 +15,9 @@ rust-version.workspace = true
 license.workspace = true
 repository.workspace = true
 
+[lints]
+workspace = true
+
 # docs.rs builds on nightly, so the backtrace feature is available there.
 [package.metadata.docs.rs]
 all-features = true
