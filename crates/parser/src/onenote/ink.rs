@@ -87,38 +87,24 @@ pub struct InkStroke {
 }
 
 impl InkStroke {
-    /// The ink stroke's path, returned intentionally as the values are
-    /// stored in the file.
+    /// The ink stroke's path.
     ///
-    /// The underlying `InkStrokePath` data is delta-encoded and
-    /// dimension-major: all X values come first, then all Y values, and
-    /// each dimension's stream contains the absolute start point followed
-    /// by deltas relative to the previous point (the same model as an SVG
-    /// path made of an `M` command followed by `l` commands). This
-    /// accessor deliberately keeps the stored encoding so callers relying
-    /// on the raw representation are not broken.
+    /// The path is delta-encoded: the first point holds the absolute start
+    /// coordinates and every following point holds its offset from the
+    /// previous point. This is the same model as an SVG path made of an `M`
+    /// command followed by `l` commands. Use [`InkStroke::absolute_path`] to
+    /// get absolute coordinates instead.
     ///
-    /// Values are in ink units (see [`InkPoint`]), already scaled by the
-    /// ink's `InkScalingX`/`InkScalingY` factors when present.
-    ///
-    /// To obtain the absolute coordinate sequence instead, use the
-    /// opt-in [`InkStroke::absolute_path`].
+    /// Values are in ink units (see [`InkPoint`]).
     pub fn path(&self) -> &[InkPoint] {
         &self.path
     }
 
-    /// The stroke's path as a sequence of absolute coordinates,
-    /// reconstructed from the delta-encoded storage values returned by
-    /// [`InkStroke::path`].
+    /// The stroke's path as absolute coordinates.
     ///
-    /// This is an opt-in helper: it takes the per-dimension running sum
-    /// of the stored values (accumulators starting at `0.0`, so the
-    /// first value passes through unchanged). Coordinates are in ink
-    /// units (see [`InkPoint`]); the conversion to any layout unit
-    /// (half-inch etc.) remains the caller's responsibility.
-    ///
-    /// [`InkStroke::path`] itself keeps the stored encoding; this method
-    /// does not change what it returns.
+    /// This accumulates the offsets returned by [`InkStroke::path`], so the
+    /// first point is the stroke's start and every following point is its
+    /// absolute position. Values are in ink units (see [`InkPoint`]).
     pub fn absolute_path(&self) -> Vec<InkPoint> {
         let mut absolute = Vec::with_capacity(self.path.len());
         let mut x = 0.0_f32;
@@ -180,9 +166,12 @@ impl InkStroke {
 
 /// A point in an ink path.
 ///
-/// Coordinates are in ink units: `1 unit = 0.01 mm`, which is `0.0378 px`
-/// at 96 DPI. They are **not** expressed in any page/outline layout unit
-/// (e.g. half-inch); that conversion is the caller's responsibility.
+/// Coordinates are in ink units. Before scaling, `1 unit = 0.01 mm`, which is
+/// `0.0378 px` at 96 DPI. If the ink specifies `InkScalingX`/`InkScalingY`,
+/// these factors are already applied, so the physical size of a unit only
+/// holds for a scale of `1`. Coordinates are **not** expressed in any
+/// page/outline layout unit (e.g. half-inch); that conversion is the caller's
+/// responsibility.
 #[derive(Copy, Clone, PartialEq, PartialOrd, Debug)]
 pub struct InkPoint {
     pub(crate) x: f32,
