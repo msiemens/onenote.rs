@@ -28,3 +28,15 @@ impl fmt::Display for FileIdentity {
         fmt::Display::fmt(&self.0.0.hyphenated(), formatter)
     }
 }
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+
+    #[test]
+    fn display_is_a_lowercase_hyphenated_uuid() {
+        let identity = FileIdentity::new(guid!("{AF6DE84B-D817-4F07-8BAF-FB6629CB7C2C}"));
+
+        assert_eq!(identity.to_string(), "af6de84b-d817-4f07-8baf-fb6629cb7c2c");
+    }
+}
