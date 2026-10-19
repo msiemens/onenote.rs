@@ -482,12 +482,8 @@ mod tests {
         ]
     }
 
-    #[test]
-    fn parse_ink_path_keeps_the_stored_delta_encoding() {
-        // Dimension-first storage: all X values then all Y values
-        // (x = [500, 12, 15], y = [300, -3, 2]).
-        let data = vec![500, 12, 15, 300, -3, 2];
-        let props = Data {
+    fn stroke_properties() -> Data {
+        Data {
             aliased: false,
             fit_to_curve: false,
             ignore_pressure: false,
@@ -498,58 +494,45 @@ mod tests {
             ink_width: 0.0,
             color: None,
             dimensions: dimensions(),
-        };
-        let path = parse_ink_path(data, &props, None, None).expect("parses");
-
-        // Contract: `path` (and therefore `InkStroke::path`) is returned in
-        // the stored, delta-encoded form — NOT accumulated.
-        let expected = vec![
-            InkPoint { x: 500.0, y: 300.0 },
-            InkPoint { x: 12.0, y: -3.0 },
-            InkPoint { x: 15.0, y: 2.0 },
-        ];
-        assert_eq!(
-            path.iter().map(|p| (p.x(), p.y())).collect::<Vec<_>>(),
-            expected.iter().map(|p| (p.x(), p.y())).collect::<Vec<_>>()
-        );
+        }
     }
 
-    #[test]
-    fn absolute_path_accumulates_the_stored_deltas() {
+    /// Parses a stroke from dimension-first storage: all X values, then all Y
+    /// values (x = [500, 12, 15], y = [300, -3, 2]).
+    fn stroke() -> InkStroke {
         let data = vec![500, 12, 15, 300, -3, 2];
-        let props = Data {
-            aliased: false,
-            fit_to_curve: false,
-            ignore_pressure: false,
-            pen_tip: None,
-            raster_operation: None,
-            transparency: None,
-            ink_height: 0.0,
-            ink_width: 0.0,
-            color: None,
-            dimensions: dimensions(),
-        };
-        let stored = parse_ink_path(data.clone(), &props, None, None).expect("parses");
-        let stroke = InkStroke {
-            path: stored,
+        InkStroke {
+            path: parse_ink_path(data, &stroke_properties(), None, None).expect("parses"),
             pen_tip: None,
             transparency: None,
             height: 0.0,
             width: 0.0,
             color: None,
             recognized_word: None,
-        };
-        // Running sums of the stored values:
-        // x: 500, 500+12, 500+12+15 ; y: 300, 300-3, 300-3+2
-        let absolute = stroke.absolute_path();
-        let expected = vec![
-            InkPoint { x: 500.0, y: 300.0 },
-            InkPoint { x: 512.0, y: 297.0 },
-            InkPoint { x: 527.0, y: 299.0 },
-        ];
+        }
+    }
+
+    #[test]
+    fn path_keeps_the_stored_delta_encoding() {
         assert_eq!(
-            absolute.iter().map(|p| (p.x(), p.y())).collect::<Vec<_>>(),
-            expected.iter().map(|p| (p.x(), p.y())).collect::<Vec<_>>()
+            stroke().path(),
+            [
+                InkPoint { x: 500.0, y: 300.0 },
+                InkPoint { x: 12.0, y: -3.0 },
+                InkPoint { x: 15.0, y: 2.0 },
+            ]
+        );
+    }
+
+    #[test]
+    fn absolute_path_accumulates_the_stored_deltas() {
+        assert_eq!(
+            stroke().absolute_path(),
+            [
+                InkPoint { x: 500.0, y: 300.0 },
+                InkPoint { x: 512.0, y: 297.0 },
+                InkPoint { x: 527.0, y: 299.0 },
+            ]
         );
     }
 }
