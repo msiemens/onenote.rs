@@ -5,6 +5,10 @@ use crate::onestore::shared::file_blob::{FileBlob, FileDataStatus};
 /// Some objects carry supplemental pictures, such as a browser-compatible
 /// fallback for an image or the icon for an embedded file. The bytes remain
 /// backed by the parser's lazy file source and are read only on demand.
+///
+/// The picture's data and extension come straight from the file and are
+/// unvalidated. The data is not guaranteed to match the extension or to be a
+/// well-formed image.
 #[derive(Clone, PartialEq, Debug)]
 pub struct Picture {
     pub(crate) data: FileBlob,
@@ -32,6 +36,11 @@ impl Picture {
     }
 
     /// The picture's file extension, when stored by OneNote.
+    ///
+    /// This is attacker-controlled data from the file. It may be empty, contain
+    /// path separators, NUL bytes or arbitrary Unicode, and it need not match
+    /// the picture's actual format. **Consumers that use this value as part of
+    /// a file name on disk must sanitise it themselves.**
     pub fn extension(&self) -> Option<&str> {
         self.extension.as_deref()
     }
