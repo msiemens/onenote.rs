@@ -50,9 +50,15 @@ fn resolve_path(path: TypedPath) -> Result<PathBuf, Error> {
     }
     #[cfg(windows)]
     {
-        let win = path
-            .with_windows_encoding_checked()
-            .map_err(|err| Error::new(std::io::ErrorKind::InvalidInput, err))?;
+        // The checked conversion rebuilds the path component by component and
+        // rejects drive prefixes, so only use it for paths that actually need
+        // converting. Windows paths are used as they are.
+        let win = if path.is_windows() {
+            path.to_path_buf()
+        } else {
+            path.with_windows_encoding_checked()
+                .map_err(|err| Error::new(std::io::ErrorKind::InvalidInput, err))?
+        };
         let s = win.to_str().ok_or_else(|| {
             Error::new(
                 std::io::ErrorKind::InvalidData,
