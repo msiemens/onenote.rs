@@ -115,10 +115,10 @@ fn to_verbatim(path: PathBuf) -> Result<PathBuf, Error> {
         return Ok(PathBuf::from(s));
     }
     let mut out = OsString::new();
-    if s.starts_with(r"\\") {
+    if let Some(unc) = s.strip_prefix(r"\\") {
         // UNC share path → \\?\UNC\server\share\...
         out.push(r"\\?\UNC\");
-        out.push(&s[2..]);
+        out.push(unc);
     } else {
         out.push(r"\\?\");
         out.push(&s);

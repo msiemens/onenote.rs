@@ -49,7 +49,7 @@ pub(crate) struct PointerToListFND {
     pub(crate) list: FileNodeList,
 }
 
-impl<'a> ParseWithRef<'a> for PointerToListFND {
+impl ParseWithRef<'_> for PointerToListFND {
     fn parse(_reader: Reader, data_ref: &FileNodeDataRef) -> Result<Self> {
         match data_ref {
             FileNodeDataRef::ElementList(list) => Ok(Self { list: list.clone() }),
@@ -134,7 +134,7 @@ pub(crate) struct ObjectInfoDependencyOverridesFND {
     data: ObjectInfoDependencyOverrideData,
 }
 
-impl<'a> ParseWithRef<'a> for ObjectInfoDependencyOverridesFND {
+impl ParseWithRef<'_> for ObjectInfoDependencyOverridesFND {
     fn parse(reader: Reader, obj_ref: &FileNodeDataRef) -> Result<Self> {
         if let FileNodeDataRef::SingleElement(obj_ref) = obj_ref {
             if !obj_ref.is_fcr_nil() {
@@ -213,7 +213,7 @@ pub(crate) struct FileDataStoreObjectReferenceFND {
     pub(crate) guid: Guid,
 }
 
-impl<'a> ParseWithRef<'a> for FileDataStoreObjectReferenceFND {
+impl ParseWithRef<'_> for FileDataStoreObjectReferenceFND {
     fn parse(reader: Reader, data_ref: &FileNodeDataRef) -> Result<Self> {
         let guid = Guid::parse(reader)?;
         if let FileNodeDataRef::SingleElement(data_ref) = data_ref {
@@ -335,7 +335,7 @@ impl<RefSize: Parse> ObjectDeclarationNode for ObjectDeclaration2RefCount<RefSiz
     }
 }
 
-impl<'a, RefSize: Parse> ParseWithRef<'a> for ObjectDeclaration2RefCount<RefSize> {
+impl<RefSize: Parse> ParseWithRef<'_> for ObjectDeclaration2RefCount<RefSize> {
     fn parse(reader: Reader, property_set_ref: &FileNodeDataRef) -> Result<Self> {
         Ok(Self {
             props: read_property_set(reader, property_set_ref)?,
@@ -352,7 +352,7 @@ pub(crate) struct ObjectGroupListReferenceFND {
     pub(crate) id: ExGuid,
 }
 
-impl<'a> ParseWithRef<'a> for ObjectGroupListReferenceFND {
+impl ParseWithRef<'_> for ObjectGroupListReferenceFND {
     fn parse(reader: Reader, data_ref: &FileNodeDataRef) -> Result<Self> {
         match data_ref {
             FileNodeDataRef::ElementList(list) => Ok(Self {
@@ -384,7 +384,7 @@ pub(crate) struct HashedChunkDescriptor<Hash: Parse> {
     hash: Hash,
 }
 
-impl<'a, Hash: Parse> ParseWithRef<'a> for HashedChunkDescriptor<Hash> {
+impl<Hash: Parse> ParseWithRef<'_> for HashedChunkDescriptor<Hash> {
     fn parse(reader: Reader, prop_ref: &FileNodeDataRef) -> Result<Self> {
         let prop_set = read_property_set(reader, prop_ref)?;
         Ok(Self {

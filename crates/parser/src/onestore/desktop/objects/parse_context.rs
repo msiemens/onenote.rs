@@ -21,7 +21,7 @@ pub(crate) struct ParseContext<'a> {
     file_data_store: Option<&'a FileDataStore>,
 }
 
-impl<'a> ParseContext<'a> {
+impl ParseContext<'_> {
     pub(crate) fn new() -> Self {
         Self {
             id_map: Rc::new(ParseContextIdMapping::default()),
@@ -67,6 +67,33 @@ impl<'a> ParseContext<'a> {
     }
 }
 
+#[derive(Clone, Default)]
+struct ParseContextIdMapping {
+    id_table: GlobalIdTable,
+}
+
+impl ParseContextIdMapping {
+    pub(crate) fn new(id_table: &GlobalIdTable) -> Self {
+        Self {
+            id_table: id_table.clone(),
+        }
+    }
+}
+
+impl MappingTable for ParseContextIdMapping {
+    fn resolve_id(&self, _index: usize, cid: &CompactId) -> Option<ExGuid> {
+        self.id_table.resolve_id(cid).ok()
+    }
+
+    fn get_object_space(&self, _index: usize, cid: &CompactId) -> Option<CellId> {
+        if let Ok(result) = self.id_table.resolve_id(cid) {
+            Some(CellId(result, ExGuid::default()))
+        } else {
+            None
+        }
+    }
+}
+
 #[cfg(test)]
 mod tests {
     use super::ParseContext;
@@ -104,32 +131,5 @@ mod tests {
                 .to_string()
                 .contains("file_data reference has not been loaded")
         );
-    }
-}
-
-#[derive(Clone, Default)]
-struct ParseContextIdMapping {
-    id_table: GlobalIdTable,
-}
-
-impl ParseContextIdMapping {
-    pub(crate) fn new(id_table: &GlobalIdTable) -> Self {
-        Self {
-            id_table: id_table.clone(),
-        }
-    }
-}
-
-impl MappingTable for ParseContextIdMapping {
-    fn resolve_id(&self, _index: usize, cid: &CompactId) -> Option<ExGuid> {
-        self.id_table.resolve_id(cid).ok()
-    }
-
-    fn get_object_space(&self, _index: usize, cid: &CompactId) -> Option<CellId> {
-        if let Ok(result) = self.id_table.resolve_id(cid) {
-            Some(CellId(result, ExGuid::default()))
-        } else {
-            None
-        }
     }
 }

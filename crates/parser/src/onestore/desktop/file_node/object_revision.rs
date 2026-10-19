@@ -24,7 +24,7 @@ impl ObjectRevisionWithRefCountFNDX {
     }
 }
 
-impl<'a> ParseWithRef<'a> for ObjectRevisionWithRefCountFNDX {
+impl ParseWithRef<'_> for ObjectRevisionWithRefCountFNDX {
     fn parse(reader: Reader, data_ref: &FileNodeDataRef) -> crate::errors::Result<Self> {
         let property_set = read_property_set(reader, data_ref)?;
         let oid = CompactId::parse(reader)?;
@@ -59,7 +59,7 @@ impl ObjectRevisionWithRefCount2FNDX {
     }
 }
 
-impl<'a> ParseWithRef<'a> for ObjectRevisionWithRefCount2FNDX {
+impl ParseWithRef<'_> for ObjectRevisionWithRefCount2FNDX {
     fn parse(reader: Reader, data_ref: &FileNodeDataRef) -> crate::errors::Result<Self> {
         let property_set = read_property_set(reader, data_ref)?;
         let oid = CompactId::parse(reader)?;

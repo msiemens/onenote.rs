@@ -41,12 +41,12 @@ impl crate::onestore::ObjectSpace for ObjectSpace {
     }
 }
 
-impl<'a, 'b> ObjectSpace {
+impl<'a> ObjectSpace {
     pub(crate) fn parse(
         mapping: &'a StorageIndexCellMapping,
         storage_index: &'a StorageIndex,
         packaging: &'a OneStorePackaging,
-        revision_cache: &'b mut HashMap<CellId, Revision>,
+        revision_cache: &mut HashMap<CellId, Revision>,
     ) -> Result<(CellId, ObjectSpace)> {
         let cell_id = mapping.cell_id;
 

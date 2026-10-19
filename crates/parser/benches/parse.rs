@@ -53,7 +53,7 @@ struct InMemFs<'a> {
     bytes: &'a Bytes,
 }
 
-impl<'a> FileSystem for InMemFs<'a> {
+impl FileSystem for InMemFs<'_> {
     fn is_directory(&self, _: TypedPath) -> io::Result<bool> {
         Ok(false)
     }

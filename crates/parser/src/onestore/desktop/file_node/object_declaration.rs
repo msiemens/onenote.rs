@@ -33,7 +33,7 @@ impl<RefSize: Parse> ObjectDeclarationNode for ObjectDeclarationWithSizedRefCoun
     }
 }
 
-impl<'a, RefSize: Parse> ParseWithRef<'a> for ObjectDeclarationWithSizedRefCount<RefSize> {
+impl<RefSize: Parse> ParseWithRef<'_> for ObjectDeclarationWithSizedRefCount<RefSize> {
     fn parse(reader: Reader, data_ref: &FileNodeDataRef) -> crate::errors::Result<Self> {
         let property_set = read_property_set(reader, data_ref)?;
 

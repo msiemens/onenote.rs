@@ -20,7 +20,7 @@ pub(crate) struct ObjectSpaceManifestListReferenceFND {
     pub(crate) last_revision: RevisionManifestListReferenceFND,
 }
 
-impl<'a> ParseWithRef<'a> for ObjectSpaceManifestListReferenceFND {
+impl ParseWithRef<'_> for ObjectSpaceManifestListReferenceFND {
     fn parse(reader: Reader, data_ref: &FileNodeDataRef) -> crate::errors::Result<Self> {
         if let FileNodeDataRef::ElementList(data_ref) = data_ref {
             // Validation

@@ -122,8 +122,8 @@ impl Debug for FileBlob {
 
         match (head, tail) {
             (Ok(head), Ok(tail)) => {
-                let first_32: String = head.iter().map(|b| format!("{:02x}", b)).collect();
-                let last_32: String = tail.iter().map(|b| format!("{:02x}", b)).collect();
+                let first_32 = hex(&head);
+                let last_32 = hex(&tail);
                 write!(
                     f,
                     "FileBlob [ {} ... {}; {:?} KiB ]",
@@ -135,6 +135,15 @@ impl Debug for FileBlob {
             _ => write!(f, "FileBlob [ <read error>; {:?} KiB ]", len / 1024),
         }
     }
+}
+
+fn hex(bytes: &[u8]) -> String {
+    use std::fmt::Write;
+
+    bytes.iter().fold(String::new(), |mut hex, byte| {
+        let _ = write!(hex, "{byte:02x}");
+        hex
+    })
 }
 
 impl PartialEq for FileBlob {

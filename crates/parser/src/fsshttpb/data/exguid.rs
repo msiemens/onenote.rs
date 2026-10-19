@@ -50,7 +50,7 @@ impl ExGuid {
 
         // A ExGuid with a 10 bit value ([FSSHTTPB] 2.2.1.7.3)
         if data & 0b111111 == 32 {
-            let value = (reader.get_u8()? as u16) << 2 | (data >> 6) as u16;
+            let value = ((reader.get_u8()? as u16) << 2) | (data >> 6) as u16;
 
             return Ok(ExGuid {
                 guid: Guid::parse(reader)?,
@@ -60,7 +60,7 @@ impl ExGuid {
 
         // A ExGuid with a 17 bit value ([FSSHTTPB] 2.2.1.7.4)
         if data & 0b1111111 == 64 {
-            let value = (reader.get_u16()? as u32) << 1 | (data >> 7) as u32;
+            let value = ((reader.get_u16()? as u32) << 1) | (data >> 7) as u32;
 
             return Ok(ExGuid {
                 guid: Guid::parse(reader)?,

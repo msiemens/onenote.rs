@@ -208,7 +208,7 @@ impl PropertyId {
     }
 
     pub(crate) fn prop_type(&self) -> u32 {
-        self.0 >> 26 & 0x1f
+        (self.0 >> 26) & 0x1f
     }
 
     pub(crate) fn bool(&self) -> bool {
