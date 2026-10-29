@@ -46,6 +46,14 @@ pub(crate) trait MappingTable {
     fn resolve_id(&self, index: usize, cid: &CompactId) -> Option<ExGuid>;
 
     fn get_object_space(&self, index: usize, cid: &CompactId) -> Option<CellId>;
+
+    /// All object spaces this table can resolve to.
+    ///
+    /// The FSSHTTPB store uses this to find the object spaces that are reachable from the data
+    /// root. Mapping tables that don't take part in that walk can keep the default.
+    fn object_spaces(&self) -> Vec<CellId> {
+        Vec::new()
+    }
 }
 
 impl fmt::Debug for dyn MappingTable {

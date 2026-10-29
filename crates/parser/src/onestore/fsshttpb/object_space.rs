@@ -41,6 +41,16 @@ impl crate::onestore::ObjectSpace for ObjectSpace {
     }
 }
 
+impl ObjectSpace {
+    /// The object spaces referenced by the objects of this object space.
+    pub(crate) fn referenced_object_spaces(&self) -> Vec<CellId> {
+        self.objects
+            .values()
+            .flat_map(|object| object.mapping.object_spaces())
+            .collect()
+    }
+}
+
 impl<'a> ObjectSpace {
     pub(crate) fn parse(
         mapping: &'a StorageIndexCellMapping,
