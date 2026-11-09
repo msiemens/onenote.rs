@@ -1,6 +1,6 @@
 use super::super::common::FileChunkReference64x32;
 use crate::Reader;
-use crate::errors::{ErrorKind, Result};
+use crate::errors::Result;
 use crate::onestore::desktop::parse::{Parse, ParseWithCount};
 use onenote_parser_macros::Parse;
 
@@ -16,29 +16,10 @@ impl ParseWithCount for TransactionLogFragment {
     fn parse(reader: Reader, size: usize) -> Result<Self> {
         let size_table_count = (size - 12) / 8;
         let mut size_table = Vec::new();
-        let mut last_was_sentinel = false;
         for _i in 0..size_table_count {
             let entry = TransactionEntry::parse(reader)?;
 
-            if entry.is_sentinel() {
-                last_was_sentinel = true;
-            } else {
-                size_table.push(entry);
-            }
-        }
-
-        // According to \[MS-ONESTORE\] 2.3.3.1, the size_table should terminate with a
-        // sentinel entry.
-        if size_table_count > 0 && !last_was_sentinel {
-            return Err(
-                ErrorKind::MalformedOneStoreData(
-                    format!(
-                        "The size_table must end in a sentinel entry. Total entries: {}. Last entry: {:?}",
-                        size_table_count,
-                        size_table[size_table_count - 1]
-                    ).into()
-                ).into()
-            );
+            size_table.push(entry);
         }
 
         Ok(Self {
