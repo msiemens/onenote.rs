@@ -43,6 +43,7 @@ impl FileNodeListFragment {
             ) {
                 maximum_node_count -= 1;
             }
+            let is_chunk_terminator = matches!(file_node.fnd, FileNodeData::ChunkTerminatorFND);
             if !matches!(file_node.fnd, FileNodeData::Null) {
                 file_nodes.push(file_node);
             }
@@ -56,6 +57,9 @@ impl FileNodeListFragment {
                     .into(),
                 )
                 .into());
+            }
+            if is_chunk_terminator {
+                break;
             }
         }
 
@@ -116,5 +120,49 @@ impl Parse for FileNodeListHeader {
             file_node_list_id,
             n_fragment_sequence,
         })
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::reader::Reader;
+
+    const HEADER_MAGIC: u64 = 0xA4567AB1F5F7F4C4;
+    const FOOTER_MAGIC: u64 = 0x8BC215C38233BA4B;
+
+    /// A fragment holding one terminator, then padding where old bytes survive:
+    /// each stale word is a node header claiming an unknown type and no size.
+    fn fragment_with_stale_padding() -> Vec<u8> {
+        let mut bytes = Vec::new();
+        bytes.extend_from_slice(&HEADER_MAGIC.to_le_bytes());
+        bytes.extend_from_slice(&0x10u32.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        // ChunkTerminatorFND: id 0x0FF, size 4, the required reserved bit.
+        let terminator: u32 = 0x0ff | (4 << 10) | (1 << 31);
+        bytes.extend_from_slice(&terminator.to_le_bytes());
+        for _ in 0..4 {
+            // Node type 0x95, declared size 0: reading it is the bug.
+            bytes.extend_from_slice(&(0x95u32 | (1 << 31)).to_le_bytes());
+        }
+        // The next fragment: nil.
+        bytes.extend_from_slice(&u64::MAX.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        bytes.extend_from_slice(&FOOTER_MAGIC.to_le_bytes());
+        bytes
+    }
+
+    #[test]
+    fn stale_padding_after_a_chunk_terminator_is_never_read_as_nodes() {
+        let bytes = fragment_with_stale_padding();
+        let mut reader = Reader::new(&bytes);
+        let mut context = ParseContext::new();
+        let fragment = FileNodeListFragment::parse(&mut reader, &mut context, bytes.len())
+            .expect("a fragment ends at its terminator");
+        assert_eq!(fragment.file_nodes.len(), 1);
+        assert!(matches!(
+            fragment.file_nodes[0].fnd,
+            FileNodeData::ChunkTerminatorFND
+        ));
     }
 }
