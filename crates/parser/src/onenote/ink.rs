@@ -84,6 +84,7 @@ pub struct InkStroke {
     pub(crate) width: f32,
     pub(crate) color: Option<u32>,
     pub(crate) recognized_word: Option<InkRecognizedWord>,
+    pub(crate) ignore_pressure: bool,
 }
 
 impl InkStroke {
@@ -112,7 +113,11 @@ impl InkStroke {
         for point in &self.path {
             x += point.x();
             y += point.y();
-            absolute.push(InkPoint { x, y });
+            absolute.push(InkPoint {
+                x,
+                y,
+                pressure: point.pressure,
+            });
         }
         absolute
     }
@@ -162,6 +167,11 @@ impl InkStroke {
     pub fn recognized_word(&self) -> Option<&InkRecognizedWord> {
         self.recognized_word.as_ref()
     }
+
+    /// Whether this stroke should ignore pressure modulation.
+    pub fn ignore_pressure(&self) -> bool {
+        self.ignore_pressure
+    }
 }
 
 /// A point in an ink path.
@@ -176,6 +186,7 @@ impl InkStroke {
 pub struct InkPoint {
     pub(crate) x: f32,
     pub(crate) y: f32,
+    pub(crate) pressure: Option<f32>,
 }
 
 impl InkPoint {
@@ -187,6 +198,11 @@ impl InkPoint {
     /// The point's Y coordinate in ink units (`0.01 mm` each).
     pub fn y(&self) -> f32 {
         self.y
+    }
+
+    /// The normalized pressure of the point (`0.0` to `1.0`), if available.
+    pub fn pressure(&self) -> Option<f32> {
+        self.pressure
     }
 }
 
@@ -409,6 +425,7 @@ fn parse_ink_stroke(
         width: props.ink_width,
         color: props.color,
         recognized_word,
+        ignore_pressure: props.ignore_pressure,
     })
 }
 
@@ -434,27 +451,56 @@ fn parse_ink_path(
             ErrorKind::MalformedOneNoteData("ink stroke properties has no y dimension".into())
         })?;
 
+    // Look for pressure dimension (OneNote or standard Tablet PC pressure GUID)
+    let pressure_dim = props.dimensions.iter().enumerate().find(|(i, d)| {
+        *i != idx_x
+            && *i != idx_y
+            && (d.id == guid!("7307502d-f9f4-4e18-b3f2-2ce1b1a3610c")
+                || d.id == guid!("73830477-6756-4c49-9dc5-3078414b25df")
+                || (d.limit_lower == 0 && d.limit_upper > 0))
+    });
+
+    let (idx_p, dim_p) = match pressure_dim {
+        Some((i, d)) => (Some(i), Some(d)),
+        None => (None, None),
+    };
+
     // Find dimensions data
-    let dimension_offset = data.len() / props.dimensions.len();
+    let dimension_offset = if props.dimensions.is_empty() {
+        0
+    } else {
+        data.len() / props.dimensions.len()
+    };
 
     let start_x = dimension_offset * idx_x;
     let start_y = dimension_offset * idx_y;
 
     let x = &data[start_x..start_x + dimension_offset];
     let y = &data[start_y..start_y + dimension_offset];
+    let p_slice = idx_p.map(|idx| &data[dimension_offset * idx..dimension_offset * (idx + 1)]);
 
     let scale_x = scale_x.unwrap_or(1.0);
     let scale_y = scale_y.unwrap_or(1.0);
 
-    let path = x
-        .iter()
-        .copied()
-        .zip(y.iter().copied())
-        .map(|(x, y)| InkPoint {
-            x: scale_x * x as f32,
-            y: scale_y * y as f32,
-        })
-        .collect();
+    let max_p = dim_p
+        .map(|d| (d.limit_upper - d.limit_lower).max(1) as f32)
+        .unwrap_or(32767.0);
+
+    let mut curr_p: i64 = 0;
+    let mut path = Vec::with_capacity(x.len());
+
+    for i in 0..x.len() {
+        let pressure = p_slice.map(|p_data| {
+            curr_p += p_data[i];
+            (curr_p as f32 / max_p).clamp(0.0, 1.0)
+        });
+
+        path.push(InkPoint {
+            x: scale_x * x[i] as f32,
+            y: scale_y * y[i] as f32,
+            pressure,
+        });
+    }
 
     Ok(path)
 }
@@ -509,6 +555,7 @@ mod tests {
             width: 0.0,
             color: None,
             recognized_word: None,
+            ignore_pressure: false,
         }
     }
 
@@ -517,9 +564,21 @@ mod tests {
         assert_eq!(
             stroke().path(),
             [
-                InkPoint { x: 500.0, y: 300.0 },
-                InkPoint { x: 12.0, y: -3.0 },
-                InkPoint { x: 15.0, y: 2.0 },
+                InkPoint {
+                    x: 500.0,
+                    y: 300.0,
+                    pressure: None
+                },
+                InkPoint {
+                    x: 12.0,
+                    y: -3.0,
+                    pressure: None
+                },
+                InkPoint {
+                    x: 15.0,
+                    y: 2.0,
+                    pressure: None
+                },
             ]
         );
     }
@@ -529,10 +588,51 @@ mod tests {
         assert_eq!(
             stroke().absolute_path(),
             [
-                InkPoint { x: 500.0, y: 300.0 },
-                InkPoint { x: 512.0, y: 297.0 },
-                InkPoint { x: 527.0, y: 299.0 },
+                InkPoint {
+                    x: 500.0,
+                    y: 300.0,
+                    pressure: None
+                },
+                InkPoint {
+                    x: 512.0,
+                    y: 297.0,
+                    pressure: None
+                },
+                InkPoint {
+                    x: 527.0,
+                    y: 299.0,
+                    pressure: None
+                },
             ]
         );
+    }
+
+    #[test]
+    fn parses_delta_encoded_pressure_dimension() {
+        let mut props = stroke_properties();
+        props.ignore_pressure = true;
+        props.dimensions.push(InkDimension {
+            id: guid!("73830477-6756-4c49-9dc5-3078414b25df"),
+            limit_lower: 0,
+            limit_upper: 1000,
+        });
+        let data = vec![10, 5, 5, 20, 5, 5, 250, 250, -100];
+        let path = parse_ink_path(data, &props, None, None).expect("parses");
+        let stroke = InkStroke {
+            path,
+            pen_tip: None,
+            transparency: None,
+            height: 0.0,
+            width: 0.0,
+            color: None,
+            recognized_word: None,
+            ignore_pressure: props.ignore_pressure,
+        };
+
+        assert!(stroke.ignore_pressure());
+        assert_eq!(stroke.path()[0].pressure(), Some(0.25));
+        assert_eq!(stroke.path()[1].pressure(), Some(0.5));
+        assert_eq!(stroke.path()[2].pressure(), Some(0.4));
+        assert_eq!(stroke.absolute_path()[1].pressure(), Some(0.5));
     }
 }

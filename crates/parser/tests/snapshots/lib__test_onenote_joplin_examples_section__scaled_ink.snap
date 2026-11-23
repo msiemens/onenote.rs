@@ -461,590 +461,1031 @@ Section {
                                                 InkPoint {
                                                     x: 3916.0,
                                                     y: 29442.4,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 287.10287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 287.10287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: 272.74774,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 22.0,
                                                     y: 775.17773,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 68.0,
                                                     y: 1579.0658,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 36.0,
                                                     y: 717.7572,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 72.0,
                                                     y: 1808.748,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 140.0,
                                                     y: 4794.618,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 114.84115,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 114.84115,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 100.48601,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 114.84115,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 114.84115,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: 272.74774,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: -14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: -14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: -14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 12.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 12.0,
                                                     y: -57.420574,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 10.0,
                                                     y: -57.420574,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 24.0,
                                                     y: -129.19629,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 20.0,
                                                     y: -100.48601,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 42.0,
                                                     y: -200.97202,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 44.0,
                                                     y: -186.61687,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 46.0,
                                                     y: -172.26172,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 46.0,
                                                     y: -157.90659,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 48.0,
                                                     y: -143.55144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 48.0,
                                                     y: -114.84115,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 98.0,
                                                     y: -215.32715,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 20.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 160.0,
                                                     y: -301.458,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 398.0,
                                                     y: -502.43002,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 630.0,
                                                     y: -344.52344,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 20.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 20.0,
                                                     y: -14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 18.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 20.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 18.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 54.0,
                                                     y: -129.19629,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: -14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: -57.420574,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: -57.420574,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: -100.48601,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: -272.74774,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: -272.74774,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: -645.98145,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: -330.1683,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: -717.7572,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 16.0,
                                                     y: -416.29916,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 42.0,
                                                     y: -875.66376,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: -272.74774,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: -258.39258,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 10.0,
                                                     y: -272.74774,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 10.0,
                                                     y: -272.74774,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: -287.10287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: -689.0469,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: -459.3646,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: -172.26172,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: -157.90659,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: -172.26172,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: -157.90659,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: -416.29916,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: -14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: -14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: -14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: -14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: -14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: -14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -14.0,
                                                     y: -28.710287,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -46.0,
                                                     y: -86.13086,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -106.0,
                                                     y: -114.84115,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -100.0,
                                                     y: -114.84115,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -272.0,
                                                     y: -301.458,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -596.0,
                                                     y: -358.8786,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -876.0,
                                                     y: -100.48601,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -448.0,
                                                     y: -14.355144,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -380.0,
                                                     y: -43.06543,
+                                                    pressure: Some(
+                                                        0.7083346,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -54.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.50001526,
+                                                    ),
                                                 },
                                             ],
                                             pen_tip: None,
@@ -1055,6 +1496,7 @@ Section {
                                                 2429671,
                                             ),
                                             recognized_word: None,
+                                            ignore_pressure: false,
                                         },
                                     ],
                                 ),
@@ -1076,1098 +1518,1920 @@ Section {
                                                 InkPoint {
                                                     x: 7198.0,
                                                     y: 3890.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 120.0,
                                                     y: -2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 254.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 10.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 10.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 10.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 10.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 6.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 18.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 30.0,
                                                     y: 24.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 66.0,
                                                     y: 64.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 18.0,
                                                     y: 18.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 12.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 10.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 10.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 10.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 14.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 14.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: 14.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: 14.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 16.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 14.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 38.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 22.0,
                                                     y: 102.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: 64.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 22.0,
                                                     y: 148.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 72.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 72.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 74.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -16.0,
                                                     y: 196.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -12.0,
                                                     y: 52.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -16.0,
                                                     y: 52.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -18.0,
                                                     y: 52.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -20.0,
                                                     y: 50.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -68.0,
                                                     y: 140.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -32.0,
                                                     y: 60.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -28.0,
                                                     y: 60.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -64.0,
                                                     y: 172.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -34.0,
                                                     y: 172.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -30.0,
                                                     y: 164.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 24.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 24.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 24.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -10.0,
                                                     y: 24.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -30.0,
                                                     y: 60.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -18.0,
                                                     y: 30.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -90.0,
                                                     y: 158.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -12.0,
                                                     y: 26.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -10.0,
                                                     y: 26.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -10.0,
                                                     y: 26.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 26.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -16.0,
                                                     y: 68.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -12.0,
                                                     y: 64.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -16.0,
                                                     y: 64.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -54.0,
                                                     y: 162.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -122.0,
                                                     y: 276.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -18.0,
                                                     y: 40.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -96.0,
                                                     y: 208.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: 14.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: 16.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: 14.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 36.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -18.0,
                                                     y: 62.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -16.0,
                                                     y: 52.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -14.0,
                                                     y: 54.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -10.0,
                                                     y: 52.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -10.0,
                                                     y: 54.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: 56.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: 54.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: 126.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 28.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 30.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 28.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: 30.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 26.0,
                                                     y: 80.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 32.0,
                                                     y: 106.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: 22.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 22.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 20.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 10.0,
                                                     y: 22.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 12.0,
                                                     y: 20.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 24.0,
                                                     y: 42.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 44.0,
                                                     y: 22.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
-                                                },
-                                                InkPoint {
-                                                    x: 0.0,
-                                                    y: 0.0,
-                                                },
-                                                InkPoint {
-                                                    x: -2.0,
-                                                    y: 2.0,
-                                                },
-                                                InkPoint {
-                                                    x: 0.0,
-                                                    y: 2.0,
-                                                },
-                                                InkPoint {
-                                                    x: -2.0,
-                                                    y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
+                                                },
+                                                InkPoint {
+                                                    x: -2.0,
+                                                    y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
+                                                },
+                                                InkPoint {
+                                                    x: 0.0,
+                                                    y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
+                                                },
+                                                InkPoint {
+                                                    x: -2.0,
+                                                    y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
+                                                },
+                                                InkPoint {
+                                                    x: 0.0,
+                                                    y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -10.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -10.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -22.0,
                                                     y: 20.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -22.0,
                                                     y: 20.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -22.0,
                                                     y: 22.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -54.0,
                                                     y: 62.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 38.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: 44.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: 46.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 112.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 50.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 40.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: 42.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 18.0,
                                                     y: 96.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 12.0,
                                                     y: 48.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: 102.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 36.0,
                                                     y: 236.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 34.0,
                                                     y: 222.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 22.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 22.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: 22.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 22.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 22.0,
                                                     y: 60.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 68.0,
                                                     y: 138.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 22.0,
                                                     y: 38.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 18.0,
                                                     y: 40.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 18.0,
                                                     y: 38.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 36.0,
                                                     y: 98.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 18.0,
                                                     y: 70.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 22.0,
                                                     y: 68.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 24.0,
                                                     y: 68.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 68.0,
                                                     y: 156.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 100.0,
                                                     y: 232.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 92.0,
                                                     y: 216.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 72.0,
                                                     y: 134.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 44.0,
                                                     y: 78.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 80.0,
                                                     y: 170.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: 42.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: 42.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 12.0,
                                                     y: 42.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 20.0,
                                                     y: 114.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: 242.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 48.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 46.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: 48.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 6.0,
                                                     y: 46.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 24.0,
                                                     y: 102.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 8.0,
                                                     y: 28.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 10.0,
                                                     y: 28.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 10.0,
                                                     y: 28.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 12.0,
                                                     y: 26.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: 26.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: 26.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 16.0,
                                                     y: 24.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 52.0,
                                                     y: 70.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 16.0,
                                                     y: 18.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 16.0,
                                                     y: 20.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 16.0,
                                                     y: 20.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 14.0,
                                                     y: 20.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 32.0,
                                                     y: 60.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 8.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 4.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 2.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: 0.0,
                                                     y: 12.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -2.0,
                                                     y: 10.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -4.0,
                                                     y: 20.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -12.0,
                                                     y: 36.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -14.0,
                                                     y: 36.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -14.0,
                                                     y: 34.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -36.0,
                                                     y: 70.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -58.0,
                                                     y: 124.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -22.0,
                                                     y: 60.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -40.0,
                                                     y: 166.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: 28.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: 20.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: 20.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: 20.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 20.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -10.0,
                                                     y: 20.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 18.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -12.0,
                                                     y: 18.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -10.0,
                                                     y: 18.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -28.0,
                                                     y: 38.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -44.0,
                                                     y: 52.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -102.0,
                                                     y: 108.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -86.0,
                                                     y: 86.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -34.0,
                                                     y: 40.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -14.0,
                                                     y: 16.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -12.0,
                                                     y: 14.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -14.0,
                                                     y: 14.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -36.0,
                                                     y: 32.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 6.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -6.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 4.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -8.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -22.0,
                                                     y: 2.0,
+                                                    pressure: Some(
+                                                        0.7499924,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -18.0,
                                                     y: 0.0,
+                                                    pressure: Some(
+                                                        0.7462081,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -16.0,
                                                     y: -2.0,
+                                                    pressure: Some(
+                                                        0.7424543,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -16.0,
                                                     y: -2.0,
+                                                    pressure: Some(
+                                                        0.73867,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -16.0,
                                                     y: -2.0,
+                                                    pressure: Some(
+                                                        0.7348857,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -16.0,
                                                     y: -2.0,
+                                                    pressure: Some(
+                                                        0.7311014,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -44.0,
                                                     y: -14.0,
+                                                    pressure: Some(
+                                                        0.7273171,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -10.0,
                                                     y: -2.0,
+                                                    pressure: Some(
+                                                        0.7083346,
+                                                    ),
                                                 },
                                                 InkPoint {
                                                     x: -32.0,
                                                     y: -8.0,
+                                                    pressure: Some(
+                                                        0.50001526,
+                                                    ),
                                                 },
                                             ],
                                             pen_tip: None,
@@ -2176,6 +3440,7 @@ Section {
                                             width: 100.00002,
                                             color: None,
                                             recognized_word: None,
+                                            ignore_pressure: false,
                                         },
                                     ],
                                 ),
