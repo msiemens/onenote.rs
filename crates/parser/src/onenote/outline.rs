@@ -399,3 +399,43 @@ pub(crate) fn parse_outline_element(
 
     Ok(element)
 }
+
+/// Parse one child of a table cell into `out`.
+///
+/// [\[MS-ONE\] 2.2.55] says each child of a table cell MUST be an outline element, and that an
+/// outline group inside a table cell "is undefined and SHOULD NOT be set". OneNote for Mac
+/// writes them anyway. Rather than fail the whole page, flatten such a group into its elements.
+///
+/// [\[MS-ONE\] 2.2.55]: https://learn.microsoft.com/en-us/openspecs/office_file_formats/ms-one/77ac529f-17ae-4d5a-b1ef-88306b3ad989
+pub(crate) fn parse_table_cell_child(
+    child_id: ExGuid,
+    space: &(impl ObjectSpace + ?Sized),
+    ctx: &mut ParserContext,
+    out: &mut Vec<OutlineElement>,
+) -> Result<()> {
+    let is_group = space
+        .get_object(child_id)
+        .is_some_and(|object| object.id() == PropertySetId::OutlineGroup.as_jcid());
+    if !is_group {
+        out.push(parse_outline_element(child_id, space, ctx)?);
+        return Ok(());
+    }
+
+    warn!(
+        ctx,
+        "table cell contains an outline group; flattening it into the cell"
+    );
+
+    fn flatten(items: Vec<OutlineItem>, out: &mut Vec<OutlineElement>) {
+        for item in items {
+            match item {
+                OutlineItem::Element(element) => out.push(element),
+                OutlineItem::Group(group) => flatten(group.outlines, out),
+            }
+        }
+    }
+
+    flatten(parse_outline_group(child_id, space, ctx)?.outlines, out);
+
+    Ok(())
+}
