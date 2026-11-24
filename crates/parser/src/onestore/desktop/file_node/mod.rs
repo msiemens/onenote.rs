@@ -143,8 +143,15 @@ impl FileNode {
             )?),
             2 => FileNodeDataRef::ElementList({
                 let list_ref = FileNodeChunkReference::parse(reader, stp_format, cb_format)?;
-                let mut resolved_reader = list_ref.resolve_to_reader(reader)?;
-                FileNodeList::parse(&mut resolved_reader, context, list_ref.data_size())
+                // An fcrZero or fcrNil reference holds no bytes, so it cannot hold a
+                // FileNodeListFragment (MS-ONESTORE 2.2.4, 2.4.1): read it as an empty
+                // list. Resolving one read a header at offset 0 and failed the section.
+                if list_ref.is_fcr_zero() || list_ref.is_fcr_nil() {
+                    Ok(FileNodeList::default())
+                } else {
+                    let mut resolved_reader = list_ref.resolve_to_reader(reader)?;
+                    FileNodeList::parse(&mut resolved_reader, context, list_ref.data_size())
+                }
             }?),
             _ => FileNodeDataRef::InvalidData,
         };
@@ -297,5 +304,25 @@ impl FileNode {
         } else {
             Ok(node)
         }
+    }
+}
+
+#[cfg(test)]
+mod tests {
+    use super::*;
+    use crate::reader::Reader;
+
+    #[test]
+    fn a_list_reference_to_no_data_is_an_empty_list() {
+        // RevisionManifestListReferenceFND (0x010), base type 2, an 8-byte offset
+        // and a 4-byte size, both zero: fcrZero.
+        let header: u32 = 0x010 | (16 << 10) | (2 << 27) | (1 << 31);
+        let mut bytes = header.to_le_bytes().to_vec();
+        bytes.extend_from_slice(&0u64.to_le_bytes());
+        bytes.extend_from_slice(&0u32.to_le_bytes());
+        let mut reader = Reader::new(&bytes);
+        let mut context = ParseContext::new();
+        let node = FileNode::parse(&mut reader, &mut context).expect("an empty list, not an error");
+        assert_eq!(node.size, 16);
     }
 }

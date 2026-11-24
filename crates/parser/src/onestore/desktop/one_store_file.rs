@@ -86,21 +86,30 @@ impl Parse for RevisionStore {
 
         let mut transaction_log = Vec::new();
         let mut transaction_log_ref = header.fcr_transaction_log.clone();
+        let mut committed_seen = 0u32;
         loop {
             let mut reader = transaction_log_ref.resolve_to_reader(reader)?;
 
             let fragment =
                 TransactionLogFragment::parse(&mut reader, transaction_log_ref.cb as usize)?;
             transaction_log_ref = fragment.next_fragment.clone();
+            committed_seen += fragment
+                .size_table
+                .iter()
+                .filter(|e| e.is_sentinel())
+                .count() as u32;
             transaction_log.push(fragment);
 
-            if transaction_log_ref.is_fcr_nil() || transaction_log_ref.is_fcr_zero() {
+            if committed_seen >= header.c_transactions_in_log
+                || transaction_log_ref.is_fcr_nil()
+                || transaction_log_ref.is_fcr_zero()
+            {
                 break;
             }
         }
 
         let mut parse_context = file_structure::ParseContext::new();
-        parse_context.update_from_transaction_log(&transaction_log);
+        parse_context.update_from_transaction_log(&transaction_log, header.c_transactions_in_log);
 
         let mut hashed_chunk_list = Vec::new();
         let mut hash_chunk_ref = header.fcr_hashed_chunk_list.clone();
