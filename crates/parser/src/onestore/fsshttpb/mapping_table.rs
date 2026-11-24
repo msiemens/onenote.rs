@@ -28,6 +28,14 @@ impl crate::onestore::MappingTable for MappingTable {
     fn get_object_space(&self, index: usize, cid: &CompactId) -> Option<CellId> {
         self.get(index, *cid, &self.object_spaces)
     }
+
+    fn object_spaces(&self) -> Vec<CellId> {
+        self.object_spaces
+            .values()
+            .flatten()
+            .map(|(_, id)| *id)
+            .collect()
+    }
 }
 
 impl MappingTable {
